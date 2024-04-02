@@ -315,9 +315,9 @@ def app():
         </a>
         ''', unsafe_allow_html=True)
 
-    st.title("HRシンデレラ")
-    st.write("「生徒のクラス分けアプリ」")
-    st.write("生徒の特性が各クラスでできるだけ均等になるように、クラス分けを行います")
+    st.write("ホームルーム シンデレラ")
+    st.title("クラス分けアプリ")
+    st.write("生徒の特性ができるだけ均等になるように、クラス分けやグループ分けを行います")
 
     zip_file_name = "template.zip"
     zip_file_path = os.path.join(os.path.dirname(__file__), zip_file_name)
