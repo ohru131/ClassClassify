@@ -3,9 +3,13 @@ import os
 from base64 import b64encode
 from itertools import combinations
 
+import numpy as np
 import pandas as pd
 import streamlit as st
 from amplify import VariableGenerator, FixstarsClient, solve
+
+from openjij import SQASampler
+from pyqubo import Array
 
 
 def create_student_pairs_dataframe(column_name1, column_name2, pairs, student_dict):
@@ -181,7 +185,36 @@ def compute_cost(num_students, num_classes, weight_list, data_list, x):
 
 
 # ロジックを含む関数
-def solve_problem(token, num_classes, weight_list, data_list, unwanted_pairs, wanted_pairs):
+def solve_problem_openjij(num_classes, weight_list, data_list, unwanted_pairs, wanted_pairs):
+    if data_list:
+        num_students = len(data_list[0])
+    else:
+        num_students = 0
+
+    x = Array.create('x', shape=(num_students, num_classes), vartype='BINARY')  # 決定変数を作成
+
+    lam1 = 10
+    H = compute_cost(num_students, num_classes, weight_list, data_list, x)
+    H += compute_penalty(num_students, num_classes, unwanted_pairs, wanted_pairs, lam1, x)
+
+    model = H.compile()
+    qubo, offset = model.to_qubo()
+
+    # OpenJijで最適化
+    sampler = SQASampler()
+    response = sampler.sample_qubo(Q=qubo, num_reads=100)
+
+    # 最小エネルギーの解を取り出す
+    dict_solution = response.first.sample
+    # デコードする
+    decoded_sample = model.decode_sample(dict_solution, vartype="BINARY")
+
+    # 解をNumPy配列に変換
+    solutions = np.array([[decoded_sample.array('x', (i, j)) for j in range(num_classes)] for i in range(num_students)])
+    return solutions
+
+
+def solve_problem_amplify(token, num_classes, weight_list, data_list, unwanted_pairs, wanted_pairs):
     if data_list:
         num_students = len(data_list[0])
     else:
@@ -218,9 +251,9 @@ def create_solution_df(xlsx_file_path, solutions, one_hot_df):
     solution_df.reset_index(drop=True, inplace=True)
 
     for k in range(solutions.shape[1]):
-        solution_df[f"{k+1}組"] = ["○" if solutions[i, k] == 1 else "" for i in range(solutions.shape[0])]
+        solution_df[f"{k + 1}組"] = ["○" if solutions[i, k] == 1 else "" for i in range(solutions.shape[0])]
 
-    header_row = pd.DataFrame([["No.", "名前"] + [f"{k+1}組" for k in range(solutions.shape[1])]],
+    header_row = pd.DataFrame([["No.", "名前"] + [f"{k + 1}組" for k in range(solutions.shape[1])]],
                               columns=solution_df.columns)
 
     solution_df = pd.concat([header_row, solution_df])
@@ -259,12 +292,15 @@ class ClassOptimizer:
         unwanted_pairs = read_pairs(xlsx_file_path, sheet_name="別の組ペア")
 
         # DataFrameを作成する
-        self.wanted_pairs_df = create_student_pairs_dataframe("生徒1","生徒2", wanted_pairs, student_dict)
-        self.unwanted_pairs_df = create_student_pairs_dataframe("生徒1","生徒2", unwanted_pairs, student_dict)
+        self.wanted_pairs_df = create_student_pairs_dataframe("生徒1", "生徒2", wanted_pairs, student_dict)
+        self.unwanted_pairs_df = create_student_pairs_dataframe("生徒1", "生徒2", unwanted_pairs, student_dict)
 
         # 最適化
-        solutions = solve_problem(token, num_classes, weight_list, data_list, unwanted_pairs,
-                                  wanted_pairs)
+        if token is None:
+            solutions = solve_problem_openjij(num_classes, weight_list, data_list, unwanted_pairs, wanted_pairs)
+        else:
+            solutions = solve_problem_amplify(token, num_classes, weight_list, data_list, unwanted_pairs, wanted_pairs)
+
         # 　結果検証
         (self.solution_df,
          self.aggregated_df,
@@ -277,7 +313,6 @@ class ClassOptimizer:
 # Streamlitの処理
 def app():
     # token = "AE/DA9enVyvhM3Y2SANsMCTLZKg9gTKmv23" # ご自身のトークンを入力
-    # https://amplify.fixstars.com/ja/user/token より取得したものを暗号化（2024-06-17まで）
     encrypted_token = b')$_(@\x1eY7"\x0c)7\n#?\'\x08\x1c* \x00R\x04=19\x04\x1e\x08.*R;8!'
 
     def xor_cypher(input_string, key):
@@ -300,14 +335,13 @@ def app():
             class_optimize.unwanted_pairs_df.to_excel(writer, sheet_name="別の組ペア", header=False, index=False)
             class_optimize.solution_df.to_excel(writer, sheet_name="組分け", header=False, index=False)
             for i, class_df in enumerate(class_optimize.class_dfs):
-                class_df.to_excel(writer, sheet_name=f"{i+1}組", header=True, index=False)
+                class_df.to_excel(writer, sheet_name=f"{i + 1}組", header=True, index=False)
             class_optimize.aggregated_df.to_excel(writer, sheet_name="集計", index=False)
             class_optimize.failed_combinations_df.to_excel(writer, sheet_name="組み合わせ失敗", header=False,
                                                            index=False)
 
         with open(filename, 'rb') as f:
             data = f.read()
-
 
         b64 = b64encode(data).decode()
         st.markdown(f'''
@@ -323,31 +357,43 @@ def app():
     zip_file_name = "template.zip"
     zip_file_path = os.path.join(os.path.dirname(__file__), zip_file_name)
 
-    st.write("生徒名簿のひな形Excelファイルをダウンロードし、加筆修正してください")
+    st.write("以下より、生徒名簿Excelファイルのひな形をダウンロードし、加筆修正してください")
     download_zip_file(zip_file_path, zip_file_name)
 
-    password = st.text_input("パスワード（あるいはアクセストークン）を入力してください")  # ユーザーがパスワードを入力
-    st.write("<a href='https://amplify.fixstars.com/ja/'>*無料のアクセストークン(Fixstars Ammplify AE) 入手先</a>",unsafe_allow_html=True)
-    if password == "":
-        exit()
+    # Amplify と Openjij の選択
+    selected_option = st.radio("最適化ライブラリを選択してください（Amplifyの方が高性能ですが、無料のアクセストークンが必要です）", ("Fixstars Amplify AE", "OpenJij"))
+    token = None
+    if selected_option == "Fixstars Amplify AE":
+        password = st.text_input("パスワード（あるいはアクセストークン）を入力してください")  # ユーザーがパスワードを入力
+        st.write("<a href='https://amplify.fixstars.com/ja/'>*無料のアクセストークン入手先</a>", unsafe_allow_html=True)
+        if password == "":
+            # st.error("パスワードかアクセストークンを入力してください")
+            st.stop()  # アクセストークンが入力されていない場合、プログラムを停止する
 
-    if len(password) >= 10:
-        decrypted_token = password
-    else:
-        decrypted_token = xor_cypher(encrypted_token.decode(), password)  # トークンを復号化
+        if len(password) >= 10:
+            decrypted_token = password
+        else:
+            decrypted_token = xor_cypher(encrypted_token.decode(), password)  # トークンを復号化
 
-    # 復号化したトークンを使用
-    token = decrypted_token
-    uploaded_file = st.file_uploader("xlsxファイルをアップロードしてください", type=["xlsx"])
+        # 復号化したトークンを使用
+        token = decrypted_token
 
-    if uploaded_file is not None:
+    elif selected_option == "OpenJij":
+        token = None
+
+    uploaded_file = st.file_uploader("生徒名簿のExcelファイルをアップロードしてください", type=["xlsx"])
+
+    if uploaded_file is None:
+        st.stop()
+
+    if st.button("クラス分けを実行"):
         with st.spinner("ファイルを処理中..."):
             # if num_classes != 0:
             try:
                 class_optimize = ClassOptimizer(uploaded_file, token)
             except RuntimeError as e:
                 if '401: Unauthorized' in str(e):
-                    st.write("パスワードが違うか、アクセストークンの有効期限切れ（2024-06-17まで）のため、処理できませんでした。")
+                    st.write("パスワードが違うか、アクセストークンの有効期限切れのため、処理できませんでした。")
                     exit()
                 else:
                     raise e
@@ -365,7 +411,7 @@ def app():
             st.write(class_optimize.aggregated_df)
             st.write(class_optimize.failed_combinations_df)
             for i, class_df in enumerate(class_optimize.class_dfs):
-                st.write(f"{i+1}組")
+                st.write(f"{i + 1}組")
                 st.write(class_df)
 
             st.write("結果のダウンロード:")
