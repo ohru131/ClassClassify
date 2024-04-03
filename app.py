@@ -277,6 +277,7 @@ class ClassOptimizer:
 # Streamlitの処理
 def app():
     # token = "AE/DA9enVyvhM3Y2SANsMCTLZKg9gTKmv23" # ご自身のトークンを入力
+    # https://amplify.fixstars.com/ja/user/token より取得したものを暗号化（2024-06-17まで）
     encrypted_token = b')$_(@\x1eY7"\x0c)7\n#?\'\x08\x1c* \x00R\x04=19\x04\x1e\x08.*R;8!'
 
     def xor_cypher(input_string, key):
@@ -346,7 +347,7 @@ def app():
                 class_optimize = ClassOptimizer(uploaded_file, token)
             except RuntimeError as e:
                 if '401: Unauthorized' in str(e):
-                    st.write("パスワードが違うか、アクセストークンの有効期限切れのため、処理できませんでした。")
+                    st.write("パスワードが違うか、アクセストークンの有効期限切れ（2024-06-17まで）のため、処理できませんでした。")
                     exit()
                 else:
                     raise e
