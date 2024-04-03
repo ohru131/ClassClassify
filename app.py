@@ -327,7 +327,7 @@ def app():
     download_zip_file(zip_file_path, zip_file_name)
 
     password = st.text_input("パスワード（あるいはアクセストークン）を入力してください")  # ユーザーがパスワードを入力
-    st.write("<a href='https://amplify.fixstars.com/ja/'>*無料のアクセストークン入手先</a>",unsafe_allow_html=True)
+    st.write("<a href='https://amplify.fixstars.com/ja/'>*無料のアクセストークン(Fixstars Ammplify AE) 入手先</a>",unsafe_allow_html=True)
     if password == "":
         exit()
 
