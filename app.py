@@ -316,7 +316,7 @@ def app():
         ''', unsafe_allow_html=True)
 
     st.write("ホームルーム シンデレラ")
-    st.title("クラス分けアプリ")
+    st.title("クラス分け最適化アプリ")
     st.write("生徒の特性ができるだけ均等になるように、クラス分けやグループ分けを行います")
 
     zip_file_name = "template.zip"
