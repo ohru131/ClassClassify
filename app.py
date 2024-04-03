@@ -325,11 +325,16 @@ def app():
     st.write("生徒名簿のひな形Excelファイルをダウンロードし、加筆修正してください")
     download_zip_file(zip_file_path, zip_file_name)
 
-    password = st.text_input("パスワードを入力してください")  # ユーザーがパスワードを入力
+    password = st.text_input("パスワード（あるいはアクセストークン）を入力してください")  # ユーザーがパスワードを入力
+    st.write("<a href='https://amplify.fixstars.com/ja/'>*無料のアクセストークン入手先</a>",unsafe_allow_html=True)
     if password == "":
         exit()
 
-    decrypted_token = xor_cypher(encrypted_token.decode(),password)  # トークンを復号化
+    if len(password) >= 10:
+        decrypted_token = password
+    else:
+        decrypted_token = xor_cypher(encrypted_token.decode(), password)  # トークンを復号化
+
 
     # 復号化したトークンを使用
     token = decrypted_token
