@@ -152,18 +152,18 @@ def read_student_data(xlsx_file_path, sheet_name="生徒名簿"):
 
 
 def compute_penalty(num_students, num_classes, unwanted_pairs, wanted_pairs, lam, x):
-    # 同じ生徒は複数のクラスに所属しない
+    # 同じ生徒は複数の組に所属しない
     penalty = lam * sum((sum(x[i, k] for k in range(num_classes)) - 1) ** 2 for i in range(num_students))
-    # クラスの人数は同じくらい
+    # 組の人数は同じくらい
     penalty += lam * sum(
         (sum(x[i, k] for i in range(num_students)) - num_students / num_classes) ** 2 for k in range(num_classes))
-    # 別のクラスにしたいペア
-    # 各ペアについて、その両方の生徒が同じクラスに所属する場合にのみペナルティを加える
+    # 別の組にしたいペア
+    # 各ペアについて、その両方の生徒が同じ組に所属する場合にのみペナルティを加える
     for pair in unwanted_pairs:
         for k in range(num_classes):
             penalty += lam * x[pair[0], k] * x[pair[1], k]
-    # 同じクラスにしたいペア
-    # 各ペアについて、その両方の生徒が同じクラスに所属しない場合にペナルティを加える
+    # 同じ組にしたいペア
+    # 各ペアについて、その両方の生徒が同じ組に所属しない場合にペナルティを加える
     for pair in wanted_pairs:
         for k in range(num_classes):
             penalty -= lam * (1 - x[pair[0], k]) * (1 - x[pair[1], k])
@@ -218,18 +218,18 @@ def create_solution_df(xlsx_file_path, solutions, one_hot_df):
     solution_df.reset_index(drop=True, inplace=True)
 
     for k in range(solutions.shape[1]):
-        solution_df[f"クラス{k+1}"] = ["○" if solutions[i, k] == 1 else "" for i in range(solutions.shape[0])]
+        solution_df[f"{k+1}組"] = ["○" if solutions[i, k] == 1 else "" for i in range(solutions.shape[0])]
 
-    header_row = pd.DataFrame([["No.", "名前"] + [f"クラス{k+1}" for k in range(solutions.shape[1])]],
+    header_row = pd.DataFrame([["No.", "名前"] + [f"{k+1}組" for k in range(solutions.shape[1])]],
                               columns=solution_df.columns)
 
     solution_df = pd.concat([header_row, solution_df])
 
     class_assignments = pd.DataFrame(solutions, columns=[k for k in range(solutions.shape[1])])
     one_hot_df_with_class = one_hot_df.copy().reset_index(drop=True)
-    one_hot_df_with_class['クラス'] = class_assignments.idxmax(axis=1) + 1
+    one_hot_df_with_class['組'] = class_assignments.idxmax(axis=1) + 1
 
-    aggregated_df = one_hot_df_with_class.groupby('クラス').sum().reset_index()
+    aggregated_df = one_hot_df_with_class.groupby('組').sum().reset_index()
 
     class_counts = pd.Series(class_assignments.sum(), name="人数")
     aggregated_df.insert(1, "人数", class_counts)
@@ -297,9 +297,9 @@ def app():
             class_optimize.original_df.to_excel(writer, sheet_name="生徒名簿", header=False, index=False)
             class_optimize.wanted_pairs_df.to_excel(writer, sheet_name="同じ組ペア", header=False, index=False)
             class_optimize.unwanted_pairs_df.to_excel(writer, sheet_name="別の組ペア", header=False, index=False)
-            class_optimize.solution_df.to_excel(writer, sheet_name="クラス分け", header=False, index=False)
+            class_optimize.solution_df.to_excel(writer, sheet_name="組分け", header=False, index=False)
             for i, class_df in enumerate(class_optimize.class_dfs):
-                class_df.to_excel(writer, sheet_name=f"クラス{i+1}", header=True, index=False)
+                class_df.to_excel(writer, sheet_name=f"{i+1}組", header=True, index=False)
             class_optimize.aggregated_df.to_excel(writer, sheet_name="集計", index=False)
             class_optimize.failed_combinations_df.to_excel(writer, sheet_name="組み合わせ失敗", header=False,
                                                            index=False)
@@ -311,7 +311,7 @@ def app():
         b64 = b64encode(data).decode()
         st.markdown(f'''
         <a href="data:file/xlsx;base64,{b64}" download="{filename}">
-            クラス分け結果のダウンロード
+            組分け結果のダウンロード
         </a>
         ''', unsafe_allow_html=True)
 
@@ -335,7 +335,6 @@ def app():
     else:
         decrypted_token = xor_cypher(encrypted_token.decode(), password)  # トークンを復号化
 
-
     # 復号化したトークンを使用
     token = decrypted_token
     uploaded_file = st.file_uploader("xlsxファイルをアップロードしてください", type=["xlsx"])
@@ -347,7 +346,7 @@ def app():
                 class_optimize = ClassOptimizer(uploaded_file, token)
             except RuntimeError as e:
                 if '401: Unauthorized' in str(e):
-                    st.write("パスワードが違うため、処理できませんでした。")
+                    st.write("パスワードが違うか、アクセストークンの有効期限切れのため、処理できませんでした。")
                     exit()
                 else:
                     raise e
@@ -365,12 +364,12 @@ def app():
             st.write(class_optimize.aggregated_df)
             st.write(class_optimize.failed_combinations_df)
             for i, class_df in enumerate(class_optimize.class_dfs):
-                st.write(f"クラス{i+1}")
+                st.write(f"{i+1}組")
                 st.write(class_df)
 
             st.write("結果のダウンロード:")
             download_solution(class_optimize,
-                              filename='クラス分け結果.xlsx')
+                              filename='組分け結果.xlsx')
 
 
 if __name__ == "__main__":
