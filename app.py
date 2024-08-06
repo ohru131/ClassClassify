@@ -313,7 +313,7 @@ class ClassOptimizer:
 # Streamlitの処理
 def app():
     # token = "AE/DA9enVyvhM3Y2SANsMCTLZKg9gTKmv23" # ご自身のトークンを入力
-    encrypted_token = b')$_(@\x1eY7"\x0c)7\n#?\'\x08\x1c* \x00R\x04=19\x04\x1e\x08.*R;8!'
+    encrypted_token = b")$_\t3<XG\x04\r')\x1e@\x14\x18\r''#8\x124\n<\x1e\x00\x13\x040P&)=2"
 
     def xor_cypher(input_string, key):
         return ''.join(chr(ord(c) ^ ord(k)) for c, k in zip(input_string, itertools.cycle(key)))
@@ -364,7 +364,7 @@ def app():
     selected_option = st.radio("最適化ライブラリを選択してください（Amplifyの方が高性能ですが、無料のアクセストークンが必要です）", ("Fixstars Amplify AE", "OpenJij"))
     token = None
     if selected_option == "Fixstars Amplify AE":
-        password = st.text_input("パスワード（あるいはアクセストークン）を入力してください")  # ユーザーがパスワードを入力
+        password = st.text_input("パスワード（あるいはアクセストークン）を入力してください 　<パスワード有効期限:2024-11-04>")  # ユーザーがパスワードを入力
         st.write("<a href='https://amplify.fixstars.com/ja/'>*無料のアクセストークン入手先</a>", unsafe_allow_html=True)
         if password == "":
             # st.error("パスワードかアクセストークンを入力してください")
