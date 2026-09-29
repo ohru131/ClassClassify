@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Download, GripVertical, RotateCcw, X } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Download, ExternalLink, GripVertical, Loader2, RotateCcw, Sheet, X } from 'lucide-react'
 import type { Problem } from '../solver/types'
 import type { ColumnReport, Report } from '../solver/evaluate'
 import { Segmented, Stat, classColor } from './ui'
@@ -15,6 +15,7 @@ export function Results({
   onReset,
   onDownload,
   edited,
+  google,
 }: {
   problem: Problem
   classOf: number[]
@@ -24,6 +25,8 @@ export function Results({
   onReset: () => void
   onDownload: () => void
   edited: boolean
+  /** Google 連携が有効なときだけ渡す */
+  google?: { label: string; busy: boolean; url: string | null; onSave: () => void }
 }) {
   const [tab, setTab] = useState<Tab>('classes')
   const [selected, setSelected] = useState<number | null>(null)
@@ -65,11 +68,28 @@ export function Results({
               <RotateCcw className="size-4" /> 手動変更を戻す
             </button>
           )}
+          {google && (
+            <button type="button" className="btn-ghost" onClick={google.onSave} disabled={google.busy}>
+              {google.busy ? <Loader2 className="size-4 animate-spin" /> : <Sheet className="size-4 text-emerald-600" />} {google.label}
+            </button>
+          )}
           <button type="button" className="btn-primary" onClick={onDownload}>
             <Download className="size-4" /> Excel で保存
           </button>
         </div>
       </div>
+
+      {google?.url && (
+        <a
+          href={google.url}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-medium text-emerald-800 hover:bg-emerald-100"
+        >
+          <CheckCircle2 className="size-4" /> スプレッドシートに書き出しました
+          <ExternalLink className="ml-auto size-4" />
+        </a>
+      )}
 
       {tab === 'classes' && (
         <ClassBoard problem={problem} classOf={classOf} k={k} selected={selected} setSelected={setSelected} onMove={onMove} report={report} />

@@ -3,7 +3,8 @@ import { AlertCircle, Cpu, Loader2, Lock, Play, Square, Zap } from 'lucide-react
 import { parseWorkbook } from './solver/parse'
 import { compile } from './solver/compile'
 import { evaluate } from './solver/evaluate'
-import { exportWorkbook } from './solver/export'
+import { buildResultSheets, exportWorkbook } from './solver/export'
+import { downloadAsXlsx, googleEnabled, pickSpreadsheet, writeResults, type GoogleFile } from './google/google'
 import { runParallel } from './solver/run'
 import type { ColumnSpec, Problem } from './solver/types'
 import { DataStep, SettingsStep } from './components/Setup'
@@ -27,12 +28,18 @@ export default function App() {
   const [running, setRunning] = useState(false)
   const [progress, setProgress] = useState(0)
   const [solution, setSolution] = useState<Solution | null>(null)
+  const [googleFile, setGoogleFile] = useState<GoogleFile | null>(null)
+  const [googleBusy, setGoogleBusy] = useState(false)
+  const [savingGoogle, setSavingGoogle] = useState(false)
+  const [savedUrl, setSavedUrl] = useState<string | null>(null)
   const cancelRef = useRef<() => void>(() => {})
   const resultRef = useRef<HTMLDivElement>(null)
 
-  const onLoad = (data: ArrayBuffer, name: string) => {
+  const onLoad = (data: ArrayBuffer, name: string, source: GoogleFile | null = null) => {
     try {
       const p = parseWorkbook(data)
+      setGoogleFile(source)
+      setSavedUrl(null)
       setProblem(p)
       setNumClasses(p.numClasses)
       setFileName(name)
@@ -40,6 +47,37 @@ export default function App() {
       setError(null)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
+    }
+  }
+
+  const showError = (e: unknown) => {
+    if (e instanceof Error && e.message === 'cancelled') return
+    setError(e instanceof Error ? e.message : String(e))
+  }
+
+  const loadFromGoogle = async () => {
+    setGoogleBusy(true)
+    try {
+      const file = await pickSpreadsheet()
+      if (file) onLoad(await downloadAsXlsx(file), file.name, file)
+    } catch (e) {
+      showError(e)
+    } finally {
+      setGoogleBusy(false)
+    }
+  }
+
+  const saveToGoogle = async () => {
+    if (!problem || !solution || !report) return
+    setSavingGoogle(true)
+    try {
+      const sheets = buildResultSheets(problem, solution.classOf, solution.k, report)
+      const title = `クラス編成結果 ${new Date().toLocaleString('ja-JP')}`
+      setSavedUrl(await writeResults(sheets, googleFile, title))
+    } catch (e) {
+      showError(e)
+    } finally {
+      setSavingGoogle(false)
     }
   }
 
@@ -56,6 +94,7 @@ export default function App() {
     cancelRef.current = job.cancel
     try {
       const res = await job.promise
+      setSavedUrl(null)
       setSolution({ classOf: res.classOf, original: res.classOf, k: numClasses, iterations: res.iterations, workers: res.workers })
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
     } catch (e) {
@@ -131,7 +170,12 @@ export default function App() {
           </div>
         )}
 
-        <DataStep onLoad={onLoad} fileName={fileName} />
+        <DataStep
+          onLoad={(d, n) => onLoad(d, n)}
+          fileName={fileName}
+          onGoogle={googleEnabled ? loadFromGoogle : undefined}
+          googleBusy={googleBusy}
+        />
 
         {problem && problem.warnings.length > 0 && (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
@@ -203,6 +247,16 @@ export default function App() {
               }
               onReset={() => setSolution((sol) => (sol ? { ...sol, classOf: sol.original } : sol))}
               onDownload={download}
+              google={
+                googleEnabled
+                  ? {
+                      label: googleFile?.mimeType === 'application/vnd.google-apps.spreadsheet' ? '元のシートに書き出す' : 'スプレッドシートに保存',
+                      busy: savingGoogle,
+                      url: savedUrl,
+                      onSave: saveToGoogle,
+                    }
+                  : undefined
+              }
             />
           )}
         </div>

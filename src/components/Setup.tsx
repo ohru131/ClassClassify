@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Download, FileSpreadsheet, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
+import { Download, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
 import type { ColumnSpec, Problem } from '../solver/types'
 import { Segmented, StepHeader } from './ui'
 
@@ -9,7 +9,18 @@ const SAMPLES = [
   { file: 'sample-group.xlsx', label: 'グループ分け（30名・6班）' },
 ]
 
-export function DataStep({ onLoad, fileName }: { onLoad: (data: ArrayBuffer, name: string) => void; fileName: string | null }) {
+export function DataStep({
+  onLoad,
+  fileName,
+  onGoogle,
+  googleBusy,
+}: {
+  onLoad: (data: ArrayBuffer, name: string) => void
+  fileName: string | null
+  /** Google 連携が有効なときだけ渡す */
+  onGoogle?: () => void
+  googleBusy?: boolean
+}) {
   const input = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
 
@@ -25,8 +36,13 @@ export function DataStep({ onLoad, fileName }: { onLoad: (data: ArrayBuffer, nam
         n={1}
         done={!!fileName}
         title="名簿を読み込む"
-        desc="ひな形の Excel に生徒の特性を記入してアップロード。データはブラウザの外に送信されません。"
+        desc={
+          onGoogle
+            ? 'ひな形に生徒の特性を記入し、Excel または Google スプレッドシートから読み込み。データはブラウザと Google の間でのみやり取りします。'
+            : 'ひな形の Excel に生徒の特性を記入してアップロード。データはブラウザの外に送信されません。'
+        }
       />
+      <div className={onGoogle ? 'grid gap-3 md:grid-cols-[1fr_16rem]' : ''}>
       <div
         onDragOver={(e) => {
           e.preventDefault()
@@ -60,6 +76,21 @@ export function DataStep({ onLoad, fileName }: { onLoad: (data: ArrayBuffer, nam
             e.target.value = ''
           }}
         />
+      </div>
+      {onGoogle && (
+        <button
+          type="button"
+          onClick={onGoogle}
+          disabled={googleBusy}
+          className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-8 text-center transition hover:border-emerald-300 hover:bg-emerald-50/40 disabled:opacity-60"
+        >
+          <span className="grid size-12 place-items-center rounded-2xl bg-white shadow-md ring-1 ring-slate-100">
+            {googleBusy ? <Loader2 className="size-6 animate-spin text-emerald-600" /> : <SheetsIcon />}
+          </span>
+          <span className="font-semibold text-slate-800">Google スプレッドシート</span>
+          <span className="text-xs text-slate-500">Google アカウントで選択</span>
+        </button>
+      )}
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -214,5 +245,15 @@ function PairBox({ title, groups, problem, tone }: { title: string; groups: numb
         </div>
       )}
     </div>
+  )
+}
+
+function SheetsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-7" aria-hidden>
+      <path fill="#0F9D58" d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2Z" />
+      <path fill="#87CEAC" d="M14.5 2v4a1.5 1.5 0 0 0 1.5 1.5h4L14.5 2Z" />
+      <path fill="#F1F1F1" d="M7.5 11h9v7h-9v-7Zm1.2 1.2v1.7h2.7v-1.7H8.7Zm3.9 0v1.7h2.7v-1.7h-2.7Zm-3.9 2.9v1.7h2.7v-1.7H8.7Zm3.9 0v1.7h2.7v-1.7h-2.7Z" />
+    </svg>
   )
 }
