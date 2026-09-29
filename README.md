@@ -9,11 +9,12 @@
 - 「同じ組にしたい」「別の組にしたい」組み合わせに対応
 - 結果をドラッグ＆ドロップで手直し → 集計を即時再計算
 - 結果を Excel で保存
+- Google スプレッドシートから読み込み・結果の書き出しに対応（[設定手順](docs/google-setup.md)）
 
 ## 使い方
 
 1. 画面の「ひな形をダウンロード」から Excel のひな形を取得し、名簿を記入
-2. Excel をアップロード（またはサンプルで試す）
+2. Excel をアップロード、または Google スプレッドシートを選択（サンプルで試すことも可）
 3. 項目ごとの重み・クラス数・探索時間を調整して「クラス編成を実行」
 
 ### Excel の形式
@@ -57,5 +58,7 @@ npm run build   # dist/ に静的ファイルを出力
 ```
 
 `main` への push で GitHub Actions がビルドし、GitHub Pages へデプロイする（Settings → Pages → Source: GitHub Actions）。
+
+ローカルで Google 連携を試すには `.env.local` に `VITE_GOOGLE_CLIENT_ID` / `VITE_GOOGLE_API_KEY` / `VITE_GOOGLE_APP_ID` を書く。
 
 技術スタック: React 19 / TypeScript / Vite / Tailwind CSS v4 / SheetJS
