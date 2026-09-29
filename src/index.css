@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  @apply bg-slate-50 text-slate-800 antialiased;
+  background-image:
+    radial-gradient(60rem 40rem at 10% -10%, rgb(99 102 241 / 0.12), transparent 60%),
+    radial-gradient(50rem 30rem at 100% 0%, rgb(217 70 239 / 0.10), transparent 60%);
+  background-attachment: fixed;
+}
+
+@utility card {
+  @apply rounded-3xl border border-white/70 bg-white/80 shadow-[0_1px_2px_rgb(15_23_42/0.04),0_8px_32px_-12px_rgb(15_23_42/0.12)] backdrop-blur-xl;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white shadow-lg shadow-indigo-500/25 hover:brightness-110;
+}
+@utility btn-ghost {
+  @apply btn border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50;
+}
+
+@keyframes shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 200% 50%; }
+}
+.shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
