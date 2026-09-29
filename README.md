@@ -56,6 +56,6 @@ npm test        # ソルバーのテスト（サンプル Excel で検証）
 npm run build   # dist/ に静的ファイルを出力
 ```
 
-`main` への push で GitHub Actions がビルドし、`gh-pages` ブランチへデプロイする。
+`main` への push で GitHub Actions がビルドし、GitHub Pages へデプロイする（Settings → Pages → Source: GitHub Actions）。
 
 技術スタック: React 19 / TypeScript / Vite / Tailwind CSS v4 / SheetJS
