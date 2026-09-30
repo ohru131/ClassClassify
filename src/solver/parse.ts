@@ -104,6 +104,8 @@ export function parseWorkbook(data: ArrayBuffer): Problem {
       else if (key.includes('最大')) maxPerClass = Math.trunc(val)
     }
     if (!numClasses) numClasses = Math.trunc(toNumber(settings[2]?.[1]) ?? 0)
+    // クラス数が数式（=CEILING(B1/B2,1) など）で計算結果が保存されていない場合は、最大人数から求める
+    if (!numClasses && maxPerClass && maxPerClass > 0) numClasses = Math.ceil(students.length / maxPerClass)
   }
   if (!numClasses || numClasses < 2) {
     numClasses = Math.max(2, Math.round(students.length / 30))
