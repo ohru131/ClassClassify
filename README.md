@@ -12,6 +12,13 @@
 - 結果を Excel で保存
 - Google スプレッドシートから読み込み・結果の書き出しに対応（[設定手順](docs/google-setup.md)）
 
+### スマホ・タブレット版（`mobile/`）
+
+同じソルバーを使う Expo / React Native アプリ（Android・iOS、学校の Chromebook・タブレット対応）。
+名簿の読み込み・編集・編成・手動移動は無料（広告あり）、Excel での書き出しと広告の非表示は Pro（買い切り）。
+データは端末内だけに保存する。セットアップ・ビルド・課金の設定は [mobile/README.md](mobile/README.md)。
+Web 版はこれまでどおり無料のまま。
+
 ## 使い方
 
 1. 画面の「Excel ひな形」から取得、または「スプレッドシートでひな形を作成」で Google ドライブに作成し、名簿を記入

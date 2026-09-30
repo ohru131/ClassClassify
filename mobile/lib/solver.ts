@@ -1,0 +1,12 @@
+// Web 版と共有するソルバー（リポジトリ直下の src/solver）への入口。
+// スマホ版のコードは必ずここ経由で import する（相対パスを画面ごとに書かない）。
+export type { ColumnKind, ColumnSpec, CompiledProblem, Problem, SolveResult, Student } from '../../src/solver/types'
+export type { ColumnReport, Report, Violation } from '../../src/solver/evaluate'
+export type { PairColor, PairGroupStatus, PairTag } from '../../src/solver/pairs'
+export { createAnnealer } from '../../src/solver/anneal'
+export { compile } from '../../src/solver/compile'
+export { evaluate } from '../../src/solver/evaluate'
+export { pairStatus, rowColor, tagText, UNWANTED_COLOR, VIOLATION_COLOR, wantedColor } from '../../src/solver/pairs'
+export { parseWorkbook } from '../../src/solver/parse'
+export { resultWorkbook, rosterWorkbook, writeXlsx } from '../../src/solver/export'
+export * as roster from '../../src/solver/roster'
