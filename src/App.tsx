@@ -4,6 +4,7 @@ import { parseWorkbook } from './solver/parse'
 import { compile } from './solver/compile'
 import { evaluate } from './solver/evaluate'
 import { buildResultSheets, exportWorkbook } from './solver/export'
+import { createTemplateSpreadsheet } from './google/template'
 import { downloadAsXlsx, googleEnabled, pickSpreadsheet, writeResults, type GoogleFile } from './google/google'
 import { runParallel } from './solver/run'
 import type { ColumnSpec, Problem } from './solver/types'
@@ -31,6 +32,8 @@ export default function App() {
   const [googleFile, setGoogleFile] = useState<GoogleFile | null>(null)
   const [googleBusy, setGoogleBusy] = useState(false)
   const [savingGoogle, setSavingGoogle] = useState(false)
+  const [templateBusy, setTemplateBusy] = useState(false)
+  const [templateUrl, setTemplateUrl] = useState<string | null>(null)
   const [savedUrl, setSavedUrl] = useState<string | null>(null)
   const cancelRef = useRef<() => void>(() => {})
   const resultRef = useRef<HTMLDivElement>(null)
@@ -64,6 +67,19 @@ export default function App() {
       showError(e)
     } finally {
       setGoogleBusy(false)
+    }
+  }
+
+  const createTemplate = async () => {
+    setTemplateBusy(true)
+    try {
+      const file = await createTemplateSpreadsheet()
+      setTemplateUrl(file.url)
+      window.open(file.url, '_blank', 'noopener')
+    } catch (e) {
+      showError(e)
+    } finally {
+      setTemplateBusy(false)
     }
   }
 
@@ -175,6 +191,9 @@ export default function App() {
           fileName={fileName}
           onGoogle={googleEnabled ? loadFromGoogle : undefined}
           googleBusy={googleBusy}
+          onCreateTemplate={googleEnabled ? createTemplate : undefined}
+          templateBusy={templateBusy}
+          templateUrl={templateUrl}
         />
 
         {problem && problem.warnings.length > 0 && (

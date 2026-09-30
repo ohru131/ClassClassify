@@ -124,10 +124,83 @@ export async function downloadAsXlsx(file: GoogleFile): Promise<ArrayBuffer> {
 
 type Cell = string | number | null
 
+export interface SheetSpec {
+  name: string
+  rows: Cell[][]
+  frozenRows?: number
+  frozenCols?: number
+  /** 背景色を付ける行（0始まり）と色 */
+  bands?: { row: number; color: string; bold?: boolean }[]
+  /** 太字にする列（0始まり） */
+  boldCols?: number[]
+  /** 列幅（px） */
+  colWidths?: number[]
+}
+
 const stamp = () => {
   const d = new Date()
   const z = (n: number) => String(n).padStart(2, '0')
   return `${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`
+}
+
+const sheetsApi = (id: string, path = '') => `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}${path}`
+const post = (url: string, body: unknown) =>
+  api(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+
+async function writeValues(spreadsheetId: string, sheets: { name: string; rows: Cell[][] }[]) {
+  await post(sheetsApi(spreadsheetId, '/values:batchUpdate'), {
+    valueInputOption: 'RAW',
+    data: sheets.map((t) => ({ range: `'${t.name.replace(/'/g, "''")}'!A1`, values: t.rows.map((r) => r.map((c) => c ?? '')) })),
+  })
+}
+
+const hex = (h: string) => {
+  const n = parseInt(h.replace('#', ''), 16)
+  return { red: ((n >> 16) & 255) / 255, green: ((n >> 8) & 255) / 255, blue: (n & 255) / 255 }
+}
+
+/** 書式付きの新しいスプレッドシートを作成する */
+export async function createSpreadsheet(title: string, sheets: SheetSpec[]): Promise<GoogleFile> {
+  const res = await post('https://sheets.googleapis.com/v4/spreadsheets', {
+    properties: { title, locale: 'ja_JP' },
+    sheets: sheets.map((t, i) => ({
+      properties: { sheetId: i, title: t.name, gridProperties: { frozenRowCount: t.frozenRows ?? 0, frozenColumnCount: t.frozenCols ?? 0 } },
+    })),
+  })
+  const json = await res.json()
+  const id: string = json.spreadsheetId
+  await writeValues(id, sheets)
+
+  const requests: unknown[] = []
+  sheets.forEach((t, sheetId) => {
+    for (const b of t.bands ?? [])
+      requests.push({
+        repeatCell: {
+          range: { sheetId, startRowIndex: b.row, endRowIndex: b.row + 1 },
+          cell: { userEnteredFormat: { backgroundColor: hex(b.color), textFormat: { bold: !!b.bold } } },
+          fields: 'userEnteredFormat(backgroundColor,textFormat.bold)',
+        },
+      })
+    for (const c of t.boldCols ?? [])
+      requests.push({
+        repeatCell: {
+          range: { sheetId, startColumnIndex: c, endColumnIndex: c + 1 },
+          cell: { userEnteredFormat: { textFormat: { bold: true } } },
+          fields: 'userEnteredFormat.textFormat.bold',
+        },
+      })
+    t.colWidths?.forEach((px, c) =>
+      requests.push({
+        updateDimensionProperties: {
+          range: { sheetId, dimension: 'COLUMNS', startIndex: c, endIndex: c + 1 },
+          properties: { pixelSize: px },
+          fields: 'pixelSize',
+        },
+      }),
+    )
+  })
+  if (requests.length) await post(sheetsApi(id, ':batchUpdate'), { requests })
+  return { id, name: title, mimeType: SHEET_MIME, url: json.spreadsheetUrl }
 }
 
 /**
@@ -137,35 +210,10 @@ const stamp = () => {
 export async function writeResults(sheets: { name: string; rows: Cell[][] }[], target: GoogleFile | null, title: string): Promise<string> {
   const suffix = stamp()
   const tabs = sheets.map((s) => ({ ...s, name: `${s.name}_${suffix}` }))
-  let spreadsheetId: string
-  let url: string
-
   if (target && target.mimeType === SHEET_MIME) {
-    spreadsheetId = target.id
-    await api(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}:batchUpdate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requests: tabs.map((t) => ({ addSheet: { properties: { title: t.name } } })) }),
-    })
-    url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`
-  } else {
-    const res = await api('https://sheets.googleapis.com/v4/spreadsheets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ properties: { title }, sheets: tabs.map((t) => ({ properties: { title: t.name } })) }),
-    })
-    const json = await res.json()
-    spreadsheetId = json.spreadsheetId
-    url = json.spreadsheetUrl
+    await post(sheetsApi(target.id, ':batchUpdate'), { requests: tabs.map((t) => ({ addSheet: { properties: { title: t.name } } })) })
+    await writeValues(target.id, tabs)
+    return `https://docs.google.com/spreadsheets/d/${target.id}/edit`
   }
-
-  await api(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values:batchUpdate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      valueInputOption: 'RAW',
-      data: tabs.map((t) => ({ range: `'${t.name.replace(/'/g, "''")}'!A1`, values: t.rows.map((r) => r.map((c) => c ?? '')) })),
-    }),
-  })
-  return url
+  return (await createSpreadsheet(title, tabs)).url
 }
