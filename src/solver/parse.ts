@@ -1,5 +1,6 @@
-import * as XLSX from 'xlsx'
-import type { ColumnKind, ColumnSpec, Problem, Student } from './types'
+import * as XLSX from 'xlsx-js-style'
+import { detectKind } from './columns'
+import type { ColumnSpec, Problem, Student } from './types'
 
 type Row = (string | number | null)[]
 
@@ -21,15 +22,6 @@ function sheetRows(wb: XLSX.WorkBook, name: string): Row[] | null {
 /** ○/〇/◯ など表記ゆれを統一 */
 const normalizeMark = (s: string) => s.replace(/[〇◯○⚪︎]/g, '○')
 
-export function detectKind(values: string[]): { kind: ColumnKind; levels: string[] } {
-  const levels = [...new Set(values.filter((v) => v !== ''))]
-  const allNumeric = levels.length > 0 && levels.every((v) => toNumber(v) !== null)
-  if (allNumeric) levels.sort((a, b) => Number(a) - Number(b))
-  else levels.sort((a, b) => a.localeCompare(b, 'ja'))
-  if (levels.length <= 1) return { kind: 'flag', levels }
-  if (allNumeric && levels.length > 6) return { kind: 'numeric', levels }
-  return { kind: 'category', levels }
-}
 
 function readGroups(rows: Row[] | null, noToIndex: Map<number, number>, label: string, warnings: string[]) {
   const groups: number[][] = []

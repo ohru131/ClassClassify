@@ -1,5 +1,4 @@
-import * as XLSX from 'xlsx'
-import { detectKind } from './parse'
+import { detectKind } from './columns'
 import type { ColumnKind, ColumnSpec, Problem, Student } from './types'
 
 export type GroupKind = 'wanted' | 'unwanted'
@@ -127,24 +126,6 @@ export function findConflicts(p: Problem): [number, number][] {
   for (const g of p.unwantedGroups)
     for (let a = 0; a < g.length; a++) for (let b = a + 1; b < g.length; b++) if (find(g[a]) === find(g[b])) out.push([g[a], g[b]])
   return out
-}
-
-/** 現在の名簿を、ひな形と同じ形式の Excel（再読み込み可能）にする */
-export function exportRoster(p: Problem, numClasses: number): Blob {
-  const wb = XLSX.utils.book_new()
-  const add = (name: string, rows: unknown[][]) => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), name)
-  const n = p.students.length
-  add('設定', [
-    ['生徒人数', n],
-    ['1クラスの最大人数', p.maxPerClass !== null && p.maxPerClass * numClasses >= n ? p.maxPerClass : Math.ceil(n / numClasses)],
-    ['クラス数', numClasses],
-  ])
-  add('生徒名簿', rosterRows(p))
-  const nos = (groups: number[][]) => groups.map((g) => g.map((i) => p.students[i].no))
-  add('同じ組ペア', nos(p.wantedGroups))
-  add('別の組ペア', nos(p.unwantedGroups))
-  const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-  return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
 }
 
 /** 数値として正規な文字列（"3", "2.5"）だけ数値にする。"007" などは文字列のまま */

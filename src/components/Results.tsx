@@ -1,7 +1,8 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Download, ExternalLink, GripVertical, Loader2, RotateCcw, Sheet, X } from 'lucide-react'
 import type { Problem } from '../solver/types'
 import type { ColumnReport, Report } from '../solver/evaluate'
+import { pairStatus, rowColor, type PairGroupStatus, type PairTag } from '../solver/pairs'
 import { Segmented, Stat, classColor } from './ui'
 
 type Tab = 'classes' | 'balance' | 'checks'
@@ -156,6 +157,16 @@ function ClassBoard({
     const flagCols = problem.columns.filter((c) => c.enabled && c.kind === 'flag')
     return problem.students.map((s) => flagCols.filter((c) => s.values[c.name] !== '').map((c) => c.name))
   }, [problem])
+  const pairs = useMemo(() => pairStatus(problem, classOf), [problem, classOf])
+  const [colorize, setColorize] = useState(true)
+  const [focus, setFocus] = useState<{ kind: 'wanted' | 'unwanted'; group: number } | null>(null)
+  // 名簿エディタでグループが変わったら強調を解除（index がずれるため）
+  useEffect(() => setFocus(null), [problem.wantedGroups, problem.unwantedGroups])
+  const focusMembers = useMemo(() => {
+    if (!focus) return null
+    const g = (focus.kind === 'wanted' ? problem.wantedGroups : problem.unwantedGroups)[focus.group]
+    return g ? new Set(g) : null
+  }, [focus, problem])
 
   return (
     <>
@@ -164,6 +175,17 @@ function ClassBoard({
         <span className="sm:hidden">左右にスワイプしてクラスを切り替え。生徒をタップすると別の組へ移動できます。</span>
         集計は即座に再計算されます。
       </p>
+      {pairs.groups.length > 0 && (
+        <PairLegend
+          problem={problem}
+          classOf={classOf}
+          groups={pairs.groups}
+          focus={focus}
+          setFocus={setFocus}
+          colorize={colorize}
+          setColorize={setColorize}
+        />
+      )}
       {/* スマホ: クラスへジャンプ */}
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:hidden">
         {Array.from({ length: k }, (_, c) => (
@@ -211,21 +233,28 @@ function ClassBoard({
               <ul className="max-h-[28rem] space-y-1 overflow-y-auto px-3 pb-4">
                 {members.map((i) => {
                   const s = problem.students[i]
+                  const pt = pairs.tags[i]
+                  const bg = colorize ? rowColor(pt) : null
+                  const dim = focusMembers && !focusMembers.has(i)
                   return (
                     <li
                       key={i}
                       draggable
                       onDragStart={(e) => e.dataTransfer.setData('text/plain', String(i))}
                       onClick={() => setSelected(selected === i ? null : i)}
+                      style={bg && selected !== i ? { backgroundColor: bg.bg } : undefined}
                       className={`group flex cursor-grab items-center gap-2 rounded-xl px-2 py-1.5 text-sm transition active:cursor-grabbing ${
-                        selected === i ? 'bg-indigo-50 ring-1 ring-indigo-300' : 'hover:bg-slate-50'
-                      }`}
+                        selected === i ? 'bg-indigo-50 ring-1 ring-indigo-300' : bg ? 'hover:brightness-95' : 'hover:bg-slate-50'
+                      } ${dim ? 'opacity-25' : ''} ${focusMembers?.has(i) && selected !== i ? 'ring-2 ring-slate-900/70' : ''}`}
                     >
                       <GripVertical className="size-3.5 shrink-0 text-slate-300 group-hover:text-slate-400" />
                       <span className="w-7 shrink-0 font-mono text-xs tabular-nums text-slate-400">{s.no}</span>
-                      <span className={`truncate font-medium ${flagged.has(i) ? 'text-rose-600' : 'text-slate-800'}`}>{s.name}</span>
-                      <span className="ml-auto flex shrink-0 gap-1">
-                        {tags[i].slice(0, 3).map((t) => (
+                      <span className={`min-w-[5.5em] shrink-0 truncate font-medium ${flagged.has(i) ? 'text-rose-600' : 'text-slate-800'}`}>{s.name}</span>
+                      <span className="ml-auto flex min-w-0 flex-wrap justify-end gap-0.5">
+                        {pt.map((t) => (
+                          <PairBadge key={`${t.kind}${t.group}`} tag={t} />
+                        ))}
+                        {tags[i].slice(0, pt.length ? 2 : 3).map((t) => (
                           <span key={t} className="rounded bg-slate-100 px-1 py-px text-[10px] font-medium text-slate-500">
                             {t}
                           </span>
@@ -240,6 +269,77 @@ function ClassBoard({
         })}
       </div>
     </>
+  )
+}
+
+function PairBadge({ tag }: { tag: PairTag }) {
+  return (
+    <span
+      title={`${tag.kind === 'wanted' ? '同じ組にする' : '別の組にする'}指定 ${tag.label}${tag.ok ? '' : '（満たせていません）'}`}
+      className={`rounded px-1 py-px text-[10px] font-bold ring-1 ${tag.ok ? '' : 'ring-2 ring-rose-500'}`}
+      style={{ backgroundColor: tag.kind === 'wanted' ? '#ffffffb3' : tag.color.bg, color: tag.color.fg, ['--tw-ring-color' as string]: tag.ok ? `${tag.color.fg}55` : undefined }}
+    >
+      {tag.label}
+      {!tag.ok && '!'}
+    </span>
+  )
+}
+
+function PairLegend({
+  problem,
+  classOf,
+  groups,
+  focus,
+  setFocus,
+  colorize,
+  setColorize,
+}: {
+  problem: Problem
+  classOf: number[]
+  groups: PairGroupStatus[]
+  focus: { kind: 'wanted' | 'unwanted'; group: number } | null
+  setFocus: (f: { kind: 'wanted' | 'unwanted'; group: number } | null) => void
+  colorize: boolean
+  setColorize: (v: boolean) => void
+}) {
+  const ok = groups.filter((g) => g.ok).length
+  return (
+    <div className="card p-4">
+      <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span className="text-sm font-bold text-slate-900">ペア指定</span>
+        <span className={`text-xs font-semibold ${ok === groups.length ? 'text-emerald-600' : 'text-rose-600'}`}>
+          {ok} / {groups.length} 件を満たしています
+        </span>
+        <span className="text-xs text-slate-400">クリックでメンバーを強調</span>
+        <label className="ml-auto inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-slate-500">
+          <input type="checkbox" checked={colorize} onChange={(e) => setColorize(e.target.checked)} className="size-4 accent-indigo-600" />
+          同じ組を色分け
+        </label>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {groups.map((g) => {
+          const active = focus?.kind === g.kind && focus.group === g.group
+          const classes = [...new Set(g.members.map((i) => classOf[i] + 1))].sort((a, b) => a - b)
+          return (
+            <button
+              key={`${g.kind}${g.group}`}
+              type="button"
+              onClick={() => setFocus(active ? null : { kind: g.kind, group: g.group })}
+              className={`inline-flex max-w-full items-center gap-1.5 rounded-lg px-2 py-1 text-left text-xs transition ${
+                active ? 'ring-2 ring-slate-900' : 'ring-1 ring-black/5 hover:ring-black/20'
+              } ${g.ok ? '' : 'outline outline-2 outline-rose-500'}`}
+              style={{ backgroundColor: g.color.bg, color: g.color.fg }}
+            >
+              <span className="shrink-0 whitespace-nowrap font-extrabold">{g.label}</span>
+              <span className="truncate font-medium text-slate-700">{g.members.map((i) => problem.students[i].name).join('・')}</span>
+              <span className="shrink-0 whitespace-nowrap font-semibold">
+                → {classes.map((c) => `${c}組`).join('/')} {g.ok ? '✓' : '✗'}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 

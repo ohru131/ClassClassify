@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, Cpu, Loader2, X, Lock, Play, Square, Zap } from 'lucide-react'
-import { parseWorkbook } from './solver/parse'
 import { compile } from './solver/compile'
 import { evaluate } from './solver/evaluate'
-import { buildResultSheets, exportWorkbook } from './solver/export'
-import { createTemplateSpreadsheet } from './google/template'
 import { downloadAsXlsx, googleEnabled, pickSpreadsheet, writeResults, type GoogleFile } from './google/google'
 import { runParallel } from './solver/run'
 import type { ColumnSpec, Problem } from './solver/types'
+
+// Excel 読み書き（SheetJS）は大きいので、必要になった時点で読み込む
+const loadParse = () => import('./solver/parse')
+const loadExport = () => import('./solver/export')
+
 import { DataStep, SettingsStep } from './components/Setup'
 import { RosterEditor, type EditorTab } from './components/RosterEditor'
-import { exportRoster } from './solver/roster'
 import { Results } from './components/Results'
 import { Logo, StepHeader } from './components/ui'
 
@@ -45,8 +46,9 @@ export default function App() {
   }, [problem])
   const resultRef = useRef<HTMLDivElement>(null)
 
-  const onLoad = (data: ArrayBuffer, name: string, source: GoogleFile | null = null) => {
+  const onLoad = async (data: ArrayBuffer, name: string, source: GoogleFile | null = null) => {
     try {
+      const { parseWorkbook } = await loadParse()
       const p = parseWorkbook(data)
       setGoogleFile(source)
       setSavedUrl(null)
@@ -69,7 +71,7 @@ export default function App() {
     setGoogleBusy(true)
     try {
       const file = await pickSpreadsheet()
-      if (file) onLoad(await downloadAsXlsx(file), file.name, file)
+      if (file) await onLoad(await downloadAsXlsx(file), file.name, file)
     } catch (e) {
       showError(e)
     } finally {
@@ -81,6 +83,7 @@ export default function App() {
     setTemplateBusy(true)
     // 自動でタブは開かない（Google 認証ポップアップと競合するため）。ボタンが「作成したひな形を開く」に変わる
     try {
+      const { createTemplateSpreadsheet } = await import('./google/template')
       const file = await createTemplateSpreadsheet()
       setTemplateUrl(file.url)
     } catch (e) {
@@ -94,6 +97,7 @@ export default function App() {
     if (!problem || !solution || !report) return
     setSavingGoogle(true)
     try {
+      const { buildResultSheets } = await loadExport()
       const sheets = buildResultSheets(problem, solution.classOf, solution.k, report)
       const title = `クラス編成結果 ${new Date().toLocaleString('ja-JP')}`
       setSavedUrl(await writeResults(sheets, googleFile, title))
@@ -155,9 +159,14 @@ export default function App() {
     [problem, solution],
   )
 
-  const download = () => {
+  const download = async () => {
     if (!problem || !solution || !report) return
-    saveBlob(exportWorkbook(problem, solution.classOf, solution.k, report), `クラス編成結果_${new Date().toISOString().slice(0, 10)}.xlsx`)
+    try {
+      const { exportWorkbook } = await loadExport()
+      saveBlob(exportWorkbook(problem, solution.classOf, solution.k, report), `クラス編成結果_${new Date().toISOString().slice(0, 10)}.xlsx`)
+    } catch (e) {
+      showError(e)
+    }
   }
 
   return (
@@ -318,7 +327,13 @@ export default function App() {
           setTab={setEditorTab}
           onChange={onProblemChange}
           onClose={() => setEditorTab(null)}
-          onExport={() => saveBlob(exportRoster(problem, numClasses), `名簿_${new Date().toISOString().slice(0, 10)}.xlsx`)}
+          onExport={async () => {
+            try {
+              saveBlob((await loadExport()).exportRoster(problem, numClasses), `名簿_${new Date().toISOString().slice(0, 10)}.xlsx`)
+            } catch (e) {
+              showError(e)
+            }
+          }}
         />
       )}
 
