@@ -50,13 +50,14 @@ mobile/
 
 ## 多言語対応（ja / en / ko / es / de / pt-BR）
 
-- **`lib/i18n.ts` の `APP_LANGUAGES` が唯一の情報源**（型・端末ロケールの判定・言語名＝endonym・Intl のロケール）。既定は端末の言語（`expo-localization`）で、未対応の言語は英語。ポルトガル語はブラジル以外も pt-BR。「Pro・設定」で言語を選ぶと端末に保存する。
+- **`APP_LANGUAGES`（`src/i18n/languages.ts`、`lib/i18n.ts` から re-export）が唯一の情報源**（型・端末ロケールの判定・言語名＝endonym・Intl のロケール）。既定は端末の言語（`expo-localization`）で、未対応の言語は英語。ポルトガル語はブラジル以外も pt-BR。「Pro・設定」で言語を選ぶと端末に保存する。
 - UI 文言は `lib/copy/en.ts`（`EN_COPY` のキー集合が正）と各言語のファイル。`Record<CopyKey, string>` なので**キーが欠けると型エラー**になり、`test/i18n.test.ts` が空文字と埋め込み（`{n}` など）の食い違い、日本語の混入を検出する。プライバシーポリシーは `lib/copy/privacy.ts`。
 - **訳語は `docs/i18n-glossary.md` に揃える**（先に用語集を直してから各所を直す）。スペイン語は中南米の語彙（grupo・estudiantes・tú）を基本にしている。
 - Excel の語彙（シート名・見出し・設定の項目名・結果の見出し）は共有ソルバーの `src/solver/labels.ts`。**読み込みは全言語のシート名・見出しを受け付け**（日本語を最優先に探すので Web 版の挙動は変わらない）、書き出しは選択中の言語で出す。ひな形も選択中の言語で生成して共有できる（無料）。
 - 日付・数値は `Intl`（`lib/locale-format.ts`）。印刷用 HTML の `lang` 属性もロケールに合わせる。
 - ホーム画面のアプリ名は `locales/*.json`（`app.config.ts` の `locales`）で言語ごとに出し分ける。
-- サンプル名簿は言語ごとに、その国らしい氏名と配慮のある項目名で生成している（`npm run samples:generate` ＝ `scripts/generate-samples.ts`。日本語のサンプルの構造・項目の分布・ペア指定をそのまま使う。リポジトリ直下で `npm install` 済みであること）。各言語のサンプルが違反0に届くことをテストで確認している。
+- サンプル名簿は Web 版と共通（リポジトリ直下で `npm run samples:generate` → `public/samples/<lang>/`）。国ごとにその国の学校で配慮される項目で作ってあり、スマホ版は `npm run samples:embed`（`scripts/embed-samples.mjs`）でそれを埋め込む。各言語のサンプルが違反0・全項目が理想範囲内に届くことをテストで確認している。
+- 言語の定義・判定（`APP_LANGUAGES` など）はリポジトリ直下の `src/i18n/languages.ts` を Web 版と共有している（`lib/i18n.ts` は re-export。Metro の `watchFolders` に `src/i18n` を追加済み）。
 - ストア掲載文は `docs/store-listing.md`（Play の en-US / en-AU / en-GB / ko-KR / es-419 / es-ES / de-DE / pt-BR / ja-JP）。
 
 ## セットアップ

@@ -11,6 +11,14 @@
 - 結果をドラッグ＆ドロップで手直し → 集計を即時再計算
 - 結果を Excel で保存
 - Google スプレッドシートから読み込み・結果の書き出しに対応（[設定手順](docs/google-setup.md)）
+- 日本語・English・한국어・Español・Deutsch・Português (Brasil) に対応（ヘッダーで切り替え）
+
+### 言語
+
+- 既定の言語は、URL の `?lang=`（`ja` / `en` / `ko` / `es` / `de` / `pt-BR`。`pt` だけでも可）→ 前回選んだ言語（ブラウザに保存）→ ブラウザの言語 → 英語 の順で決まる。例: `https://ohru131.github.io/ClassClassify/?lang=ko`
+- Excel のシート名・見出し・結果の出力、ひな形、Google スプレッドシートの出力は選択中の言語で出す。**読み込みはどの言語のシート名・見出しでも受け付ける**（日本語のファイルは従来どおり）。
+- サンプル名簿は言語ごとに、その国の学校でクラス分けに配慮される項目で作ってある（`public/samples/<lang>/`、生成は `npm run samples:generate`。項目と根拠は [docs/i18n-glossary.md](docs/i18n-glossary.md) 第3節）。
+- 訳語は [docs/i18n-glossary.md](docs/i18n-glossary.md) に揃える。言語の定義はスマホ版と共通（`src/i18n/languages.ts`）、UI 文言は `src/copy/`（英語のキー集合が正で、欠けると型エラー）。
 
 ### スマホ・タブレット版（`mobile/`）
 
@@ -61,7 +69,8 @@ QUBO では「1人1クラス」「人数」「ペア条件」をすべてペナ�
 ```bash
 npm install
 npm run dev     # 開発サーバー
-npm test        # ソルバーのテスト（サンプル Excel で検証）
+npm test        # ソルバー・多言語・サンプルのテスト
+npm run samples:generate   # 言語別のサンプル名簿を作り直す（public/samples/）
 npm run build   # dist/ に静的ファイルを出力
 ```
 

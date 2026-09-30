@@ -4,6 +4,8 @@ import type { Problem } from '../solver/types'
 import type { ColumnReport, Report } from '../solver/evaluate'
 import { pairStatus, rowColor, type PairGroupStatus, type PairTag } from '../solver/pairs'
 import { Segmented, Stat, classColor } from './ui'
+import { useT } from '../i18n/web'
+import { violationText } from '../solver/labels'
 
 type Tab = 'classes' | 'balance' | 'checks'
 
@@ -29,6 +31,7 @@ export function Results({
   /** Google 連携が有効なときだけ渡す */
   google?: { label: string; busy: boolean; url: string | null; onSave: () => void }
 }) {
+  const { t, className } = useT()
   const [tab, setTab] = useState<Tab>('classes')
   const [selected, setSelected] = useState<number | null>(null)
   const perfect = report.totalExcess === 0
@@ -37,18 +40,18 @@ export function Results({
   return (
     <section className="space-y-6">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Stat label="クラス" value={k} sub={`${problem.students.length} 名を編成`} />
-        <Stat label="人数差" value={sizeGap} sub={`${Math.min(...report.sizes)}〜${Math.max(...report.sizes)} 名`} tone={sizeGap <= 1 ? 'good' : 'bad'} />
+        <Stat label={t('statClasses')} value={k} sub={t('statClassesSub', { n: problem.students.length })} />
+        <Stat label={t('statGap')} value={sizeGap} sub={t('statGapSub', { min: Math.min(...report.sizes), max: Math.max(...report.sizes) })} tone={sizeGap <= 1 ? 'good' : 'bad'} />
         <Stat
-          label="バランス"
-          value={perfect ? '完全' : report.totalExcess}
-          sub={perfect ? '全項目が理想の範囲内' : '理想範囲からのずれ（人）'}
+          label={t('statBalance')}
+          value={perfect ? t('perfect') : report.totalExcess}
+          sub={perfect ? t('balancePerfectSub') : t('balanceSub')}
           tone={perfect ? 'good' : 'default'}
         />
         <Stat
-          label="条件違反"
+          label={t('statViolations')}
           value={report.violations.length}
-          sub={report.violations.length ? 'ペア条件を満たせていません' : 'ペア条件をすべて満たしています'}
+          sub={report.violations.length ? t('violationsSub') : t('violationsOk')}
           tone={report.violations.length ? 'bad' : 'good'}
         />
       </div>
@@ -58,15 +61,15 @@ export function Results({
           value={tab}
           onChange={setTab}
           options={[
-            { value: 'classes', label: 'クラス一覧' },
-            { value: 'balance', label: 'バランス分析' },
-            { value: 'checks', label: `条件チェック${report.violations.length ? ` (${report.violations.length})` : ''}` },
+            { value: 'classes', label: t('tabClasses') },
+            { value: 'balance', label: t('tabBalance') },
+            { value: 'checks', label: report.violations.length ? t('tabChecksN', { n: report.violations.length }) : t('tabChecks') },
           ]}
         />
         <div className="flex gap-2">
           {edited && (
             <button type="button" className="btn-ghost" onClick={onReset}>
-              <RotateCcw className="size-4" /> 手動変更を戻す
+              <RotateCcw className="size-4" /> {t('undoMoves')}
             </button>
           )}
           {google && (
@@ -75,7 +78,7 @@ export function Results({
             </button>
           )}
           <button type="button" className="btn-primary" onClick={onDownload}>
-            <Download className="size-4" /> Excel で保存
+            <Download className="size-4" /> {t('saveExcel')}
           </button>
         </div>
       </div>
@@ -87,7 +90,7 @@ export function Results({
           rel="noreferrer"
           className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-medium text-emerald-800 hover:bg-emerald-100"
         >
-          <CheckCircle2 className="size-4" /> スプレッドシートに書き出しました
+          <CheckCircle2 className="size-4" /> {t('savedToSheet')}
           <ExternalLink className="ml-auto size-4" />
         </a>
       )}
@@ -102,12 +105,12 @@ export function Results({
           ))}
         </div>
       )}
-      {tab === 'checks' && <Checks problem={problem} report={report} />}
+      {tab === 'checks' && <Checks problem={problem} report={report} classOf={classOf} />}
 
       {selected !== null && (
         <div className="fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 mx-auto flex w-fit max-w-[calc(100%-2rem)] flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
           <span className="text-sm font-semibold text-slate-800">
-            {problem.students[selected].no}:{problem.students[selected].name} を移動 →
+            {t('moveTitle', { who: `${problem.students[selected].no}:${problem.students[selected].name}` })}
           </span>
           {Array.from({ length: k }, (_, c) => (
             <button
@@ -120,10 +123,10 @@ export function Results({
               }}
               className={`rounded-lg px-2.5 py-1 text-xs font-bold ring-1 transition hover:brightness-95 disabled:opacity-30 ${classColor(c).soft}`}
             >
-              {c + 1}組
+              {className(c)}
             </button>
           ))}
-          <button type="button" onClick={() => setSelected(null)} className="ml-1 rounded-lg p-1 text-slate-400 hover:bg-slate-100" aria-label="閉じる">
+          <button type="button" onClick={() => setSelected(null)} className="ml-1 rounded-lg p-1 text-slate-400 hover:bg-slate-100" aria-label={t('close')}>
             <X className="size-4" />
           </button>
         </div>
@@ -149,6 +152,7 @@ function ClassBoard({
   onMove: (student: number, to: number) => void
   report: Report
 }) {
+  const { t, className, file } = useT()
   const [over, setOver] = useState<number | null>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const flagged = useMemo(() => new Set(report.violations.flatMap((v) => v.students)), [report])
@@ -157,7 +161,7 @@ function ClassBoard({
     const flagCols = problem.columns.filter((c) => c.enabled && c.kind === 'flag')
     return problem.students.map((s) => flagCols.filter((c) => s.values[c.name] !== '').map((c) => c.name))
   }, [problem])
-  const pairs = useMemo(() => pairStatus(problem, classOf), [problem, classOf])
+  const pairs = useMemo(() => pairStatus(problem, classOf, file.tagPrefix), [problem, classOf, file])
   const [colorize, setColorize] = useState(true)
   const [focus, setFocus] = useState<{ kind: 'wanted' | 'unwanted'; group: number } | null>(null)
   // 名簿エディタでグループが変わったら強調を解除（index がずれるため）
@@ -171,9 +175,9 @@ function ClassBoard({
   return (
     <>
       <p className="text-xs text-slate-500">
-        <span className="hidden sm:inline">生徒をドラッグ、またはクリックして別の組へ移動できます。</span>
-        <span className="sm:hidden">左右にスワイプしてクラスを切り替え。生徒をタップすると別の組へ移動できます。</span>
-        集計は即座に再計算されます。
+        <span className="hidden sm:inline">{t('boardHintDesktop')}</span>
+        <span className="sm:hidden">{t('boardHintMobile')}</span>
+        {t('boardHintTail')}
       </p>
       {pairs.groups.length > 0 && (
         <PairLegend
@@ -195,7 +199,7 @@ function ClassBoard({
             onClick={() => cardRefs.current[c]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
             className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ring-1 ${classColor(c).soft}`}
           >
-            {c + 1}組 {report.sizes[c]}名
+            {t('classChip', { cls: className(c), n: report.sizes[c] })}
           </button>
         ))}
       </div>
@@ -226,9 +230,9 @@ function ClassBoard({
               <div className="flex items-center justify-between px-5 pb-2 pt-4">
                 <div className="flex items-center gap-2">
                   <span className={`size-2.5 rounded-full ${color.dot}`} />
-                  <span className="text-lg font-extrabold text-slate-900">{c + 1}組</span>
+                  <span className="text-lg font-extrabold text-slate-900">{className(c)}</span>
                 </div>
-                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold tabular-nums text-slate-600">{members.length} 名</span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold tabular-nums text-slate-600">{t('studentsN', { n: members.length })}</span>
               </div>
               <ul className="max-h-[28rem] space-y-1 overflow-y-auto px-3 pb-4">
                 {members.map((i) => {
@@ -273,9 +277,10 @@ function ClassBoard({
 }
 
 function PairBadge({ tag }: { tag: PairTag }) {
+  const { t } = useT()
   return (
     <span
-      title={`${tag.kind === 'wanted' ? '同じ組にする' : '別の組にする'}指定 ${tag.label}${tag.ok ? '' : '（満たせていません）'}`}
+      title={`${t(tag.kind === 'wanted' ? 'wantedBadgeTitle' : 'unwantedBadgeTitle', { label: tag.label })}${tag.ok ? '' : t('unmetSuffix')}`}
       className={`rounded px-1 py-px text-[10px] font-bold ring-1 ${tag.ok ? '' : 'ring-2 ring-rose-500'}`}
       style={{ backgroundColor: tag.kind === 'wanted' ? '#ffffffb3' : tag.color.bg, color: tag.color.fg, ['--tw-ring-color' as string]: tag.ok ? `${tag.color.fg}55` : undefined }}
     >
@@ -302,18 +307,19 @@ function PairLegend({
   colorize: boolean
   setColorize: (v: boolean) => void
 }) {
+  const { t, className, file } = useT()
   const ok = groups.filter((g) => g.ok).length
   return (
     <div className="card p-4">
       <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="text-sm font-bold text-slate-900">ペア指定</span>
+        <span className="text-sm font-bold text-slate-900">{t('pairings')}</span>
         <span className={`text-xs font-semibold ${ok === groups.length ? 'text-emerald-600' : 'text-rose-600'}`}>
-          {ok} / {groups.length} 件を満たしています
+          {t('pairingsMet', { ok, n: groups.length })}
         </span>
-        <span className="text-xs text-slate-400">クリックでメンバーを強調</span>
+        <span className="text-xs text-slate-400">{t('clickToHighlight')}</span>
         <label className="ml-auto inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium text-slate-500">
           <input type="checkbox" checked={colorize} onChange={(e) => setColorize(e.target.checked)} className="size-4 accent-indigo-600" />
-          同じ組を色分け
+          {t('colorize')}
         </label>
       </div>
       <div className="flex flex-wrap gap-1.5">
@@ -331,9 +337,9 @@ function PairLegend({
               style={{ backgroundColor: g.color.bg, color: g.color.fg }}
             >
               <span className="shrink-0 whitespace-nowrap font-extrabold">{g.label}</span>
-              <span className="truncate font-medium text-slate-700">{g.members.map((i) => problem.students[i].name).join('・')}</span>
+              <span className="truncate font-medium text-slate-700">{g.members.map((i) => problem.students[i].name).join(file.joinSep)}</span>
               <span className="shrink-0 whitespace-nowrap font-semibold">
-                → {classes.map((c) => `${c}組`).join('/')} {g.ok ? '✓' : '✗'}
+                → {classes.map((c) => className(c - 1)).join('/')} {g.ok ? '✓' : '✗'}
               </span>
             </button>
           )
@@ -344,20 +350,21 @@ function PairLegend({
 }
 
 function BalanceCard({ col, k }: { col: ColumnReport; k: number }) {
+  const { t, className, num } = useT()
   const numeric = col.kind === 'numeric'
   const max = Math.max(1, ...col.rows.flat())
   return (
-    <div className="card p-5">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="card min-w-0 p-5">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <div className="font-bold text-slate-900">{col.column}</div>
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-400">重み {col.weight}</span>
+          <span className="text-slate-400">{t('weightN', { w: col.weight })}</span>
           {numeric ? (
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">平均値</span>
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">{t('average')}</span>
           ) : col.excess === 0 ? (
-            <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700">均等</span>
+            <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700">{t('even')}</span>
           ) : (
-            <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-700">ずれ {col.excess}</span>
+            <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-700">{t('offBy', { n: col.excess })}</span>
           )}
         </div>
       </div>
@@ -367,17 +374,17 @@ function BalanceCard({ col, k }: { col: ColumnReport; k: number }) {
             <tr className="text-xs text-slate-400">
               <th className="py-1 pr-2 text-left font-medium"></th>
               {Array.from({ length: k }, (_, c) => (
-                <th key={c} className="px-1 py-1 text-center font-semibold">
-                  {c + 1}組
+                <th key={c} className="whitespace-nowrap px-1 py-1 text-center font-semibold">
+                  {className(c)}
                 </th>
               ))}
-              <th className="px-1 py-1 text-center font-medium">理想</th>
+              <th className="px-1 py-1 text-center font-medium">{t('ideal')}</th>
             </tr>
           </thead>
           <tbody>
             {col.levels.map((level, l) => (
               <tr key={level}>
-                <td className="max-w-24 truncate py-1 pr-2 text-xs font-semibold text-slate-600">{level}</td>
+                <td className="max-w-24 truncate py-1 pr-2 text-xs font-semibold text-slate-600">{numeric ? t('averageLevel') : level}</td>
                 {col.rows[l].map((v, c) => {
                   const ideal = col.ideal[l]
                   const ok = numeric || (v >= Math.floor(ideal) && v <= Math.ceil(ideal))
@@ -388,12 +395,12 @@ function BalanceCard({ col, k }: { col: ColumnReport; k: number }) {
                         className={`rounded-lg py-1.5 text-center font-bold tabular-nums ${ok ? 'text-indigo-900' : 'text-amber-900 ring-2 ring-amber-400'}`}
                         style={{ backgroundColor: ok ? `rgb(99 102 241 / ${alpha})` : `rgb(251 191 36 / ${alpha + 0.1})` }}
                       >
-                        {numeric ? v.toFixed(2) : v}
+                        {numeric ? num(v, 2) : v}
                       </div>
                     </td>
                   )
                 })}
-                <td className="px-1 py-1 text-center text-xs tabular-nums text-slate-400">{col.ideal[l].toFixed(numeric ? 2 : 1)}</td>
+                <td className="px-1 py-1 text-center text-xs tabular-nums text-slate-400">{num(col.ideal[l], numeric ? 2 : 1)}</td>
               </tr>
             ))}
           </tbody>
@@ -403,16 +410,17 @@ function BalanceCard({ col, k }: { col: ColumnReport; k: number }) {
   )
 }
 
-function Checks({ problem, report }: { problem: Problem; report: Report }) {
+function Checks({ problem, report, classOf }: { problem: Problem; report: Report; classOf: number[] }) {
+  const { t, fileLang } = useT()
   const total = problem.wantedGroups.length + problem.unwantedGroups.length
   if (report.violations.length === 0)
     return (
       <div className="card flex items-center gap-4 p-6">
         <CheckCircle2 className="size-10 shrink-0 text-emerald-500" />
         <div>
-          <div className="font-bold text-slate-900">すべての条件を満たしています</div>
+          <div className="font-bold text-slate-900">{t('allMet')}</div>
           <div className="text-sm text-slate-500">
-            {total ? `同じ組 ${problem.wantedGroups.length} 件・別の組 ${problem.unwantedGroups.length} 件の指定をすべて反映しました。` : 'ペアの指定はありません。'}
+            {total ? t('allMetBody', { w: problem.wantedGroups.length, u: problem.unwantedGroups.length }) : t('noPairsBody')}
           </div>
         </div>
       </div>
@@ -422,7 +430,7 @@ function Checks({ problem, report }: { problem: Problem; report: Report }) {
       {report.violations.map((v, i) => (
         <div key={i} className="flex items-center gap-3 px-5 py-3.5 text-sm">
           <AlertTriangle className="size-4 shrink-0 text-rose-500" />
-          <span className="text-slate-700">{v.message}</span>
+          <span className="text-slate-700">{violationText(fileLang, v, problem, classOf)}</span>
         </div>
       ))}
     </div>

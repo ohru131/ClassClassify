@@ -15,6 +15,26 @@ const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.s
 
 export const googleEnabled = !!(CLIENT_ID && API_KEY && APP_ID)
 
+/** エラー・Picker の文言（既定は日本語。App が選択中の言語に差し替える） */
+interface GoogleMessages {
+  scriptFailed: (src: string) => string
+  authFailed: (msg: string) => string
+  apiError: (msg: string) => string
+  pickerTitle: string
+  /** Picker の表示言語（Google の言語コード） */
+  locale?: string
+}
+let MSG: GoogleMessages = {
+  scriptFailed: (src) => `${src} を読み込めませんでした`,
+  authFailed: (msg) => `Google 認証に失敗しました: ${msg}`,
+  apiError: (msg) => `Google API エラー: ${msg}`,
+  pickerTitle: '名簿のスプレッドシートを選択',
+  locale: 'ja',
+}
+export function setGoogleMessages(m: GoogleMessages) {
+  MSG = { ...MSG, ...m }
+}
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
   interface Window {
@@ -41,7 +61,7 @@ function loadScript(src: string) {
       s.onload = () => resolve()
       s.onerror = () => {
         loaded.delete(src)
-        reject(new Error(`${src} を読み込めませんでした`))
+        reject(new Error(MSG.scriptFailed(src)))
       }
       document.head.appendChild(s)
     })
@@ -62,13 +82,13 @@ async function getToken(): Promise<string> {
       client_id: CLIENT_ID,
       scope: SCOPE,
       callback: (res: any) => {
-        if (res.error) return reject(new Error(`Google 認証に失敗しました: ${res.error_description ?? res.error}`))
+        if (res.error) return reject(new Error(MSG.authFailed(res.error_description ?? res.error)))
         token = { value: res.access_token, expires: Date.now() + Number(res.expires_in) * 1000 }
         consented = true
         resolve(res.access_token)
       },
       error_callback: (err: any) =>
-        reject(new Error(err?.type === 'popup_closed' ? 'cancelled' : `Google 認証に失敗しました: ${err?.message ?? err?.type}`)),
+        reject(new Error(err?.type === 'popup_closed' ? 'cancelled' : MSG.authFailed(err?.message ?? err?.type))),
     })
     client.requestAccessToken({ prompt: consented ? '' : undefined })
   })
@@ -89,7 +109,7 @@ async function api(url: string, init: RequestInit = {}, retried = false): Promis
     } catch {
       /* ignore */
     }
-    throw new Error(`Google API エラー: ${msg}`)
+    throw new Error(MSG.apiError(msg))
   }
   return res
 }
@@ -107,8 +127,8 @@ export async function pickSpreadsheet(): Promise<GoogleFile | null> {
       .setOAuthToken(t)
       .setDeveloperKey(API_KEY)
       .setAppId(APP_ID)
-      .setLocale('ja')
-      .setTitle('名簿のスプレッドシートを選択')
+      .setLocale(MSG.locale ?? 'ja')
+      .setTitle(MSG.pickerTitle)
       .setCallback((data: any) => {
         if (data.action === g.Action.PICKED) {
           const d = data.docs[0]
