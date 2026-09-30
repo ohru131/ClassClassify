@@ -22,7 +22,7 @@
 | 同じ組にする | 同じ組にする | keep together | 같은 반 배정 | mantener juntos | zusammen | manter juntos |
 | 別の組にする | 別の組にする | keep apart | 분리 배정 | separar | trennen | separar |
 | ペア指定（上の2つの総称） | ペア指定 | pairings | 배정 조건 | condiciones | Wünsche | condições |
-| ペア指定のラベル | 同1 / 別1 | T1 / A1（Together / Apart） | 같1 / 분1 | J1 / S1（Juntos / Separar） | Z1 / T1（Zusammen / Trennen） | J1 / S1（Juntos / Separar） |
+| ペア指定のラベル | 同1 / 別1 | T1 / A1（Together / Apart） | 같1 / 분1 | J1 / S1（Juntos / Separar） | Z1 / G1（zusammen / getrennt。T は英語の Together と紛らわしいので使わない） | J1 / S1（Juntos / Separar） |
 | 理想範囲（各組の目標人数の帯） | 理想の範囲 | target range | 목표 범위 | rango ideal | Sollbereich | faixa ideal |
 | 理想（1組あたりの目標値） | 理想 | target | 목표 | meta | Soll | meta |
 | バランス | バランス | balance | 균형 | equilibrio | Ausgewogenheit | equilíbrio |
@@ -84,9 +84,9 @@
 |---|---|---|---|
 | ja | 性別♀・学習支援・登校支援・視覚配慮（該当）、情緒面の配慮・走力・ピアノ・学習・体育（1〜3）、PTA（該当）、**テスト平均（点数）** | 性別♀・学習支援・登校支援・学習・協調性（該当）、走力・ピアノ（カテゴリ）、**テスト平均** | 性別♀・走力・ピアノ・学習（該当）、体育・前回の組（カテゴリ）、**50m走（秒）** |
 | en | Gender (F/M)、Reading score（点数）、Math level（1〜3）、IEP/504 plan・English learner・Behavior support・Leadership（✓） | Gender、Reading score、IEP/504 plan、Previous class（A〜D） | Gender、Reading score、Leadership、Previous group（1〜6） |
-| ko | 성별(여/남)、학업 성취도（点数）、교우 관계（원만/보통/지원 필요）、특수교육 대상・한국어 지원・리더십（✓）、출신 초등학교（4校） | 성별、학업 성취도、특수교육 대상、이전 반（1〜4반） | 성별、학업 성취도、리더십、이전 모둠（1〜6） |
+| ko | 성별(여/남)、학업 성취도（点数）、교우 관계 지원・특수교육 대상・한국어 지원・리더십（✓）、출신 초등학교（4校） | 성별、학업 성취도、특수교육 대상、이전 반（1〜4반） | 성별、학업 성취도、리더십、이전 모둠（1〜6） |
 | es | Género (F/M)、Promedio de notas（4,0〜7,0）、NEE (PIE)・Liderazgo（✓）、Convivencia escolar（Sin observaciones/Seguimiento）、Grupo de origen（A〜D） | Género、Promedio de notas、NEE (PIE)、Grupo de origen | Género、Promedio de notas、Liderazgo、Equipo anterior（1〜6） |
-| de | Geschlecht (w/m)、Notenschnitt（1,0〜4,0）、Förderbedarf・DaZ（✓）、Verhalten（unauffällig/Unterstützung）、Herkunftsgrundschule（4校） | Geschlecht、Notenschnitt、Förderbedarf、Herkunftsgrundschule | Geschlecht、Notenschnitt、Teamfähigkeit、Vorherige Gruppe（1〜6） |
+| de | Geschlecht (w/m)、Notenschnitt（1,0〜4,0）、Förderbedarf・DaZ・Unterstützung Verhalten（✓）、Herkunftsgrundschule（4校） | Geschlecht、Notenschnitt、Förderbedarf、Herkunftsgrundschule | Geschlecht、Notenschnitt、Teamfähigkeit、Vorherige Gruppe（1〜6） |
 | pt-BR | Gênero (F/M)、Média（5,0〜10,0）、AEE・Liderança（✓）、Convivência（Tranquila/Acompanhamento）、Turma de origem（A〜D） | Gênero、Média、AEE、Turma de origem | Gênero、Média、Liderança、Grupo anterior（1〜6） |
 
 全言語共通で、同じ組（友だちの希望）と別の組（離す必要のある生徒）の指定を入れてある（sample-group は別の組のみ。日本語の元サンプルに合わせた）。
@@ -99,7 +99,7 @@
 | 前の組・出身校を散らす（Previous class / 출신 초등학교 / Herkunftsgrundschule / Grupo・Turma de origen） | `pain-points-and-target.md` 0 節 10「前年度クラスの分散」、`overseas-demand.md` C（韓国の中学は出身小学校の割合を考慮）、D（Klasse 5 の「出身小学校の大集団は避ける」） |
 | 支援の必要性（IEP/504・특수교육 대상・Förderbedarf・NEE (PIE)・AEE・学習支援） | `pain-points-and-target.md` 1.2「支援の必要性」、`overseas-demand.md` O 節（米 IEP/504、韓 특수교육대상、独 Förderbedarf、es-419 NEE、チリ PIE、pt-BR AEE）、A.7 |
 | 言語の支援（English learner・한국어 지원・DaZ） | `overseas-demand.md` O 節 en（EAL/ESL/ELL）・de（DaZ）。韓国は O 節 ko の「다문화 を属性名の既定値に置かない」に従い、**家庭の属性ではなく必要な支援（한국어 지원）**で表す |
-| 行動・関係（Behavior support・교우 관계・Verhalten・Convivencia escolar・Convivência） | `pain-points-and-target.md` 1.2「行動面: 海外では学力・社会性・行動の3軸」、`overseas-demand.md` B.2（米の基準に behavior）、A.1（ブラジルの「行動の異質性」）。値は「支援が要る/要らない」の中立な語にし、子どもを評価する語（良い/悪い）は使わない |
+| 行動・関係（Behavior support・교우 관계 지원・Unterstützung Verhalten・Convivencia escolar・Convivência） | `pain-points-and-target.md` 1.2「行動面: 海外では学力・社会性・行動の3軸」、`overseas-demand.md` B.2（米の基準に behavior）、A.1（ブラジルの「行動の異質性」）。値は「支援が要る/要らない」の中立な語にし、子どもを評価する語（良い/悪い）は使わない |
 | リーダー性（Leadership・리더십・Liderazgo・Liderança・Teamfähigkeit） | `pain-points-and-target.md` 1.2「リーダー性・積極性: 学級委員候補を分散」 |
 | 別の組（離す） | `pain-points-and-target.md` 1.2「人間関係（分離）」、`overseas-demand.md` C（学校暴力予防法の分離義務。ただしアプリ内では 학교폭력 の語を使わず「분리 배정」と書く） |
 | 同じ組（友だちの希望） | `pain-points-and-target.md` 1.2「海外では友だち4人を書かせ最低1人と同じ組」、`overseas-demand.md` B.1・D（Freundschaftswunsch） |
@@ -110,7 +110,9 @@
 - 性別は各言語の中立な略記（F/M、여/남、w/m）にし、男女を半々にした。選択肢は学校が自由に決められる（アプリは値の種類を固定しない）。
 - 診断名・国籍・家庭事情は項目名にしない。**必要な支援**の名前にする（「障害」ではなく IEP/504・특수교육 대상、「外国籍・多文化」ではなく English learner・한국어 지원・DaZ）。
 - es の「Grupo de origen」: 調査資料は「curso de origen」も挙げているが、`curso` はスペインで学年・チリで組を指して階層がずれる（A.7）ため、UI と同じ **grupo** に揃えた。
-- 氏名は、その国で一般的な名と姓を機械的に組み合わせた架空のもの（性別は半々）。
+- **子どもを評価する値のカテゴリにしない。** 以前は ko「교우 관계: 원만/보통/지원 필요」、de「Verhalten: unauffällig/Unterstützung」と3段・2段の値を持たせていたが、「원만」「unauffällig」は子どもへの評価そのもので、名簿に残る（レビューで指摘）。**支援が要る子にだけ印を付ける該当項目**（교우 관계 지원・Unterstützung Verhalten）に変えた。カテゴリの項目は出身校で残るので、各サンプルが該当・カテゴリ・数値の3種類を含むのは変わらない。
+- 小数の項目（Notenschnitt・Promedio de notas・Média・50m走）は**数値のセルに表示形式 0.0** で書く。文字列のままだと Excel で「数値が文字列として保存されています」と出て、並べ替え・平均が効かない。
+- 氏名は、その国で一般的な名と姓を機械的に組み合わせた架空のもの（性別は半々）。組み合わせが実在の有名人と一致したもの（Owen Wilson・Jack White・Henry Adams・Beatriz Souza）は `scripts/generate-samples.ts` の `EXCLUDED_NAMES` で除いている。見つけたら足す。
 
 ## 4. ネイティブスピーカーに確認してほしい箇所
 
@@ -118,4 +120,4 @@
 - es: 「Armar grupos」（チリ・アルゼンチンでは自然、メキシコで違和感が無いか）、「Comité de familias」。
 - de: 「Unterstützung Anwesenheit」「Wünsche」（ペア指定の総称。保護者の友だち希望と区別がつくか）。
 - pt-BR: 「Enturmação」をシート名に使ってよいか（学校の事務用語として通じるか）。
-- サンプルの項目名・値: ko「교우 관계」の値「지원 필요」、「한국어 지원」／de「Verhalten: unauffällig / Unterstützung」「Notenschnitt」の向き（1,0 が最良）／es「Convivencia escolar: Seguimiento」「NEE (PIE)」（チリ以外で通じるか）／pt-BR「Convivência: Acompanhamento」「AEE」。
+- サンプルの項目名・値: ko「교우 관계 지원」、「한국어 지원」／de「Unterstützung Verhalten」「Notenschnitt」の向き（1,0 が最良）／es「Convivencia escolar: Seguimiento」「NEE (PIE)」（チリ以外で通じるか）／pt-BR「Convivência: Acompanhamento」「AEE」。

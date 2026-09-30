@@ -14,7 +14,7 @@ import type { WorkBook } from 'xlsx-js-style'
 import XLSX from '../src/solver/xlsx'
 
 import { rosterWorkbook } from '../src/solver/export'
-import type { FileLanguage } from '../src/solver/labels'
+import { FILE_LABELS, type FileLanguage } from '../src/solver/labels'
 import type { ColumnSpec, Problem, Student } from '../src/solver/types'
 import { detectKind } from '../src/solver/columns'
 
@@ -94,7 +94,8 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       columns: [
         { kind: 'gender', name: '성별', values: ['여', '남'] },
         { kind: 'score', name: '학업 성취도', min: 55, max: 100, step: 1 },
-        { kind: 'category', name: '교우 관계', values: ['원만', '보통', '지원 필요'], weights: [3, 4, 1] },
+        // 교우 관계를 원만/보통 のような評価の値で持たない（名簿に評価が残る）。支援が要る子だけに印を付ける
+        { kind: 'flag', name: '교우 관계 지원', rate: 0.12 },
         { kind: 'flag', name: '특수교육 대상', rate: 0.06 },
         { kind: 'flag', name: '한국어 지원', rate: 0.06 },
         { kind: 'flag', name: '리더십', rate: 0.12 },
@@ -159,7 +160,8 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
         { kind: 'score', name: 'Notenschnitt', min: 1.0, max: 4.0, step: 0.1, decimals: 1 },
         { kind: 'flag', name: 'Förderbedarf', rate: 0.08 },
         { kind: 'flag', name: 'DaZ', rate: 0.1 },
-        { kind: 'category', name: 'Verhalten', values: ['unauffällig', 'Unterstützung'], weights: [7, 1] },
+        // 「unauffällig」のような評価の値を名簿に残さない。支援が要る子だけに印を付ける
+        { kind: 'flag', name: 'Unterstützung Verhalten', rate: 0.12 },
         { kind: 'category', name: 'Herkunftsgrundschule', values: ['GS Am Park', 'GS Lindenweg', 'GS Nord', 'GS Süd'] },
       ],
     },
@@ -213,6 +215,15 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       ],
     },
   },
+}
+
+// 組み合わせの結果が実在の有名人と同じ氏名になったものは使わない（見つけたら足す）
+const EXCLUDED_NAMES: Record<Lang, ReadonlySet<string>> = {
+  en: new Set(['Owen Wilson', 'Jack White', 'Henry Adams']),
+  ko: new Set(),
+  es: new Set(),
+  de: new Set(),
+  'pt-BR': new Set(['Beatriz Souza']),
 }
 
 // 名（女・男）と姓。ありふれた名前を機械的に組み合わせた架空の氏名
@@ -279,7 +290,7 @@ function build(lang: Lang, id: SampleId): Problem {
       }
     }
     let name = ''
-    for (let tries = 0; !name || used.has(name); tries++) {
+    for (let tries = 0; !name || used.has(name) || EXCLUDED_NAMES[lang].has(name); tries++) {
       const k = counter[g]++
       name = names.join(names[g][k % names[g].length], names.last[Math.floor(r() * names.last.length)])
     }
@@ -398,13 +409,43 @@ const ZIP_NAMES: Record<FileLanguage, Record<SampleId, string>> = {
   'pt-BR': { sample1: 'turmas-exemplo-1.xlsx', sample2: 'turmas-exemplo-2.xlsx', 'sample-group': 'grupos-exemplo.xlsx' },
 }
 
+/**
+ * 小数の項目（5.0 や 3.2）を数値のセルにし、表示形式 0.0 を付ける。
+ * rosterWorkbook は「数値にしても文字が変わらない値」だけを数値にするので、5.0 が文字列のまま残り、
+ * Excel で緑の三角（数値が文字列として保存されています）が出るうえ並べ替え・平均が効かない。
+ */
+function formatDecimals(wb: WorkBook, lang: FileLanguage, id: SampleId): WorkBook {
+  const L = FILE_LABELS[lang]
+  const ws = wb.Sheets[L.sheets.roster]
+  const range = XLSX.utils.decode_range(ws['!ref']!)
+  const decimalsOf = new Map<string, number>()
+  if (lang === 'ja') decimalsOf.set(JA_SCORE[id].name, JA_SCORE[id].decimals)
+  else for (const c of DEFS[lang][id].columns) if (c.kind === 'score' && c.decimals) decimalsOf.set(c.name, c.decimals)
+  for (let c = 0; c <= range.e.c; c++) {
+    const head = ws[XLSX.utils.encode_cell({ r: 1, c })]
+    const d = head ? decimalsOf.get(String(head.v)) : undefined
+    if (!d) continue
+    for (let r = 2; r <= range.e.r; r++) {
+      const cell = ws[XLSX.utils.encode_cell({ r, c })]
+      if (!cell || cell.v === '' || cell.v === null) continue
+      const x = Number(cell.v)
+      if (!Number.isFinite(x)) continue
+      cell.t = 'n'
+      cell.v = x
+      cell.z = `0.${'0'.repeat(d)}`
+      delete cell.w
+    }
+  }
+  return wb
+}
+
 const write = (wb: WorkBook) => new Uint8Array(XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true }) as ArrayBuffer)
 
 for (const lang of Object.keys(ZIP_NAMES) as FileLanguage[]) {
   const dir = new URL(`samples/${lang}/`, root)
   mkdirSync(dir, { recursive: true })
   const files = IDS.map((id) => {
-    const wb = lang === 'ja' ? jaWorkbook(id) : rosterWorkbook(build(lang, id), DEFS[lang][id].k, lang)
+    const wb = formatDecimals(lang === 'ja' ? jaWorkbook(id) : rosterWorkbook(build(lang, id), DEFS[lang][id].k, lang), lang, id)
     const data = write(wb)
     writeFileSync(new URL(`${id}.xlsx`, dir), data)
     return { name: ZIP_NAMES[lang][id], data }

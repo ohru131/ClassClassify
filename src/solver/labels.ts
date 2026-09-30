@@ -184,7 +184,7 @@ export const FILE_LABELS: Record<FileLanguage, FileLabels> = {
     maxPerClass: 'Höchstzahl pro Klasse',
     classCount: 'Anzahl Klassen',
     className: (c) => `Klasse ${c + 1}`,
-    tagPrefix: { wanted: 'Z', unwanted: 'T' },
+    tagPrefix: { wanted: 'Z', unwanted: 'G' },
     classCol: 'Klasse',
     pairCol: 'Wünsche',
     pairLabel: 'ID',
