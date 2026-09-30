@@ -37,6 +37,19 @@ import {
 
 export type EditorTab = 'students' | GroupKind
 
+/** 画面幅が md（768px）以上か。表とカードのどちらか一方だけを描画するために使う */
+function useIsDesktop() {
+  const query = '(min-width: 768px)'
+  const [match, setMatch] = useState(() => window.matchMedia(query).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(query)
+    const on = () => setMatch(mq.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [])
+  return match
+}
+
 const EMPTY = '__empty__'
 
 export function RosterEditor({
@@ -150,6 +163,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [newCol, setNewCol] = useState<string | null>(null)
   const [newKind, setNewKind] = useState<ColumnKind>('flag')
+  const desktop = useIsDesktop()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { wanted, unwanted } = useMemo(() => groupsOf(problem), [problem])
 
@@ -244,7 +258,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
           <input
-            autoFocus={window.matchMedia('(min-width: 768px)').matches}
+            autoFocus={desktop}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="NO・名前で検索"
@@ -357,8 +371,8 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               setSort(null)
               setTimeout(() => {
                 scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-                const inputs = [...(scrollRef.current?.querySelectorAll<HTMLInputElement>('input[data-name]') ?? [])].filter((el) => el.offsetParent !== null)
-                inputs[inputs.length - 1]?.focus()
+                const inputs = scrollRef.current?.querySelectorAll<HTMLInputElement>('input[data-name]')
+                inputs?.[inputs.length - 1]?.focus()
               }, 50)
             }}
           >
@@ -370,7 +384,8 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
       {/* 表 */}
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
         {/* スマホ: カード表示 */}
-        <div className="space-y-2 p-3 md:hidden">
+        {!desktop && (
+        <div className="space-y-2 p-3">
           {visible.length > 0 && (
             <label className="flex items-center gap-2 px-1 text-xs font-semibold text-slate-500">
               <Checkbox checked={allVisibleSelected} onChange={toggleAll} /> 表示中をすべて選択
@@ -411,12 +426,12 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                 {(wanted[i].length > 0 || unwanted[i].length > 0) && (
                   <div className="mt-1 flex flex-wrap gap-1 pl-7">
                     {wanted[i].map((g) => (
-                      <button key={`w${g}`} type="button" onClick={() => openGroups('wanted')} className="rounded-md bg-indigo-50 px-1.5 py-0.5 text-[11px] font-bold text-indigo-600">
+                      <button key={`w${g}`} type="button" onClick={() => openGroups('wanted')} className="rounded-md bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-600">
                         同{g + 1}: {problem.wantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join('・')}
                       </button>
                     ))}
                     {unwanted[i].map((g) => (
-                      <button key={`u${g}`} type="button" onClick={() => openGroups('unwanted')} className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] font-bold text-rose-600">
+                      <button key={`u${g}`} type="button" onClick={() => openGroups('unwanted')} className="rounded-md bg-rose-50 px-2 py-1 text-xs font-bold text-rose-600">
                         別{g + 1}: {problem.unwantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join('・')}
                       </button>
                     ))}
@@ -435,7 +450,10 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
           })}
         </div>
 
-        <table className="hidden w-full border-separate border-spacing-0 text-sm md:table">
+        )}
+
+        {desktop && (
+        <table className="w-full border-separate border-spacing-0 text-sm">
           <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur">
             <tr className="text-left text-xs text-slate-500">
               <th className="sticky left-0 z-10 w-10 border-b border-slate-200 bg-white px-3 py-2">
@@ -541,6 +559,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
             })}
           </tbody>
         </table>
+        )}
         {visible.length === 0 && (
           <div className="py-16 text-center text-sm text-slate-400">
             条件に合う生徒がいません。
@@ -666,7 +685,7 @@ function ValueCell({ column, value, onChange }: { column: ColumnSpec; value: str
         type="button"
         onClick={() => onChange(on ? '' : mark)}
         aria-pressed={on}
-        className={`grid h-7 min-w-10 place-items-center rounded-lg px-2 text-xs font-bold transition ${
+        className={`grid h-9 min-w-12 place-items-center rounded-lg px-2 md:h-7 md:min-w-10 text-xs font-bold transition ${
           on ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30' : 'border border-dashed border-slate-200 text-slate-300 hover:border-indigo-300 hover:text-indigo-400'
         }`}
       >
@@ -696,7 +715,7 @@ function CategorySelect({ levels, value, onChange }: { levels: string[]; value: 
           if (v) onChange(v)
         } else onChange(e.target.value)
       }}
-      className={`h-7 w-20 min-w-0 rounded-lg border px-1.5 text-sm outline-none focus:border-indigo-400 md:w-auto md:px-2 ${value === '' ? 'border-dashed border-slate-200 text-slate-300' : 'border-slate-200 bg-white font-semibold text-slate-700'}`}
+      className={`h-9 w-20 min-w-0 rounded-lg md:h-7 border px-1.5 text-sm outline-none focus:border-indigo-400 md:w-auto md:px-2 ${value === '' ? 'border-dashed border-slate-200 text-slate-300' : 'border-slate-200 bg-white font-semibold text-slate-700'}`}
     >
       <option value="">—</option>
       {levels.map((l) => (
@@ -846,12 +865,20 @@ function Popover({
     const r = ref.current?.getBoundingClientRect()
     if (!r) return
     const width = panel.current?.offsetWidth ?? 220
+    const height = panel.current?.offsetHeight ?? 0
     const left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8))
-    setPos(up ? { left, bottom: window.innerHeight - r.top + 8 } : { left, top: r.bottom + 4 })
+    // 下に収まらなければ上に開く
+    const flip = up || (r.bottom + 4 + height > window.innerHeight - 8 && r.top - 8 - height > 8)
+    setPos(flip ? { left, bottom: window.innerHeight - r.top + 8 } : { left, top: r.bottom + 4 })
   }
 
   useLayoutEffect(() => {
-    if (open) place()
+    if (!open || !panel.current) return
+    place()
+    // 中身の増減（「この条件をクリア」の表示など）で位置を再計算
+    const ro = new ResizeObserver(() => place())
+    ro.observe(panel.current)
+    return () => ro.disconnect()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -902,7 +929,7 @@ function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => voi
       type="checkbox"
       checked={checked}
       onChange={onChange}
-      className="size-4 cursor-pointer rounded border-slate-300 accent-indigo-600"
+      className="size-5 cursor-pointer rounded border-slate-300 accent-indigo-600 md:size-4"
     />
   )
 }
