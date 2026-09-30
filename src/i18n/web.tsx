@@ -16,7 +16,7 @@ const readStored = () => {
 
 /** Web 版の表示言語。<html lang>・タイトル・meta description も言語に合わせる */
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<AppLanguage>(() => resolveInitialLanguage(window.location.search, readStored(), navigator.languages ?? [navigator.language]))
+  const [lang, setLangState] = useState<AppLanguage>(() => resolveInitialLanguage(window.location.search, readStored(), navigator.languages?.length ? navigator.languages : [navigator.language]))
 
   const setLang = useCallback((l: AppLanguage) => {
     setLangState(l)

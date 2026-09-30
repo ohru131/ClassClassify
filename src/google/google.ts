@@ -4,6 +4,8 @@
  * 通信はブラウザ ⇔ Google の間だけで行い、第三者のサーバーは経由しない。
  */
 
+import { isAppLanguage, type AppLanguage } from '../i18n/languages'
+
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY as string | undefined
 /** Google Cloud プロジェクト番号。Picker で選んだファイルへのアクセス権付与に必要 */
@@ -236,10 +238,15 @@ const hex = (h: string) => {
   return { red: ((n >> 16) & 255) / 255, green: ((n >> 8) & 255) / 255, blue: (n & 255) / 255 }
 }
 
-/** 書式付きの新しいスプレッドシートを作成する */
+// 新しく作るスプレッドシートのロケール（小数点・日付・関数の区切りに効く）。
+// スペイン語は中南米の語彙に合わせてメキシコ（es_419 はスプレッドシートのロケールに無い）
+const SHEETS_LOCALE: Record<AppLanguage, string> = { ja: 'ja_JP', en: 'en_US', ko: 'ko_KR', es: 'es_MX', de: 'de_DE', 'pt-BR': 'pt_BR' }
+export const spreadsheetLocale = (lang: string | undefined) => (isAppLanguage(lang) ? SHEETS_LOCALE[lang] : 'ja_JP')
+
+/** 書式付きの新しいスプレッドシートを作成する（ロケールは setGoogleMessages で渡した表示言語） */
 export async function createSpreadsheet(title: string, sheets: SheetSpec[]): Promise<GoogleFile> {
   const res = await post('https://sheets.googleapis.com/v4/spreadsheets', {
-    properties: { title, locale: 'ja_JP' },
+    properties: { title, locale: spreadsheetLocale(MSG.locale) },
     sheets: sheets.map((t, i) => ({
       properties: { sheetId: i, title: t.name, gridProperties: { frozenRowCount: t.frozenRows ?? 0, frozenColumnCount: t.frozenCols ?? 0 } },
     })),

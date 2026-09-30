@@ -253,7 +253,8 @@ export function violationText(lang: FileLanguage, v: Violation, p: Problem, clas
   return t.unwanted(who(p, v.students[0]), who(p, v.students[1]), l.className(classOf[v.students[0]]))
 }
 
-const norm = (s: string) => s.trim().toLowerCase().replace(/[.．º°]/g, '')
+// 「N.º」「Nº」「N°」はどれも nº に揃える。º まで消すと素の「N」（属性の列名としてありうる）と区別できなくなる
+const norm = (s: string) => s.trim().toLowerCase().replace(/[.．]/g, '').replace(/°/g, 'º')
 const all = <K extends keyof FileLabels>(key: K) => Object.values(FILE_LABELS).map((l) => l[key])
 
 /** 読み込みで受け付けるシート名（日本語を最初に探す） */
@@ -264,7 +265,8 @@ export const SHEET_ALIASES = {
   unwanted: Object.values(FILE_LABELS).map((l) => l.sheets.unwanted),
 }
 
-const NO_HEADERS = new Set([...all('no'), 'NO', 'N', 'NUM', 'NÚM', 'NUMERO', 'NÚMERO', 'NUMMER', 'NR', '#'].map(norm))
+// 素の「N」「#」は入れない（属性の列名として使われうるので、番号の列と取り違える）
+const NO_HEADERS = new Set([...all('no'), 'NO', 'NUM', 'NÚM', 'NUMERO', 'NÚMERO', 'NUMMER', 'NR'].map(norm))
 const NAME_HEADERS = new Set([...all('name'), '名前', '氏名', 'Nombre', 'Nome', 'Name', '이름', '성명'].map(norm))
 const CLASS_COUNT_KEYS = new Set([...all('classCount'), 'Number of groups', '학급 수', 'Anzahl der Klassen', 'Número de turmas'].map(norm))
 const MAX_KEYS = new Set([...all('maxPerClass'), 'Max class size', 'Maximum per class'].map(norm))

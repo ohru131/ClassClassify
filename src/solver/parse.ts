@@ -61,8 +61,15 @@ export function parseWorkbook(data: ArrayBuffer, msg: ParseMessages = JA_PARSE_M
 
   const weightRow = roster[0]
   const headerRow = roster[1].map(cellStr)
-  const noCol = headerRow.findIndex((h) => h.toUpperCase().replace(/[.．]/g, '') === 'NO' || isNoHeader(h))
-  const nameCol = headerRow.findIndex((h) => h === '名前' || h === '氏名' || isNameHeader(h))
+  // まず従来どおりの完全一致（NO / 名前 / 氏名）を列全体から探し、見つからないときだけ他の言語の見出しを見る。
+  // 1回の findIndex で両方を見ると、「NO | Name | 氏名」のようなファイルで左にある Name が勝ってしまい、
+  // 日本語のファイルの読み方が変わる
+  const findCol = (legacy: (h: string) => boolean, other: (h: string) => boolean) => {
+    const i = headerRow.findIndex(legacy)
+    return i >= 0 ? i : headerRow.findIndex(other)
+  }
+  const noCol = findCol((h) => h.toUpperCase().replace(/[.．]/g, '') === 'NO', isNoHeader)
+  const nameCol = findCol((h) => h === '名前' || h === '氏名', isNameHeader)
   const c0 = noCol >= 0 ? noCol : 0
   const c1 = nameCol >= 0 ? nameCol : 1
 

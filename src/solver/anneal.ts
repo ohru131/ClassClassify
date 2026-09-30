@@ -246,7 +246,9 @@ export function createAnnealer(p: CompiledProblem, opt: AnnealOptions): Annealer
     res = { classOf, cost, elapsedMs: performance.now() - t0, iterations: iter }
   }
 
-  const run = (sliceMs: number): boolean => {
+  const run = (sliceMsIn: number): boolean => {
+    // 0・負・NaN だと1回も進まずに戻り、呼び出し側のループが永久に終わらない。最低 1ms は進める
+    const sliceMs = Math.max(1, sliceMsIn || 0)
     if (polished) return true
     if (!finished) {
       const sliceStart = performance.now()

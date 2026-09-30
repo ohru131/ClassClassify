@@ -159,7 +159,7 @@ export function buildTemplateSheets(buf: ArrayBuffer, lang: AppLanguage = 'ja'):
 
 /** 記入例つきのひな形スプレッドシートを利用者の Drive に作成する */
 export async function createTemplateSpreadsheet(lang: AppLanguage = 'ja', title = 'Mosaic 名簿ひな形'): Promise<GoogleFile> {
-  // 日本語は従来どおりの記入例（./sample1.xlsx）、他の言語はその国のサンプル
-  const buf = await (await fetch(lang === 'ja' ? './sample1.xlsx' : sampleUrl(lang, 'sample1'))).arrayBuffer()
+  // その言語のサンプル（日本語も samples/ja/。旧 ./sample1.xlsx は以前のリンク用に残してある）
+  const buf = await (await fetch(sampleUrl(lang, 'sample1'))).arrayBuffer()
   return createSpreadsheet(title, buildTemplateSheets(buf, lang))
 }

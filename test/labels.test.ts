@@ -73,6 +73,30 @@ describe('言語別のシート名・見出し', () => {
     expect(q.warnings[0]).toContain('Keep apart')
   })
 
+  const roster = (rows: unknown[][]) => {
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['クラス数', 2]]), '設定')
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), '生徒名簿')
+    return parseWorkbook(writeXlsx(wb, 'array'))
+  }
+
+  it('番号の見出しが無いファイルは従来どおり 0 列目を番号として読む（素の「N」「#」を番号と取り違えない）', () => {
+    const q = roster([['', '', 1, 1], ['', '名前', 'N', '#'], [1, '青木', '✓', 'a'], [2, '井上', '', 'b'], [3, '上田', '✓', 'a']])
+    expect(q.students.map((s) => [s.no, s.name])).toEqual([[1, '青木'], [2, '井上'], [3, '上田']])
+    expect(q.columns.map((c) => c.name)).toEqual(['N', '#'])
+  })
+
+  it('「NO | Name | 氏名」では従来の完全一致の 氏名 を名前の列にする', () => {
+    const q = roster([['', '', ''], ['NO', 'Name', '氏名'], [1, 'x', '青木'], [2, 'y', '井上']])
+    expect(q.students.map((s) => s.name)).toEqual(['青木', '井上'])
+    expect(q.columns.map((c) => c.name)).toEqual(['Name'])
+  })
+
+  it('スペイン語・ポルトガル語の番号の見出し（N.º / Nº / N°）は番号として読む', () => {
+    for (const h of ['N.º', 'Nº', 'N°', 'Nr.', 'No.'])
+      expect(roster([['', '', ''], ['Nombre', h, 'x'], ['Ana', 1, '✓'], ['Bea', 2, '']]).students.map((s) => s.no), h).toEqual([1, 2])
+  })
+
   it('違反の説明を言語別に作る（日本語は evaluate のメッセージのまま）', () => {
     const p = load('sample1.xlsx')
     const classOf = p.students.map(() => 0)
