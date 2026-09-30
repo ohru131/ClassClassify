@@ -510,16 +510,17 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
           >
             <Split className="size-4" /> 別の組にする
           </button>
-          <BulkSet problem={problem} onApply={(col, v) => change(setValueFor(problem, sel, col, v))} />
+          {sel.length > 0 && <BulkSet problem={problem} onApply={(col, v) => change(setValueFor(problem, sel, col, v))} />}
           <button
             type="button"
+            disabled={sel.length === 0}
             onClick={() => {
               if (confirm(`${sel.length} 名を名簿から削除しますか？`)) {
                 onChange(removeStudents(problem, sel))
                 setSelected(new Set())
               }
             }}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold text-rose-300 hover:bg-white/10"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold text-rose-300 hover:bg-white/10 disabled:opacity-40"
           >
             <Trash2 className="size-4" /> 削除
           </button>
@@ -861,7 +862,7 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
         {groups.map((g, gi) => {
           const bad = g.some((i) => conflictSet.has(i))
           return (
-            <div key={`${gi}:${g.join('-')}`} className={`group rounded-2xl border bg-white p-4 transition hover:shadow-md ${bad ? 'border-amber-300' : 'border-slate-200'}`}>
+            <div key={gi} className={`group rounded-2xl border bg-white p-4 transition hover:shadow-md ${bad ? 'border-amber-300' : 'border-slate-200'}`}>
               <div className="mb-2 flex items-center justify-between">
                 <span className={`rounded-md px-2 py-0.5 text-xs font-bold ${tone.badge}`}>
                   {kind === 'wanted' ? '同' : '別'}
@@ -1011,13 +1012,16 @@ function StudentPicker({ problem, exclude, onPick, autoFocus }: { problem: Probl
 function NoInput({ value, validate, onCommit }: { value: number; validate: (no: number) => string | null; onCommit: (no: number) => void }) {
   const [draft, setDraft] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => () => clearTimeout(timer.current), [])
   const commit = () => {
     if (draft === null) return
     const no = Number(draft)
     const err = !Number.isInteger(no) || no < 1 ? 'NO は 1 以上の整数で入力してください' : validate(no)
     if (err) {
       setError(err)
-      setTimeout(() => setError(null), 2500)
+      clearTimeout(timer.current)
+      timer.current = setTimeout(() => setError(null), 2500)
     } else if (no !== value) onCommit(no)
     setDraft(null)
   }

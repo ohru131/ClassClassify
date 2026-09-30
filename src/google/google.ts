@@ -51,6 +51,8 @@ function loadScript(src: string) {
 }
 
 let token: { value: string; expires: number } | null = null
+/** 一度同意を得たら、以降の再取得は同意画面を出さない（ポップアップブロック回避） */
+let consented = false
 
 async function getToken(): Promise<string> {
   if (token && token.expires > Date.now() + 60_000) return token.value
@@ -62,12 +64,13 @@ async function getToken(): Promise<string> {
       callback: (res: any) => {
         if (res.error) return reject(new Error(`Google 認証に失敗しました: ${res.error_description ?? res.error}`))
         token = { value: res.access_token, expires: Date.now() + Number(res.expires_in) * 1000 }
+        consented = true
         resolve(res.access_token)
       },
       error_callback: (err: any) =>
         reject(new Error(err?.type === 'popup_closed' ? 'cancelled' : `Google 認証に失敗しました: ${err?.message ?? err?.type}`)),
     })
-    client.requestAccessToken({ prompt: token ? '' : undefined })
+    client.requestAccessToken({ prompt: consented ? '' : undefined })
   })
 }
 

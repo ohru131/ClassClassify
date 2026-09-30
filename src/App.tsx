@@ -79,17 +79,11 @@ export default function App() {
 
   const createTemplate = async () => {
     setTemplateBusy(true)
-    // ポップアップブロック回避のため、クリック直後に空のタブを開いておく
-    const tab = window.open('', '_blank')
+    // 自動でタブは開かない（Google 認証ポップアップと競合するため）。ボタンが「作成したひな形を開く」に変わる
     try {
       const file = await createTemplateSpreadsheet()
       setTemplateUrl(file.url)
-      if (tab) {
-        tab.opener = null
-        tab.location.href = file.url
-      }
     } catch (e) {
-      tab?.close()
       showError(e)
     } finally {
       setTemplateBusy(false)

@@ -111,3 +111,13 @@ describe('レビュー指摘の回帰テスト', async () => {
     expect(r.isNoTaken(p, p.students[0].no, 0)).toBe(false)
   })
 })
+
+describe('無効にした項目', async () => {
+  const r = await import('../src/solver/roster')
+  it('名簿 Excel の往復で無効のまま', async () => {
+    let p = load('sample1.xlsx')
+    p = { ...p, columns: p.columns.map((c, i) => (i === 0 ? { ...c, enabled: false, weight: 0 } : c)) }
+    const q = parseWorkbook(await r.exportRoster(p, 4).arrayBuffer())
+    expect(q.columns[0].enabled).toBe(false)
+  })
+})
