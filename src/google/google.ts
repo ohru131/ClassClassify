@@ -143,6 +143,55 @@ export interface SheetSpec {
   boldCols?: number[]
   /** 列幅（px） */
   colWidths?: number[]
+  /** セル単位の塗り（結果出力用） */
+  fills?: { row: number; col: number; cols?: number; bg?: string; fg?: string; bold?: boolean }[]
+  /** 列幅（文字数。colWidths が無いときに使う） */
+  widths?: number[]
+}
+
+/** SheetSpec の書式を Sheets API の batchUpdate リクエストにする */
+function formatRequests(sheetId: number, t: SheetSpec): unknown[] {
+  const requests: unknown[] = []
+  for (const b of t.bands ?? [])
+    requests.push({
+      repeatCell: {
+        range: { sheetId, startRowIndex: b.row, endRowIndex: b.row + 1 },
+        cell: { userEnteredFormat: { backgroundColor: hex(b.color), textFormat: { bold: !!b.bold } } },
+        fields: 'userEnteredFormat(backgroundColor,textFormat.bold)',
+      },
+    })
+  for (const c of t.boldCols ?? [])
+    requests.push({
+      repeatCell: {
+        range: { sheetId, startColumnIndex: c, endColumnIndex: c + 1 },
+        cell: { userEnteredFormat: { textFormat: { bold: true } } },
+        fields: 'userEnteredFormat.textFormat.bold',
+      },
+    })
+  for (const f of t.fills ?? [])
+    requests.push({
+      repeatCell: {
+        range: { sheetId, startRowIndex: f.row, endRowIndex: f.row + 1, startColumnIndex: f.col, endColumnIndex: f.col + (f.cols ?? 1) },
+        cell: {
+          userEnteredFormat: {
+            ...(f.bg && { backgroundColor: hex(f.bg) }),
+            textFormat: { bold: !!f.bold, ...(f.fg && { foregroundColor: hex(f.fg) }) },
+          },
+        },
+        fields: `userEnteredFormat(${f.bg ? 'backgroundColor,' : ''}textFormat)`,
+      },
+    })
+  const widths = t.colWidths ?? t.widths?.map((w) => Math.round(w * 8 + 16))
+  widths?.forEach((px, c) =>
+    requests.push({
+      updateDimensionProperties: {
+        range: { sheetId, dimension: 'COLUMNS', startIndex: c, endIndex: c + 1 },
+        properties: { pixelSize: px },
+        fields: 'pixelSize',
+      },
+    }),
+  )
+  return requests
 }
 
 const stamp = () => {
@@ -179,34 +228,7 @@ export async function createSpreadsheet(title: string, sheets: SheetSpec[]): Pro
   const id: string = json.spreadsheetId
   await writeValues(id, sheets)
 
-  const requests: unknown[] = []
-  sheets.forEach((t, sheetId) => {
-    for (const b of t.bands ?? [])
-      requests.push({
-        repeatCell: {
-          range: { sheetId, startRowIndex: b.row, endRowIndex: b.row + 1 },
-          cell: { userEnteredFormat: { backgroundColor: hex(b.color), textFormat: { bold: !!b.bold } } },
-          fields: 'userEnteredFormat(backgroundColor,textFormat.bold)',
-        },
-      })
-    for (const c of t.boldCols ?? [])
-      requests.push({
-        repeatCell: {
-          range: { sheetId, startColumnIndex: c, endColumnIndex: c + 1 },
-          cell: { userEnteredFormat: { textFormat: { bold: true } } },
-          fields: 'userEnteredFormat.textFormat.bold',
-        },
-      })
-    t.colWidths?.forEach((px, c) =>
-      requests.push({
-        updateDimensionProperties: {
-          range: { sheetId, dimension: 'COLUMNS', startIndex: c, endIndex: c + 1 },
-          properties: { pixelSize: px },
-          fields: 'pixelSize',
-        },
-      }),
-    )
-  })
+  const requests = sheets.flatMap((t, sheetId) => formatRequests(sheetId, t))
   if (requests.length) await post(sheetsApi(id, ':batchUpdate'), { requests })
   return { id, name: title, mimeType: SHEET_MIME, url: json.spreadsheetUrl }
 }
@@ -215,12 +237,15 @@ export async function createSpreadsheet(title: string, sheets: SheetSpec[]): Pro
  * 結果を書き出す。元が Google スプレッドシートならタブを追加し、
  * そうでなければ（アップロードした Excel・Drive 上の .xlsx）新しいスプレッドシートを作成する。
  */
-export async function writeResults(sheets: { name: string; rows: Cell[][] }[], target: GoogleFile | null, title: string): Promise<string> {
+export async function writeResults(sheets: SheetSpec[], target: GoogleFile | null, title: string): Promise<string> {
   const suffix = stamp()
   const tabs = sheets.map((s) => ({ ...s, name: `${s.name}_${suffix}` }))
   if (target && target.mimeType === SHEET_MIME) {
-    await post(sheetsApi(target.id, ':batchUpdate'), { requests: tabs.map((t) => ({ addSheet: { properties: { title: t.name } } })) })
+    const res = await post(sheetsApi(target.id, ':batchUpdate'), { requests: tabs.map((t) => ({ addSheet: { properties: { title: t.name } } })) })
+    const ids: number[] = (await res.json()).replies.map((r: any) => r.addSheet.properties.sheetId)
     await writeValues(target.id, tabs)
+    const requests = tabs.flatMap((t, i) => formatRequests(ids[i], t))
+    if (requests.length) await post(sheetsApi(target.id, ':batchUpdate'), { requests })
     return `https://docs.google.com/spreadsheets/d/${target.id}/edit`
   }
   return (await createSpreadsheet(title, tabs)).url

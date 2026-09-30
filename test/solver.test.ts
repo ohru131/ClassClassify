@@ -4,7 +4,7 @@ import { parseWorkbook } from '../src/solver/parse'
 import { compile } from '../src/solver/compile'
 import { anneal } from '../src/solver/anneal'
 import { evaluate } from '../src/solver/evaluate'
-import { exportWorkbook } from '../src/solver/export'
+import { exportRoster, exportWorkbook } from '../src/solver/export'
 
 const load = (f: string) => {
   const b = readFileSync(new URL(`../public/${f}`, import.meta.url))
@@ -27,7 +27,7 @@ describe.each(['sample1.xlsx', 'sample2.xlsx', 'sample-group.xlsx'])('%s', (file
 
 describe('Google ひな形', () => {
   it('ひな形の内容が sample1.xlsx と同じ問題として読み込める', async () => {
-    const XLSX = await import('xlsx')
+    const XLSX = await import('xlsx-js-style')
     const { buildTemplateSheets } = await import('../src/google/template')
     const b = readFileSync(new URL('../public/sample1.xlsx', import.meta.url))
     const buf = b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)
@@ -73,7 +73,7 @@ describe('名簿編集', async () => {
     const col = p.columns.find((c) => c.name === 'リーダー')!
     expect(col).toMatchObject({ kind: 'flag', levels: ['○'], enabled: true })
     p = r.updateStudent(p, 3, { name: '新しい名前' })
-    const buf = r.exportRoster(p, 4)
+    const buf = exportRoster(p, 4)
     return buf.arrayBuffer().then((ab) => {
       const q = parseWorkbook(ab)
       expect(q.students).toEqual(p.students)
@@ -113,21 +113,20 @@ describe('レビュー指摘の回帰テスト', async () => {
 })
 
 describe('無効にした項目', async () => {
-  const r = await import('../src/solver/roster')
   it('名簿 Excel の往復で無効のまま', async () => {
     let p = load('sample1.xlsx')
     p = { ...p, columns: p.columns.map((c, i) => (i === 0 ? { ...c, enabled: false, weight: 0 } : c)) }
-    const q = parseWorkbook(await r.exportRoster(p, 4).arrayBuffer())
+    const q = parseWorkbook(await exportRoster(p, 4).arrayBuffer())
     expect(q.columns[0].enabled).toBe(false)
   })
 })
 
 describe('設定シート', () => {
   it('クラス数が計算結果なしの数式でも、生徒人数と最大人数から求める', async () => {
-    const XLSX = await import('xlsx')
+    const XLSX = await import('xlsx-js-style')
     const wb = XLSX.utils.book_new()
     const settings = XLSX.utils.aoa_to_sheet([['生徒人数', 10], ['1クラスの最大人数', 4], ['クラス数', null]])
-    settings['B3'] = { t: 'n', f: 'CEILING(B1/B2,1)' } as import('xlsx').CellObject
+    settings['B3'] = { t: 'n', f: 'CEILING(B1/B2,1)' } as import('xlsx-js-style').CellObject
     XLSX.utils.book_append_sheet(wb, settings, '設定')
     XLSX.utils.book_append_sheet(
       wb,
@@ -137,5 +136,32 @@ describe('設定シート', () => {
     const p = parseWorkbook(XLSX.write(wb, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer)
     expect(p.numClasses).toBe(3)
     expect(p.warnings).toEqual([])
+  })
+})
+
+describe('ペア指定の出力', () => {
+  it('組分けシートにペア指定列と色が入り、ペア指定シートに判定が出る', async () => {
+    const XLSX = await import('xlsx-js-style')
+    const { pairStatus } = await import('../src/solver/pairs')
+    const p = load('sample1.xlsx')
+    const { compiled } = compile(p)
+    const res = anneal(compiled, { timeMs: 500, seed: 1 })
+    // 同1 を意図的に崩す
+    const classOf = [...res.classOf]
+    const [a, b] = p.wantedGroups[0]
+    classOf[b] = (classOf[a] + 1) % p.numClasses
+    const report = evaluate(p, classOf, p.numClasses)
+    const wb = XLSX.read(await exportWorkbook(p, classOf, p.numClasses, report).arrayBuffer(), { cellStyles: true })
+    expect(wb.SheetNames).toContain('ペア指定')
+    const ws = wb.Sheets['組分け']
+    expect(ws['D1'].v).toBe('ペア指定')
+    const row = a + 2
+    expect(String(ws[`D${row}`].v)).toContain('同1(×)')
+    expect(ws[`A${row}`].s?.fgColor?.rgb ?? ws[`A${row}`].s?.fill?.fgColor?.rgb).toMatch(/E0F2FE$/)
+    const pairs = XLSX.utils.sheet_to_json<string[]>(wb.Sheets['ペア指定'], { header: 1 })
+    expect(pairs[1][0]).toBe('同1')
+    expect(pairs[1][4]).toBe('×')
+    const st = pairStatus(p, classOf)
+    expect(st.groups.find((g) => g.label === '同1')!.ok).toBe(false)
   })
 })
