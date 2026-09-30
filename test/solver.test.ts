@@ -121,3 +121,21 @@ describe('無効にした項目', async () => {
     expect(q.columns[0].enabled).toBe(false)
   })
 })
+
+describe('設定シート', () => {
+  it('クラス数が計算結果なしの数式でも、生徒人数と最大人数から求める', async () => {
+    const XLSX = await import('xlsx')
+    const wb = XLSX.utils.book_new()
+    const settings = XLSX.utils.aoa_to_sheet([['生徒人数', 10], ['1クラスの最大人数', 4], ['クラス数', null]])
+    settings['B3'] = { t: 'n', f: 'CEILING(B1/B2,1)' } as import('xlsx').CellObject
+    XLSX.utils.book_append_sheet(wb, settings, '設定')
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.aoa_to_sheet([['', '重み', 1], ['NO', '名前', 'A'], ...Array.from({ length: 10 }, (_, i) => [i + 1, `s${i}`, i % 2 ? '○' : ''])]),
+      '生徒名簿',
+    )
+    const p = parseWorkbook(XLSX.write(wb, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer)
+    expect(p.numClasses).toBe(3)
+    expect(p.warnings).toEqual([])
+  })
+})
