@@ -113,5 +113,5 @@ export function parseWorkbook(data: ArrayBuffer): Problem {
   const wantedGroups = readGroups(sheetRows(wb, '同じ組ペア'), noToIndex, '同じ組ペア', warnings)
   const unwantedGroups = readGroups(sheetRows(wb, '別の組ペア'), noToIndex, '別の組ペア', warnings)
 
-  return { students, columns, numClasses, maxPerClass, wantedGroups, unwantedGroups, rosterSheet: roster, warnings }
+  return { students, columns, numClasses, maxPerClass, wantedGroups, unwantedGroups, warnings }
 }

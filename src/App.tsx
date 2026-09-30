@@ -9,6 +9,8 @@ import { downloadAsXlsx, googleEnabled, pickSpreadsheet, writeResults, type Goog
 import { runParallel } from './solver/run'
 import type { ColumnSpec, Problem } from './solver/types'
 import { DataStep, SettingsStep } from './components/Setup'
+import { RosterEditor, type EditorTab } from './components/RosterEditor'
+import { exportRoster } from './solver/roster'
 import { Results } from './components/Results'
 import { Logo, StepHeader } from './components/ui'
 
@@ -35,6 +37,7 @@ export default function App() {
   const [templateBusy, setTemplateBusy] = useState(false)
   const [templateUrl, setTemplateUrl] = useState<string | null>(null)
   const [savedUrl, setSavedUrl] = useState<string | null>(null)
+  const [editorTab, setEditorTab] = useState<EditorTab | null>(null)
   const cancelRef = useRef<() => void>(() => {})
   const resultRef = useRef<HTMLDivElement>(null)
 
@@ -97,6 +100,22 @@ export default function App() {
     }
   }
 
+  const onProblemChange = (next: Problem) => {
+    // 生徒の追加・削除で index が変わるため、既存の編成結果は破棄
+    if (problem && next.students.length !== problem.students.length) setSolution(null)
+    setProblem(next)
+  }
+
+  const saveBlob = (blob: Blob, name: string) => {
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = name
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+  }
+
   const onColumnChange = (i: number, patch: Partial<ColumnSpec>) =>
     setProblem((p) => (p ? { ...p, columns: p.columns.map((c, j) => (i === j ? { ...c, ...patch } : c)) } : p))
 
@@ -127,14 +146,7 @@ export default function App() {
 
   const download = () => {
     if (!problem || !solution || !report) return
-    const blob = exportWorkbook(problem, solution.classOf, solution.k, report)
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `クラス編成結果_${new Date().toISOString().slice(0, 10)}.xlsx`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+    saveBlob(exportWorkbook(problem, solution.classOf, solution.k, report), `クラス編成結果_${new Date().toISOString().slice(0, 10)}.xlsx`)
   }
 
   return (
@@ -215,6 +227,7 @@ export default function App() {
             timeSec={timeSec}
             setTimeSec={setTimeSec}
             onColumnChange={onColumnChange}
+            onOpenEditor={setEditorTab}
           />
         )}
 
@@ -280,6 +293,17 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {problem && editorTab && (
+        <RosterEditor
+          problem={problem}
+          tab={editorTab}
+          setTab={setEditorTab}
+          onChange={onProblemChange}
+          onClose={() => setEditorTab(null)}
+          onExport={() => saveBlob(exportRoster(problem, numClasses), `名簿_${new Date().toISOString().slice(0, 10)}.xlsx`)}
+        />
+      )}
 
       <footer className="border-t border-slate-200/70 py-8 text-center text-xs text-slate-400">
         Mosaic · クラス編成オプティマイザー — MIT License

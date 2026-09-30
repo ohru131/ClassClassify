@@ -43,3 +43,43 @@ describe('Google ひな形', () => {
     expect(t.unwantedGroups).toEqual(a.unwantedGroups)
   })
 })
+
+describe('名簿編集', async () => {
+  const r = await import('../src/solver/roster')
+  it('生徒削除でペアの index を詰め直す', () => {
+    const p = load('sample1.xlsx')
+    const target = p.wantedGroups[0][0]
+    const q = r.removeStudents(p, [target])
+    expect(q.students.length).toBe(p.students.length - 1)
+    for (const g of [...q.wantedGroups, ...q.unwantedGroups]) for (const i of g) expect(i).toBeLessThan(q.students.length)
+    const names = (pp: typeof p, gs: number[][]) => gs.map((g) => g.map((i) => pp.students[i].no))
+    const removedNo = p.students[target].no
+    expect(names(q, q.wantedGroups)).toEqual(
+      names(p, p.wantedGroups).map((g) => g.filter((n) => n !== removedNo)).filter((g) => g.length >= 2),
+    )
+  })
+  it('矛盾する指定を検出する', () => {
+    let p = load('sample2.xlsx')
+    p = { ...p, wantedGroups: [], unwantedGroups: [] }
+    p = r.addGroup(p, 'wanted', [0, 1])
+    p = r.addGroup(p, 'wanted', [1, 2])
+    p = r.addGroup(p, 'unwanted', [0, 2])
+    expect(r.findConflicts(p)).toEqual([[0, 2]])
+  })
+  it('値の編集で項目の種類を再判定し、名簿 Excel を再読み込みできる', () => {
+    let p = load('sample1.xlsx')
+    p = r.addColumn(p, 'リーダー')
+    p = r.setValueFor(p, [0, 5, 9], 'リーダー', '○')
+    const col = p.columns.find((c) => c.name === 'リーダー')!
+    expect(col).toMatchObject({ kind: 'flag', levels: ['○'], enabled: true })
+    p = r.updateStudent(p, 3, { name: '新しい名前' })
+    const buf = r.exportRoster(p, 4)
+    return buf.arrayBuffer().then((ab) => {
+      const q = parseWorkbook(ab)
+      expect(q.students).toEqual(p.students)
+      expect(q.columns).toEqual(p.columns)
+      expect(q.wantedGroups).toEqual(p.wantedGroups)
+      expect(q.unwantedGroups).toEqual(p.unwantedGroups)
+    })
+  })
+})
