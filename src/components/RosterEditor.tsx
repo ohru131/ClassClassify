@@ -9,6 +9,7 @@ import {
   Filter,
   Link2,
   Plus,
+  RefreshCw,
   Search,
   Split,
   Trash2,
@@ -16,13 +17,14 @@ import {
   Users,
   X,
 } from 'lucide-react'
-import type { ColumnSpec, Problem } from '../solver/types'
+import type { ColumnKind, ColumnSpec, Problem } from '../solver/types'
 import {
   addColumn,
   addGroup,
   addStudent,
   findConflicts,
   groupsOf,
+  isNoTaken,
   removeColumn,
   removeGroup,
   removeStudents,
@@ -70,12 +72,14 @@ export function RosterEditor({
   ]
 
   return (
-    <div className="fixed inset-0 z-40 flex items-stretch justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:p-4" onMouseDown={onClose}>
+    <div
+      className="fixed inset-0 z-40 flex items-stretch justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:p-4"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
       <div
         role="dialog"
         aria-modal
         aria-label="名簿エディタ"
-        onMouseDown={(e) => e.stopPropagation()}
         className="flex w-full max-w-[90rem] flex-col overflow-hidden bg-white shadow-2xl sm:rounded-3xl"
       >
         <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-3">
@@ -144,15 +148,23 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
   const [sort, setSort] = useState<{ col: string; dir: 1 | -1 } | null>(null)
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [newCol, setNewCol] = useState<string | null>(null)
+  const [newKind, setNewKind] = useState<ColumnKind>('flag')
   const scrollRef = useRef<HTMLDivElement>(null)
   const { wanted, unwanted } = useMemo(() => groupsOf(problem), [problem])
 
-  const visible = useMemo(() => {
+  // 絞り込み・並べ替えは条件を変えたときだけ適用する（編集中の行が消えたり動いたりしないように）
+  const problemRef = useRef(problem)
+  problemRef.current = problem
+  const [applyTick, setApplyTick] = useState(0)
+  const [dirty, setDirty] = useState(false)
+  const order = useMemo(() => {
+    const p = problemRef.current
+    const { wanted, unwanted } = groupsOf(p)
     const q = query.trim().toLowerCase()
-    let rows = problem.students
+    let rows = p.students
       .map((s, i) => ({ s, i }))
       .filter(({ s, i }) => {
-        if (q && !(`${s.no}` === q || s.name.toLowerCase().includes(q) || `${s.no}`.startsWith(q))) return false
+        if (q && !(s.name.toLowerCase().includes(q) || `${s.no}`.startsWith(q))) return false
         for (const [col, set] of Object.entries(filters)) {
           if (set.size === 0) continue
           const v = s.values[col] ?? ''
@@ -179,8 +191,20 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         return c * sort.dir
       })
     }
-    return rows
-  }, [problem, query, filters, pairFilter, sort, wanted, unwanted])
+    return rows.map((r) => r.i)
+    // 生徒数・ペア指定が変わったとき（index が変わりうる）も再計算
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, filters, pairFilter, sort, applyTick, problem.students.length, problem.wantedGroups, problem.unwantedGroups])
+  useEffect(() => setDirty(false), [order])
+  const visible = useMemo(
+    () => order.filter((i) => i < problem.students.length).map((i) => ({ s: problem.students[i], i })),
+    [order, problem.students],
+  )
+  const filtering = !!query || pairFilter !== 'all' || !!sort || Object.values(filters).some((f) => f.size > 0)
+  const change = (p: Problem) => {
+    if (filtering) setDirty(true)
+    onChange(p)
+  }
 
   const activeFilterCount = Object.values(filters).filter((s) => s.size > 0).length + (pairFilter !== 'all' ? 1 : 0) + (query ? 1 : 0)
   const clearFilters = () => {
@@ -207,7 +231,10 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
       return next
     })
 
-  const sel = [...selected].filter((i) => i < problem.students.length)
+  // 非表示になった生徒は一括操作の対象にしない
+  const visibleSet = new Set(visible.map((v) => v.i))
+  const sel = [...selected].filter((i) => visibleSet.has(i))
+  const hiddenSelected = selected.size - sel.length
 
   return (
     <div className="flex h-full flex-col">
@@ -264,6 +291,16 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
           </button>
         )}
         <div className="ml-auto flex items-center gap-2">
+          {dirty && (
+            <button
+              type="button"
+              onClick={() => setApplyTick((t) => t + 1)}
+              className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 hover:bg-amber-100"
+              title="編集内容に合わせて絞り込み・並べ替えをやり直す"
+            >
+              <RefreshCw className="size-3.5" /> 絞り込みを再適用
+            </button>
+          )}
           <span className="text-xs tabular-nums text-slate-500">
             {visible.length === problem.students.length ? `${visible.length} 名` : `${visible.length} / ${problem.students.length} 名`}
           </span>
@@ -273,7 +310,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               onSubmit={(e) => {
                 e.preventDefault()
                 const name = newCol.trim()
-                if (name) onChange(addColumn(problem, name))
+                if (name) onChange(addColumn(problem, name, newKind))
                 setNewCol(null)
               }}
             >
@@ -281,10 +318,23 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                 autoFocus
                 value={newCol}
                 onChange={(e) => setNewCol(e.target.value)}
-                onBlur={() => !newCol.trim() && setNewCol(null)}
+                onKeyDown={(e) => e.key === 'Escape' && (e.stopPropagation(), setNewCol(null))}
                 placeholder="項目名（例: リーダー）"
                 className="w-44 rounded-xl border border-indigo-300 px-3 py-2 text-sm outline-none ring-2 ring-indigo-100"
               />
+              <select
+                value={newKind}
+                onChange={(e) => setNewKind(e.target.value as ColumnKind)}
+                className="rounded-xl border border-slate-200 px-2 py-2 text-sm outline-none focus:border-indigo-400"
+                title="値の種類"
+              >
+                <option value="flag">○ / 空欄</option>
+                <option value="category">段階・カテゴリ</option>
+                <option value="numeric">数値（点数など）</option>
+              </select>
+              <button type="button" className="btn-ghost !py-2" onClick={() => setNewCol(null)}>
+                取消
+              </button>
               <button type="submit" className="btn-primary !py-2">
                 追加
               </button>
@@ -351,14 +401,10 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                     <Checkbox checked={isSel} onChange={() => toggleOne(i)} />
                   </td>
                   <td className="border-b border-slate-100 px-2 py-1">
-                    <input
-                      type="number"
+                    <NoInput
                       value={s.no}
-                      onChange={(e) => {
-                        const no = Number(e.target.value)
-                        if (Number.isFinite(no)) onChange(updateStudent(problem, i, { no }))
-                      }}
-                      className="w-16 rounded-lg border border-transparent bg-transparent px-2 py-1 font-mono text-xs tabular-nums text-slate-500 outline-none hover:border-slate-200 focus:border-indigo-400 focus:bg-white"
+                      validate={(no) => (isNoTaken(problem, no, i) ? `NO ${no} は他の生徒が使っています` : null)}
+                      onCommit={(no) => change(updateStudent(problem, i, { no }))}
                     />
                   </td>
                   <td className="border-b border-slate-100 px-2 py-1">
@@ -366,7 +412,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                       data-name
                       value={s.name}
                       placeholder="名前を入力"
-                      onChange={(e) => onChange(updateStudent(problem, i, { name: e.target.value }))}
+                      onChange={(e) => change(updateStudent(problem, i, { name: e.target.value }))}
                       className="w-full min-w-32 rounded-lg border border-transparent bg-transparent px-2 py-1 font-medium text-slate-800 outline-none placeholder:text-slate-300 hover:border-slate-200 focus:border-indigo-400 focus:bg-white"
                     />
                   </td>
@@ -375,7 +421,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                       <ValueCell
                         column={c}
                         value={s.values[c.name] ?? ''}
-                        onChange={(v) => onChange(setValueFor(problem, isSel ? sel : [i], c.name, v))}
+                        onChange={(v) => change(setValueFor(problem, isSel ? sel : [i], c.name, v))}
                       />
                     </td>
                   ))}
@@ -436,9 +482,12 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
       </div>
 
       {/* 一括操作バー */}
-      {sel.length > 0 && (
+      {selected.size > 0 && (
         <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 bg-slate-900 px-5 py-3 text-sm text-white">
-          <span className="mr-1 font-semibold tabular-nums">{sel.length} 名を選択</span>
+          <span className="mr-1 font-semibold tabular-nums">
+            {sel.length} 名を選択
+            {hiddenSelected > 0 && <span className="ml-1 text-xs font-normal text-slate-400">（非表示の {hiddenSelected} 名は対象外）</span>}
+          </span>
           <button
             type="button"
             disabled={sel.length < 2}
@@ -461,7 +510,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
           >
             <Split className="size-4" /> 別の組にする
           </button>
-          <BulkSet problem={problem} onApply={(col, v) => onChange(setValueFor(problem, sel, col, v))} />
+          <BulkSet problem={problem} onApply={(col, v) => change(setValueFor(problem, sel, col, v))} />
           <button
             type="button"
             onClick={() => {
@@ -602,11 +651,11 @@ function BulkSet({ problem, onApply }: { problem: Problem; onApply: (col: string
     >
       {(close) => (
         <div className="max-h-80 w-64 overflow-auto p-2 text-slate-700">
-          {problem.columns.map((c) => (
+          {problem.columns.filter((c) => c.kind !== 'numeric').map((c) => (
             <div key={c.name} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
               <span className="truncate text-sm font-semibold">{c.name}</span>
               <div className="flex shrink-0 gap-1">
-                {(c.levels.length ? c.levels : ['○']).slice(0, 6).map((l) => (
+                {(c.levels.length ? c.levels : c.kind === 'flag' ? ['○'] : []).slice(0, 6).map((l) => (
                   <button
                     key={l}
                     type="button"
@@ -719,12 +768,17 @@ function Popover({
   useEffect(() => {
     if (!open) return
     const onDown = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
+    // Esc はポップオーバーだけを閉じ、名簿エディタ自体には伝えない
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      e.stopPropagation()
+      setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown, true)
+    document.addEventListener('keydown', onKey, true)
     return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('mousedown', onDown, true)
+      document.removeEventListener('keydown', onKey, true)
     }
   }, [open])
   return (
@@ -807,7 +861,7 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
         {groups.map((g, gi) => {
           const bad = g.some((i) => conflictSet.has(i))
           return (
-            <div key={gi} className={`group rounded-2xl border bg-white p-4 transition hover:shadow-md ${bad ? 'border-amber-300' : 'border-slate-200'}`}>
+            <div key={`${gi}:${g.join('-')}`} className={`group rounded-2xl border bg-white p-4 transition hover:shadow-md ${bad ? 'border-amber-300' : 'border-slate-200'}`}>
               <div className="mb-2 flex items-center justify-between">
                 <span className={`rounded-md px-2 py-0.5 text-xs font-bold ${tone.badge}`}>
                   {kind === 'wanted' ? '同' : '別'}
@@ -817,7 +871,7 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
                   {bad && <AlertTriangle className="size-4 text-amber-500" />}
                   <button
                     type="button"
-                    onClick={() => onChange(removeGroup(problem, kind, gi))}
+                    onClick={() => confirm(`${kind === 'wanted' ? '同' : '別'}${gi + 1} のグループを削除しますか？`) && onChange(removeGroup(problem, kind, gi))}
                     className="rounded-lg p-1 text-slate-300 opacity-0 transition hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
                     aria-label="グループを削除"
                   >
@@ -825,7 +879,15 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
                   </button>
                 </div>
               </div>
-              <Members problem={problem} members={g} tone={tone} onChange={(m) => onChange(setGroup(problem, kind, gi, m))} />
+              <Members
+                problem={problem}
+                members={g}
+                tone={tone}
+                onChange={(m) => {
+                  if (m.length < 2 && !confirm('メンバーが1人になるため、このグループは削除されます。よろしいですか？')) return
+                  onChange(setGroup(problem, kind, gi, m))
+                }}
+              />
             </div>
           )
         })}
@@ -940,6 +1002,45 @@ function StudentPicker({ problem, exclude, onPick, autoFocus }: { problem: Probl
             </li>
           ))}
         </ul>
+      )}
+    </div>
+  )
+}
+
+/** NO 入力: 入力中は下書きとして保持し、確定（Enter / フォーカスアウト）時に 1 以上の整数・重複なしを検証 */
+function NoInput({ value, validate, onCommit }: { value: number; validate: (no: number) => string | null; onCommit: (no: number) => void }) {
+  const [draft, setDraft] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const commit = () => {
+    if (draft === null) return
+    const no = Number(draft)
+    const err = !Number.isInteger(no) || no < 1 ? 'NO は 1 以上の整数で入力してください' : validate(no)
+    if (err) {
+      setError(err)
+      setTimeout(() => setError(null), 2500)
+    } else if (no !== value) onCommit(no)
+    setDraft(null)
+  }
+  return (
+    <div className="relative">
+      <input
+        inputMode="numeric"
+        value={draft ?? String(value)}
+        onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ''))}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
+          if (e.key === 'Escape') {
+            e.stopPropagation()
+            setDraft(null)
+          }
+        }}
+        className={`w-16 rounded-lg border bg-transparent px-2 py-1 font-mono text-xs tabular-nums text-slate-500 outline-none focus:bg-white ${
+          error ? 'border-rose-400 bg-rose-50' : 'border-transparent hover:border-slate-200 focus:border-indigo-400'
+        }`}
+      />
+      {error && (
+        <div className="absolute left-0 top-full z-20 mt-1 whitespace-nowrap rounded-lg bg-rose-600 px-2 py-1 text-xs font-medium text-white shadow-lg">{error}</div>
       )}
     </div>
   )

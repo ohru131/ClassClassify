@@ -83,3 +83,31 @@ describe('名簿編集', async () => {
     })
   })
 })
+
+describe('レビュー指摘の回帰テスト', async () => {
+  const r = await import('../src/solver/roster')
+  it('数値列は編集で水準が減っても数値のまま、カテゴリ列もカテゴリのまま', () => {
+    let p = load('sample1.xlsx')
+    p = r.addColumn(p, '点数', 'numeric')
+    p = r.addColumn(p, '係', 'category')
+    expect(p.columns.find((c) => c.name === '点数')!.kind).toBe('numeric')
+    p = r.setValueFor(p, [0, 1, 2, 3, 4, 5, 6], '点数', '50')
+    p = r.setValueFor(p, [0], '点数', '90')
+    p = r.setValueFor(p, [0], '点数', '')
+    expect(p.columns.find((c) => c.name === '点数')!.kind).toBe('numeric')
+    p = r.setValueFor(p, [0, 1], '係', '図書')
+    expect(p.columns.find((c) => c.name === '係')).toMatchObject({ kind: 'category', levels: ['図書'], enabled: true })
+  })
+  it('toCell は正規の数値文字列だけ数値化する', () => {
+    expect(r.toCell('3')).toBe(3)
+    expect(r.toCell('2.5')).toBe(2.5)
+    expect(r.toCell('007')).toBe('007')
+    expect(r.toCell('0x10')).toBe('0x10')
+    expect(r.toCell('○')).toBe('○')
+  })
+  it('NO の重複を検出する', () => {
+    const p = load('sample1.xlsx')
+    expect(r.isNoTaken(p, p.students[1].no, 0)).toBe(true)
+    expect(r.isNoTaken(p, p.students[0].no, 0)).toBe(false)
+  })
+})

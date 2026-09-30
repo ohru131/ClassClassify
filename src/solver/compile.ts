@@ -62,13 +62,13 @@ export function compile(p: Problem, numClasses = p.numClasses): { compiled: Comp
     }
   }
 
-  const maxSize = Math.min(Math.ceil(n / k), p.maxPerClass ?? Infinity)
   return {
     compiled: {
       n,
       k,
       minSize: Math.floor(n / k),
-      maxSize: Math.max(maxSize, Math.ceil(n / k)),
+      // 人数は均等（差1以内）を前提とする。maxPerClass は読み込み時に ceil(n/k) 以上であることを検証済み
+      maxSize: Math.ceil(n / k),
       weights,
       lo,
       hi,

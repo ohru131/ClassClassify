@@ -1,14 +1,21 @@
 import * as XLSX from 'xlsx'
 import { detectKind } from './parse'
-import type { ColumnSpec, Problem, Student } from './types'
+import type { ColumnKind, ColumnSpec, Problem, Student } from './types'
 
 export type GroupKind = 'wanted' | 'unwanted'
 const key = (k: GroupKind) => (k === 'wanted' ? 'wantedGroups' : 'unwantedGroups')
 
-/** 生徒の値から各列の種類・水準を再判定する（重み・有効/無効は維持） */
+/**
+ * 生徒の値から各列の水準を再計算する（重み・有効/無効は維持）。
+ * 編集中に入力欄の種類が変わらないよう、数値・カテゴリ列の種類は保持する（該当→カテゴリへの昇格のみ）。
+ */
 export function refreshColumns(students: Student[], columns: ColumnSpec[]): ColumnSpec[] {
   return columns.map((c) => {
-    const { kind, levels } = detectKind(students.map((s) => s.values[c.name] ?? ''))
+    const detected = detectKind(students.map((s) => s.values[c.name] ?? ''))
+    const { levels } = detected
+    const allNumeric = levels.every((v) => Number.isFinite(Number(v)))
+    const kind: ColumnKind =
+      c.kind === 'numeric' && allNumeric ? 'numeric' : c.kind === 'category' || (c.kind === 'numeric' && !allNumeric) ? 'category' : detected.kind
     const wasEmpty = c.levels.length === 0
     return { ...c, kind, levels, enabled: wasEmpty && levels.length > 0 ? c.weight > 0 : c.enabled && levels.length > 0 }
   })
@@ -57,14 +64,17 @@ export function removeStudents(p: Problem, idxs: number[]): Problem {
   }
 }
 
-export function addColumn(p: Problem, name: string): Problem {
+export function addColumn(p: Problem, name: string, kind: ColumnKind = 'flag'): Problem {
   if (!name || name === 'NO' || name === '名前' || p.columns.some((c) => c.name === name)) return p
   return {
     ...p,
     students: p.students.map((s) => ({ ...s, values: { ...s.values, [name]: '' } })),
-    columns: [...p.columns, { name, weight: 1, kind: 'flag', levels: [], enabled: false }],
+    columns: [...p.columns, { name, weight: 1, kind, levels: [], enabled: false }],
   }
 }
+
+/** NO の重複チェック（i 番目の生徒を除く） */
+export const isNoTaken = (p: Problem, no: number, except: number) => p.students.some((s, i) => i !== except && s.no === no)
 
 export function removeColumn(p: Problem, name: string): Problem {
   return {
@@ -126,7 +136,7 @@ export function exportRoster(p: Problem, numClasses: number): Blob {
   const n = p.students.length
   add('設定', [
     ['生徒人数', n],
-    ['1クラスの最大人数', p.maxPerClass ?? Math.ceil(n / numClasses)],
+    ['1クラスの最大人数', p.maxPerClass !== null && p.maxPerClass * numClasses >= n ? p.maxPerClass : Math.ceil(n / numClasses)],
     ['クラス数', numClasses],
   ])
   add('生徒名簿', rosterRows(p))
@@ -137,12 +147,14 @@ export function exportRoster(p: Problem, numClasses: number): Blob {
   return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
 }
 
-const toCell = (v: string | undefined) => (v === undefined || v === '' ? '' : Number.isFinite(Number(v)) ? Number(v) : v)
+/** 数値として正規な文字列（"3", "2.5"）だけ数値にする。"007" などは文字列のまま */
+export const toCell = (v: string | undefined): string | number =>
+  v === undefined || v === '' ? '' : String(Number(v)) === v ? Number(v) : v
 
 /** 出力用の元名簿シートを現在の内容から作り直す */
 export function rosterRows(p: Problem): (string | number | null)[][] {
   return [
-    ['', '重み', ...p.columns.map((c) => (c.enabled ? c.weight : 0))],
+    ['', '重み', ...p.columns.map((c) => c.weight)],
     ['NO', '名前', ...p.columns.map((c) => c.name)],
     ...p.students.map((s) => [s.no, s.name, ...p.columns.map((c) => toCell(s.values[c.name]))]),
   ]

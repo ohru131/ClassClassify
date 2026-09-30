@@ -71,9 +71,14 @@ async function getToken(): Promise<string> {
   })
 }
 
-async function api(url: string, init: RequestInit = {}): Promise<Response> {
+async function api(url: string, init: RequestInit = {}, retried = false): Promise<Response> {
   const t = await getToken()
   const res = await fetch(url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${t}` } })
+  if (res.status === 401 && !retried) {
+    // トークン失効 → 取り直して1回だけ再試行
+    token = null
+    return api(url, init, true)
+  }
   if (!res.ok) {
     let msg = `${res.status}`
     try {
@@ -140,7 +145,7 @@ export interface SheetSpec {
 const stamp = () => {
   const d = new Date()
   const z = (n: number) => String(n).padStart(2, '0')
-  return `${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`
+  return `${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`
 }
 
 const sheetsApi = (id: string, path = '') => `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(id)}${path}`
