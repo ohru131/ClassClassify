@@ -163,7 +163,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 border-b border-white/60 bg-white/60 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-5">
           <Logo />
           <a
             href="https://github.com/ohru131/ClassClassify"
@@ -177,19 +177,20 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-6 px-5 pb-24 pt-10">
+      <main className="mx-auto max-w-6xl space-y-4 px-4 pb-24 pt-8 sm:space-y-6 sm:px-5 sm:pt-10">
         <div className="max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/70 px-3 py-1 text-xs font-semibold text-indigo-700">
             <Zap className="size-3.5" /> 焼きなまし法 × 並列マルチスタート
           </div>
-          <h1 className="text-4xl font-black leading-tight tracking-tight text-slate-900 sm:text-5xl">
+          <h1 className="text-[1.9rem] font-black leading-tight tracking-tight text-slate-900 [word-break:keep-all] sm:text-5xl">
             個性が響き合う、
             <br />
             <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-              バランスの良いクラスを。
+              <span className="inline-block">バランスの良い</span>
+              <span className="inline-block">クラスを。</span>
             </span>
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-slate-600">
+          <p className="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
             性別・学力・支援の必要性など、生徒の特性が各クラスに均等に散らばるよう自動で編成します。
             「同じ組にしたい」「別の組にしたい」組み合わせも考慮。結果はその場で手直しできます。
           </p>
@@ -248,7 +249,7 @@ export default function App() {
         )}
 
         {problem && (
-          <section className="card p-6 sm:p-8">
+          <section className="card p-5 sm:p-8">
             <StepHeader n={3} done={!!solution && !running} title="編成する" desc="複数の CPU コアで同時に探索し、最もバランスの良い案を採用します。" />
             {running ? (
               <div className="space-y-3">

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import {
   AlertTriangle,
   ArrowDown,
@@ -82,19 +83,19 @@ export function RosterEditor({
         aria-label="名簿エディタ"
         className="flex w-full max-w-[90rem] flex-col overflow-hidden bg-white shadow-2xl sm:rounded-3xl"
       >
-        <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-3">
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-3 py-2 sm:gap-3 sm:px-5 sm:py-3">
           <div className="mr-2 text-lg font-extrabold text-slate-900">名簿</div>
-          <div className="inline-flex rounded-xl bg-slate-100 p-1">
+          <div className="order-last flex w-full rounded-xl bg-slate-100 p-1 sm:order-none sm:inline-flex sm:w-auto">
             {tabs.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 onClick={() => setTab(t.id)}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+                className={`inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-semibold transition sm:flex-none sm:px-3 ${
                   tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
-                {t.icon}
+                <span className="hidden sm:inline">{t.icon}</span>
                 {t.label}
                 <span className="rounded-full bg-slate-200/70 px-1.5 text-[11px] tabular-nums text-slate-600">{t.count}</span>
               </button>
@@ -102,7 +103,7 @@ export function RosterEditor({
           </div>
           <div className="ml-auto flex items-center gap-2">
             <button type="button" className="btn-ghost !py-2" onClick={onExport} title="ひな形と同じ形式で保存（再読み込み可能）">
-              <Download className="size-4" /> 名簿を保存
+              <Download className="size-4" /> <span className="hidden sm:inline">名簿を保存</span><span className="sm:hidden">保存</span>
             </button>
             <button type="button" onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100" aria-label="閉じる">
               <X className="size-5" />
@@ -239,17 +240,19 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
   return (
     <div className="flex h-full flex-col">
       {/* ツールバー */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-5 py-3">
+      <div className="flex flex-col gap-2 border-b border-slate-100 px-3 py-3 sm:px-5 lg:flex-row lg:flex-wrap lg:items-center">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
           <input
-            autoFocus
+            autoFocus={window.matchMedia('(min-width: 768px)').matches}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="NO・名前で検索"
-            className="w-52 rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none lg:w-52 transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
           />
         </div>
+        {/* スマホでは横スクロール */}
+        <div className="-mx-3 flex items-center gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:-mx-5 sm:px-5 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0">
         {problem.columns.map((c) => (
           <FilterMenu
             key={c.name}
@@ -290,7 +293,8 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
             条件をクリア
           </button>
         )}
-        <div className="ml-auto flex items-center gap-2">
+        </div>
+        <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
           {dirty && (
             <button
               type="button"
@@ -301,12 +305,12 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               <RefreshCw className="size-3.5" /> 絞り込みを再適用
             </button>
           )}
-          <span className="text-xs tabular-nums text-slate-500">
+          <span className="mr-auto text-xs tabular-nums text-slate-500 lg:mr-0">
             {visible.length === problem.students.length ? `${visible.length} 名` : `${visible.length} / ${problem.students.length} 名`}
           </span>
           {newCol !== null ? (
             <form
-              className="flex items-center gap-1"
+              className="flex w-full flex-wrap items-center gap-1 sm:w-auto"
               onSubmit={(e) => {
                 e.preventDefault()
                 const name = newCol.trim()
@@ -320,7 +324,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                 onChange={(e) => setNewCol(e.target.value)}
                 onKeyDown={(e) => e.key === 'Escape' && (e.stopPropagation(), setNewCol(null))}
                 placeholder="項目名（例: リーダー）"
-                className="w-44 rounded-xl border border-indigo-300 px-3 py-2 text-sm outline-none ring-2 ring-indigo-100"
+                className="min-w-0 flex-1 rounded-xl border border-indigo-300 px-3 py-2 text-sm outline-none ring-2 ring-indigo-100 sm:w-44 sm:flex-none"
               />
               <select
                 value={newKind}
@@ -353,8 +357,8 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               setSort(null)
               setTimeout(() => {
                 scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-                const inputs = scrollRef.current?.querySelectorAll<HTMLInputElement>('input[data-name]')
-                inputs?.[inputs.length - 1]?.focus()
+                const inputs = [...(scrollRef.current?.querySelectorAll<HTMLInputElement>('input[data-name]') ?? [])].filter((el) => el.offsetParent !== null)
+                inputs[inputs.length - 1]?.focus()
               }, 50)
             }}
           >
@@ -365,7 +369,73 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
 
       {/* 表 */}
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
-        <table className="w-full border-separate border-spacing-0 text-sm">
+        {/* スマホ: カード表示 */}
+        <div className="space-y-2 p-3 md:hidden">
+          {visible.length > 0 && (
+            <label className="flex items-center gap-2 px-1 text-xs font-semibold text-slate-500">
+              <Checkbox checked={allVisibleSelected} onChange={toggleAll} /> 表示中をすべて選択
+            </label>
+          )}
+          {visible.map(({ s, i }) => {
+            const isSel = selected.has(i)
+            return (
+              <div key={i} className={`rounded-2xl border p-3 transition ${isSel ? 'border-indigo-300 bg-indigo-50/60' : 'border-slate-200 bg-white'}`}>
+                <div className="flex items-center gap-2">
+                  <Checkbox checked={isSel} onChange={() => toggleOne(i)} />
+                  <NoInput
+                    value={s.no}
+                    validate={(no) => (isNoTaken(problem, no, i) ? `NO ${no} は他の生徒が使っています` : null)}
+                    onCommit={(no) => change(updateStudent(problem, i, { no }))}
+                  />
+                  <input
+                    data-name
+                    value={s.name}
+                    placeholder="名前を入力"
+                    onChange={(e) => change(updateStudent(problem, i, { name: e.target.value }))}
+                    className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1 text-base font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-indigo-400 focus:bg-white"
+                  />
+                  <button
+                    type="button"
+                    aria-label="削除"
+                    onClick={() => {
+                      if (confirm(`${label(problem, i)} を名簿から削除しますか？`)) {
+                        onChange(removeStudents(problem, [i]))
+                        setSelected(new Set())
+                      }
+                    }}
+                    className="rounded-lg p-2 text-slate-300 hover:bg-rose-50 hover:text-rose-500"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+                {(wanted[i].length > 0 || unwanted[i].length > 0) && (
+                  <div className="mt-1 flex flex-wrap gap-1 pl-7">
+                    {wanted[i].map((g) => (
+                      <button key={`w${g}`} type="button" onClick={() => openGroups('wanted')} className="rounded-md bg-indigo-50 px-1.5 py-0.5 text-[11px] font-bold text-indigo-600">
+                        同{g + 1}: {problem.wantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join('・')}
+                      </button>
+                    ))}
+                    {unwanted[i].map((g) => (
+                      <button key={`u${g}`} type="button" onClick={() => openGroups('unwanted')} className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] font-bold text-rose-600">
+                        別{g + 1}: {problem.unwantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join('・')}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5">
+                  {problem.columns.map((c) => (
+                    <div key={c.name} className="flex min-w-0 items-center justify-between gap-2">
+                      <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-500">{c.name}</span>
+                      <ValueCell column={c} value={s.values[c.name] ?? ''} onChange={(v) => change(setValueFor(problem, isSel ? sel : [i], c.name, v))} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <table className="hidden w-full border-separate border-spacing-0 text-sm md:table">
           <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur">
             <tr className="text-left text-xs text-slate-500">
               <th className="sticky left-0 z-10 w-10 border-b border-slate-200 bg-white px-3 py-2">
@@ -483,7 +553,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
 
       {/* 一括操作バー */}
       {selected.size > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 bg-slate-900 px-5 py-3 text-sm text-white">
+        <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 bg-slate-900 px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] text-sm text-white sm:px-5 sm:py-3">
           <span className="mr-1 font-semibold tabular-nums">
             {sel.length} 名を選択
             {hiddenSelected > 0 && <span className="ml-1 text-xs font-normal text-slate-400">（非表示の {hiddenSelected} 名は対象外）</span>}
@@ -626,7 +696,7 @@ function CategorySelect({ levels, value, onChange }: { levels: string[]; value: 
           if (v) onChange(v)
         } else onChange(e.target.value)
       }}
-      className={`h-7 rounded-lg border px-2 text-sm outline-none focus:border-indigo-400 ${value === '' ? 'border-dashed border-slate-200 text-slate-300' : 'border-slate-200 bg-white font-semibold text-slate-700'}`}
+      className={`h-7 w-20 min-w-0 rounded-lg border px-1.5 text-sm outline-none focus:border-indigo-400 md:w-auto md:px-2 ${value === '' ? 'border-dashed border-slate-200 text-slate-300' : 'border-slate-200 bg-white font-semibold text-slate-700'}`}
     >
       <option value="">—</option>
       {levels.map((l) => (
@@ -753,6 +823,9 @@ function FilterButton({ active, open, children }: { active: boolean; open: boole
   )
 }
 
+/**
+ * ポップオーバー。body 直下に fixed 配置で描画するため、横スクロールするツールバー等の中でも切れない。
+ */
 function Popover({
   button,
   children,
@@ -765,33 +838,60 @@ function Popover({
   up?: boolean
 }) {
   const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState<CSSProperties>({})
   const ref = useRef<HTMLDivElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
+
+  const place = () => {
+    const r = ref.current?.getBoundingClientRect()
+    if (!r) return
+    const width = panel.current?.offsetWidth ?? 220
+    const left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8))
+    setPos(up ? { left, bottom: window.innerHeight - r.top + 8 } : { left, top: r.bottom + 4 })
+  }
+
+  useLayoutEffect(() => {
+    if (open) place()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
   useEffect(() => {
     if (!open) return
-    const onDown = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
+    const inside = (t: EventTarget | null) => ref.current?.contains(t as Node) || panel.current?.contains(t as Node)
+    const onDown = (e: Event) => !inside(e.target) && setOpen(false)
     // Esc はポップオーバーだけを閉じ、名簿エディタ自体には伝えない
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
       e.stopPropagation()
       setOpen(false)
     }
-    document.addEventListener('mousedown', onDown, true)
+    // スクロール時は閉じずに位置を追従（スマホでボタンを押すと横スクロールが起きるため）
+    const onScroll = (e: Event) => !panel.current?.contains(e.target as Node) && place()
+    document.addEventListener('pointerdown', onDown, true)
     document.addEventListener('keydown', onKey, true)
+    window.addEventListener('scroll', onScroll, true)
+    window.addEventListener('resize', place)
     return () => {
-      document.removeEventListener('mousedown', onDown, true)
+      document.removeEventListener('pointerdown', onDown, true)
       document.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('scroll', onScroll, true)
+      window.removeEventListener('resize', place)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
+
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative shrink-0">
       <button type="button" onClick={() => setOpen((o) => !o)} className={dark ? 'text-white' : ''}>
         {button(open)}
       </button>
-      {open && (
-        <div className={`absolute left-0 z-30 rounded-xl border border-slate-200 bg-white shadow-xl ${up ? 'bottom-full mb-2' : 'top-full mt-1'}`}>
-          {children(() => setOpen(false))}
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div ref={panel} style={{ position: 'fixed', ...pos }} className="z-50 max-w-[calc(100vw-1rem)] rounded-xl border border-slate-200 bg-white shadow-xl">
+            {children(() => setOpen(false))}
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }
@@ -818,7 +918,7 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
   const conflictSet = useMemo(() => new Set(conflicts.flat()), [conflicts])
 
   return (
-    <div className="h-full overflow-auto px-5 py-5">
+    <div className="h-full overflow-auto px-3 py-4 sm:px-5 sm:py-5">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="font-bold text-slate-900">{kind === 'wanted' ? '同じ組にするグループ' : '別の組にするグループ'}</div>
@@ -984,7 +1084,7 @@ function StudentPicker({ problem, exclude, onPick, autoFocus }: { problem: Probl
           }
         }}
         placeholder="＋ NO か名前で追加"
-        className="w-40 rounded-lg border border-dashed border-slate-300 bg-transparent px-2 py-1 text-sm outline-none placeholder:text-slate-400 focus:border-solid focus:border-indigo-400 focus:bg-white"
+        className="w-44 rounded-lg border border-dashed border-slate-300 bg-transparent px-2 py-1 text-sm outline-none placeholder:text-slate-400 focus:border-solid focus:border-indigo-400 focus:bg-white"
       />
       {open && results.length > 0 && (
         <ul className="absolute left-0 top-full z-30 mt-1 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
