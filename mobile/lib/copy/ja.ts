@@ -212,7 +212,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   parseDuplicateNo: '出席番号 {no} が重複しています',
   parseUnknownNo: '「{sheet}」{row}行目: 出席番号 {no} は名簿にありません',
   parseClassCountUnknown: '「{sheet}」シートのクラス数が読み取れないため {k} クラスとしました',
-  parseMaxTooSmall: '1クラスの最大人数 {max} × {k} クラスでは全員が収まりません。最大人数を無視します',
+  parseMaxTooSmall: '1クラス最大 {max} 人 × {k} クラスでは全員が入らないため、最大人数は無視しました',
   sharingUnavailable: 'この端末ではファイルの共有を利用できません。',
   popupBlocked: 'ポップアップがブロックされました。ブラウザの設定で許可してください。',
   fileResults: 'クラス編成結果',

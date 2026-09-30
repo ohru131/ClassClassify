@@ -19,7 +19,7 @@ export const JA_COPY: Record<WebCopyKey, string> = {
   heroDesc:
     '性別・学力・支援の必要性など、生徒の特性が各クラスに均等に散らばるよう自動で編成します。「同じ組にしたい」「別の組にしたい」組み合わせも考慮。結果はその場で手直しできます。',
   heroLocal: 'データはブラウザ内だけで処理',
-  heroFree: '登録・トークン不要、完全無料',
+  heroFree: 'アカウント登録不要、完全無料',
   warningsTitle: '読み込み時の注意',
 
   step1Title: '名簿を読み込む',
@@ -215,5 +215,5 @@ export const JA_COPY: Record<WebCopyKey, string> = {
   parseDuplicateNo: '出席番号 {no} が重複しています',
   parseUnknownNo: '「{sheet}」{row}行目: 出席番号 {no} は名簿にありません',
   parseClassCountUnknown: '「{sheet}」シートのクラス数が読み取れないため {k} クラスとしました',
-  parseMaxTooSmall: '1クラスの最大人数 {max} × {k} クラスでは全員が収まりません。最大人数を無視します',
+  parseMaxTooSmall: '1クラス最大 {max} 人 × {k} クラスでは全員が入らないため、最大人数は無視しました',
 }

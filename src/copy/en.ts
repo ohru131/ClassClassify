@@ -18,7 +18,7 @@ export const EN_COPY = {
   heroDesc:
     'Mosaic spreads student attributes — gender, academics, support needs and more — evenly across classes. It also respects the students you want to keep together or apart, and you can adjust the result right away.',
   heroLocal: 'Data is processed only in your browser',
-  heroFree: 'No sign-up, no tokens, completely free',
+  heroFree: 'No sign-up, no account, completely free',
   warningsTitle: 'Notes from loading',
 
   step1Title: 'Load a roster',
@@ -214,7 +214,7 @@ export const EN_COPY = {
   parseDuplicateNo: 'No. {no} appears more than once',
   parseUnknownNo: '"{sheet}", row {row}: No. {no} is not in the roster',
   parseClassCountUnknown: 'The number of classes in "{sheet}" could not be read, so {k} classes were used',
-  parseMaxTooSmall: 'A maximum of {max} × {k} classes cannot fit everyone, so the maximum was ignored',
+  parseMaxTooSmall: 'A maximum of {max} students × {k} classes cannot fit everyone, so the maximum was ignored',
 }
 
 export type WebCopyKey = keyof typeof EN_COPY

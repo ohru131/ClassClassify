@@ -72,7 +72,7 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `RevenueCat 개인정보 처리방침: ${RC}`,
       ],
     },
-    { title: '문의', body: [`문의는 GitHub(${GH})의 Issues로 보내 주세요.`] },
+    { title: '문의', body: [`문의는 GitHub(${GH})의 Issues로 보내 주십시오.`] },
   ],
   es: [
     {
@@ -82,7 +82,7 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         'La optimización (armar los grupos) también se hace completamente en este dispositivo.',
         'En Android, la copia de seguridad de la app está desactivada, así que las listas no se incluyen en la copia automática en Google Drive. En iPhone y iPad pueden incluirse en las copias de seguridad del propio dispositivo que tú administras (copia en iCloud o en tu computadora).',
         'Cuando exportas un Excel o un PDF, tú eliges a dónde enviarlo (Excel, Google Drive, correo, etc.) desde el menú de compartir del dispositivo. A partir de ahí se aplican las condiciones de ese servicio.',
-        'Puedes borrar los datos guardados con «Borrar la lista y los resultados de este dispositivo» en la pestaña Pro, o desinstalando la app.',
+        'Puedes borrar los datos guardados con “Borrar la lista y los resultados de este dispositivo” en la pestaña Pro, o desinstalando la app.',
       ],
     },
     {
@@ -126,7 +126,7 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         'A otimização (montar as turmas) também é feita inteiramente neste aparelho.',
         'No Android, o backup do app está desativado, então as listas não entram no backup automático do Google Drive. No iPhone e no iPad, elas podem entrar nos backups do próprio aparelho que você gerencia (backup do iCloud ou no computador).',
         'Ao exportar um Excel ou PDF, você escolhe para onde enviar (Excel, Google Drive, e-mail etc.) no menu de compartilhar do aparelho. A partir daí valem os termos desse serviço.',
-        'Você pode apagar os dados salvos em «Apagar a lista e o resultado deste aparelho», na aba Pro, ou desinstalando o app.',
+        'Você pode apagar os dados salvos em “Apagar a lista e o resultado deste aparelho”, na aba Pro, ou desinstalando o app.',
       ],
     },
     {

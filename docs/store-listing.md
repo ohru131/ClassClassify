@@ -10,15 +10,15 @@
 
 | Play のロケール | アプリ名 | 短い説明 | 詳しい説明 |
 |---|---|---|---|
-| en-US | 23 | 80 | 2134 |
-| en-AU | 23 | 77 | 1939 |
-| en-GB | 22 | 76 | 1871 |
-| ko-KR | 11 | 51 | 1048 |
-| es-419 | 20 | 79 | 2146 |
-| es-ES | 25 | 78 | 1936 |
-| de-DE | 24 | 79 | 2483 |
-| pt-BR | 21 | 76 | 2181 |
-| ja-JP | 12 | 43 | 848 |
+| en-US | 23 | 80 | 2236 |
+| en-AU | 23 | 77 | 2029 |
+| en-GB | 22 | 76 | 1954 |
+| ko-KR | 11 | 55 | 1057 |
+| es-419 | 20 | 79 | 2250 |
+| es-ES | 25 | 78 | 2295 |
+| de-DE | 24 | 79 | 2575 |
+| pt-BR | 21 | 76 | 2261 |
+| ja-JP | 12 | 44 | 889 |
 
 ## en-US（英語・米国）
 
@@ -39,7 +39,7 @@ Mosaic: Class Placement
 Balanced class lists in seconds. Free, no sign-up, student data stays on device.
 ```
 
-### 詳しい説明（2134字 / 4000）
+### 詳しい説明（2236字 / 4000）
 
 ```
 Building next year's class lists by hand takes hours: balancing boys and girls, academic levels, students who need extra support, and the friendships and conflicts parents and teachers tell you about. Mosaic does the class placement for you in seconds, and you stay in control of every decision.
@@ -48,7 +48,7 @@ HOW IT WORKS
 • Load your roster from an Excel file (.xlsx), start from a sample, or type it in.
 • Add any attributes you care about — gender, reading level, behavior, IEP or 504 support, English learners — and give each one a weight.
 • Mark students to keep together and students to keep apart.
-• Choose the number of classes and tap "Build classes". Mosaic spreads every attribute as evenly as possible and meets your keep-together / keep-apart conditions.
+• Choose the number of classes and tap "Build classes". Mosaic spreads every attribute as evenly as possible, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
 • Check the balance tables, then move any student to another class with one tap. Totals update instantly.
 
 WHY TEACHERS USE IT
@@ -60,7 +60,7 @@ WHY TEACHERS USE IT
 
 MOSAIC PRO (ONE-TIME PURCHASE)
 • Export the results to Excel and Google Drive: placement, class lists, one sheet per class, pairings and a summary.
-• Print or save as PDF for staff meetings: class lists with color-coded pairings and a legend, plus the balance tables, on A4 pages.
+• Print or save as PDF for staff meetings: class lists with color-coded pairings and a legend, plus the balance tables, on print-ready pages.
 • Buy once and keep it — Pro is not a subscription.
 
 Mosaic uses the same engine as the free Mosaic web app, and Excel files work in both. The class placement uses simulated annealing, an optimization method that tries a huge number of combinations.
@@ -87,16 +87,16 @@ Mosaic: Class Placement
 Next year's classes, balanced in seconds. Free, no sign-up, data stays local.
 ```
 
-### 詳しい説明（1939字 / 4000）
+### 詳しい説明（2029字 / 4000）
 
 ```
-Every Term 4, teachers sit down with sticky notes and spreadsheets to build next year's classes: an even spread of girls and boys, learning levels, behaviour, students with NCCD adjustments or EAL/D support, and the friendship requests from families. Mosaic turns that into a few seconds of work and leaves every final decision with you.
+Every Term 4, teachers sit down with sticky notes and spreadsheets to build next year's classes: an even spread of girls and boys, learning levels, behaviour, students with a support plan or EAL/D support, and the friendship requests from families. Mosaic turns that into a few seconds of work and leaves every final decision with you.
 
 HOW IT WORKS
 • Load your roster from Excel (.xlsx), start from a sample, or enter it in the app.
 • Add the attributes your class placement policy uses and give each a weight.
 • Record students to keep together (for example, one friend each) and students to keep apart.
-• Set the number of classes and tap "Build classes". Mosaic spreads every attribute evenly and meets the keep-together and keep-apart conditions.
+• Set the number of classes and tap "Build classes". Mosaic spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
 • Review the balance tables and move any student to another class with a single tap. Totals update straight away.
 
 WHY SCHOOLS USE IT
@@ -135,16 +135,16 @@ Mosaic: Mixing Classes
 Mix classes fairly in seconds. Free, no sign-up, pupil data stays on device.
 ```
 
-### 詳しい説明（1871字 / 4000）
+### 詳しい説明（1954字 / 4000）
 
 ```
-Mixing classes in a two-form or three-form entry school is one of the hardest jobs of the summer term: balancing girls and boys, attainment, behaviour, pupils with SEN support or an EHCP, EAL, and the friendship groups parents ask about. Mosaic does the number-crunching in seconds and leaves every decision with you.
+Mixing classes in a two-form or three-form entry school is one of the hardest jobs of the summer term: balancing girls and boys, attainment, behaviour, pupils with a support plan, EAL, and the friendship groups parents ask about. Mosaic does the number-crunching in seconds and leaves every decision with you.
 
 HOW IT WORKS
 • Load your class list from Excel (.xlsx), start from a sample, or type it in.
 • Add the attributes you care about and give each one a weight.
 • Mark pupils to keep together and pupils to keep apart.
-• Choose the number of classes and tap "Build classes". Mosaic spreads every attribute evenly and meets your keep-together and keep-apart conditions.
+• Choose the number of classes and tap "Build classes". Mosaic spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
 • Check the balance tables and move any pupil to another class with one tap. Totals update instantly.
 
 WHY TEACHERS USE IT
@@ -177,13 +177,13 @@ Privacy: class lists and results are stored only on your device. To verify a Pro
 Mosaic 반 편성
 ```
 
-### 短い説明（51字 / 80）
+### 短い説明（55字 / 80）
 
 ```
-성별·학업·지원 필요 학생을 고르게, 분리 배정도 지켜 반 편성을 몇 초 만에. 가입 없음.
+성별·학업·지원 필요 학생을 고르게, 분리 배정도 최대한 반영해 몇 초 만에 반 편성. 가입 없음.
 ```
 
-### 詳しい説明（1048字 / 4000）
+### 詳しい説明（1057字 / 4000）
 
 ```
 매년 2월, 다음 학년 반 편성은 담임 선생님들이 며칠씩 매달리는 일입니다. 남녀 비율, 학업 수준, 학습 지원이 필요한 학생, 같은 반에 두면 안 되는 학생까지 모두 고려해야 하니까요. Mosaic는 이 반 편성을 몇 초 만에 끝내고, 최종 판단은 선생님께 맡깁니다.
@@ -192,13 +192,13 @@ Mosaic 반 편성
 • 엑셀 파일(.xlsx)로 학생 명단을 불러오거나, 예시로 시작하거나, 앱에서 직접 입력합니다.
 • 성별, 학업, 학습 지원, 체육 등 고려할 항목을 넣고 항목마다 가중치를 정합니다.
 • 같은 반에 배정할 학생과 서로 다른 반에 배정할 학생(분리 배정)을 지정합니다.
-• 반 수를 정하고 "반 편성 실행"을 누르면 모든 항목이 각 반에 고르게 나뉘고, 같은 반 배정·분리 배정 조건도 지켜집니다.
+• 반 수를 정하고 "반 편성 실행"을 누르면 모든 항목이 각 반에 고르게 나뉩니다. 같은 반 배정은 항상 지키고, 분리 배정은 최대한 반영합니다.
 • 균형 표를 확인하고, 필요하면 학생을 눌러 다른 반으로 옮기세요. 집계는 바로 다시 계산됩니다.
 
 선생님들이 쓰는 이유
 • 반 편성은 무료입니다. 광고도, 회원 가입도 없습니다.
 • 학생 명단은 이 기기에만 저장되고 어디에도 전송되지 않습니다. 계산도 휴대폰·태블릿·크롬북 안에서 합니다.
-• 분리가 필요한 학생을 확실하게 다른 반으로 나눕니다. 충족하지 못한 조건이 있으면 바로 표시됩니다.
+• 분리가 필요한 학생은 최대한 다른 반으로 나누고, 충족하지 못한 조건이 있으면 바로 표시합니다.
 • 항목마다 목표 범위와 각 반의 인원이 표로 보여서, 학년 협의회에서 설명하기 쉽습니다.
 • 안드로이드 태블릿과 크롬북에서 가로·세로 모두, 마우스와 키보드로도 쓸 수 있습니다.
 • 수업 중 모둠 편성에도 같은 방식으로 쓸 수 있습니다.
@@ -232,7 +232,7 @@ Mosaic: armar grupos
 Arma grupos equilibrados para el año escolar en segundos. Gratis, sin registro.
 ```
 
-### 詳しい説明（2146字 / 4000）
+### 詳しい説明（2250字 / 4000）
 
 ```
 Antes de que empiece el año escolar hay que armar los grupos: equilibrar niñas y niños, el desempeño académico, los estudiantes con NEE que necesitan apoyo y las amistades o conflictos que conocen los docentes. Hacerlo a mano toma días. Mosaic hace la distribución de estudiantes en grupos en segundos, y la decisión final siempre es tuya.
@@ -241,7 +241,7 @@ CÓMO FUNCIONA
 • Carga la lista de estudiantes desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app.
 • Agrega los criterios que quieras (género, desempeño, apoyo en el aprendizaje, convivencia) y dale un peso a cada uno.
 • Indica qué estudiantes mantener juntos y a quiénes separar.
-• Elige el número de grupos y toca «Armar grupos». Mosaic reparte cada criterio de forma pareja y cumple las condiciones de mantener juntos y separar.
+• Elige el número de grupos y toca “Armar grupos”. Mosaic reparte cada criterio de forma pareja, siempre deja juntos a los estudiantes que unes y separa a los demás en la medida de lo posible. Si alguna condición no se puede cumplir, lo ves de inmediato.
 • Revisa las tablas de equilibrio y mueve a cualquier estudiante a otro grupo con un toque. Los totales se recalculan al instante.
 
 POR QUÉ LO USAN LOS DOCENTES
@@ -280,16 +280,16 @@ Mosaic: reparto en grupos
 Reparte al alumnado en grupos equilibrados en segundos. Gratis y sin registro.
 ```
 
-### 詳しい説明（1936字 / 4000）
+### 詳しい説明（2295字 / 4000）
 
 ```
-Cada curso hay que repartir al alumnado en grupos siguiendo los criterios del centro: equilibrio entre niñas y niños, rendimiento variado en cada grupo, alumnado con NEAE repartido de forma justa y las incompatibilidades que conoce el equipo docente. Mosaic hace ese reparto en grupos en segundos y deja la última palabra al profesorado.
+Cada curso hay que repartir al alumnado en grupos siguiendo los criterios del centro: equilibrio entre niñas y niños, rendimiento variado en cada grupo, alumnado con necesidades de apoyo repartido de forma justa y las incompatibilidades que conoce el equipo docente. Mosaic hace ese reparto en grupos en segundos y deja la última palabra al profesorado.
 
 CÓMO FUNCIONA
-• Carga la lista desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app.
+• Carga la lista desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app. La app usa vocabulario latinoamericano (“Armar grupos”, “estudiantes”), y los ejemplos incluidos usan la escala de notas de 1 a 7; con tu propio Excel puedes usar la de 0 a 10.
 • Añade los criterios del centro y dale un peso a cada uno.
 • Indica qué estudiantes mantener juntos y a quiénes separar.
-• Elige el número de grupos y pulsa «Armar grupos». Mosaic reparte cada criterio de forma equilibrada: los grupos quedan heterogéneos y parecidos entre sí, sin agrupar por rendimiento.
+• Elige el número de grupos y pulsa “Armar grupos”. Mosaic reparte cada criterio de forma equilibrada: los grupos quedan heterogéneos y parecidos entre sí, sin agrupar por rendimiento. Los estudiantes que unes quedan siempre juntos y los que separas, separados en la medida de lo posible; si alguna condición no se puede cumplir, lo ves de inmediato.
 • Revisa las tablas de equilibrio y mueve a cualquier estudiante a otro grupo con un toque.
 
 POR QUÉ LO USA EL PROFESORADO
@@ -328,7 +328,7 @@ Mosaic Klasseneinteilung
 Ausgewogene Klassen in Sekunden. Alle Daten bleiben auf dem Gerät – ohne Konto.
 ```
 
-### 詳しい説明（2483字 / 4000）
+### 詳しい説明（2575字 / 4000）
 
 ```
 Alle Daten bleiben auf dem Gerät. Keine Cloud, kein Konto: Mosaic berechnet die Klasseneinteilung direkt auf Ihrem Smartphone, Tablet oder Chromebook.
@@ -339,7 +339,7 @@ SO FUNKTIONIERT ES
 • Schülerliste aus Excel (.xlsx) laden, mit einem Beispiel beginnen oder direkt in der App eingeben.
 • Merkmale festlegen (z. B. Geschlecht, Leistung, Förderbedarf, DaZ) und jedem Merkmal ein Gewicht geben.
 • Freundschaftswünsche als „zusammen“ und Kinder, die getrennt werden sollen, als „trennen“ eintragen.
-• Anzahl der Klassen wählen und „Klassen einteilen“ antippen. Mosaic verteilt jedes Merkmal möglichst gleichmäßig und berücksichtigt alle Wünsche.
+• Anzahl der Klassen wählen und „Klassen einteilen“ antippen. Mosaic verteilt jedes Merkmal möglichst gleichmäßig, hält „zusammen“ immer ein und trennt die anderen so weit wie möglich. Was sich nicht erfüllen lässt, wird sofort angezeigt.
 • Verteilungstabellen prüfen und einzelne Kinder mit einem Tipp in eine andere Klasse verschieben. Die Auswertung wird sofort neu berechnet.
 
 WARUM LEHRKRÄFTE ES NUTZEN
@@ -379,7 +379,7 @@ Mosaic: montar turmas
 Enturmação equilibrada em segundos. Grátis, sem cadastro e sem enviar dados.
 ```
 
-### 詳しい説明（2181字 / 4000）
+### 詳しい説明（2261字 / 4000）
 
 ```
 Antes do início do ano letivo, a coordenação pedagógica precisa montar as turmas: equilibrar meninas e meninos, desempenho, alunos com deficiência ou atendidos pelo AEE, comportamento e os pedidos das famílias. Fazer a enturmação à mão leva dias. O Mosaic faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
@@ -388,7 +388,7 @@ COMO FUNCIONA
 • Carregue a lista de alunos do Excel (.xlsx), comece com um exemplo ou digite no app.
 • Adicione os critérios que quiser (gênero, desempenho, apoio à aprendizagem, comportamento) e dê um peso para cada um.
 • Indique quais alunos manter juntos e quais separar.
-• Escolha o número de turmas e toque em «Montar turmas». O Mosaic distribui cada critério de forma equilibrada e atende às condições de manter juntos e separar.
+• Escolha o número de turmas e toque em “Montar turmas”. O Mosaic distribui cada critério de forma equilibrada, sempre mantém juntos os alunos que você une e separa os outros na medida do possível. Se alguma condição não puder ser atendida, você vê na hora.
 • Confira as tabelas de equilíbrio e mova qualquer aluno para outra turma com um toque. Os totais são recalculados na hora.
 
 POR QUE AS ESCOLAS USAM
@@ -405,7 +405,7 @@ MOSAIC PRO (COMPRA ÚNICA)
 
 O Mosaic usa o mesmo motor da versão web gratuita, e os arquivos do Excel funcionam nas duas.
 
-Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a compra do Pro, a loja e o RevenueCat recebem um identificador anônimo e o recibo, nunca nomes de alunos nem dados da lista. Na hora de pensar na LGPD, a escola sabe que a lista de alunos não sai do aparelho.
+Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a compra do Pro, a loja e o RevenueCat recebem um identificador anônimo e o recibo, nunca nomes de alunos nem dados da lista. Para a LGPD, vale saber que a lista de alunos não sai do aparelho.
 ```
 
 ## ja-JP（日本語）
@@ -421,13 +421,13 @@ Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a c
 Mosaic クラス編成
 ```
 
-### 短い説明（43字 / 80）
+### 短い説明（44字 / 80）
 
 ```
-男女・学力・支援の必要な子を各クラスに均等に。同じ組・別の組の指定も守って数秒で編成。
+男女・学力・支援の必要な子を各クラスに均等に。同じ組・別の組の指定も反映して数秒で編成。
 ```
 
-### 詳しい説明（848字 / 4000）
+### 詳しい説明（889字 / 4000）
 
 ```
 新年度のクラス編成は、男女比、学力、支援の必要な子、同じクラスにしたい子・離したい子まで、いくつもの条件を同時に満たす作業です。付箋と名簿で何日もかかることも珍しくありません。Mosaic はこのクラス分けを数秒で行い、最後の判断は先生に委ねます。
@@ -436,7 +436,7 @@ Mosaic クラス編成
 ・Excel（.xlsx）の名簿を読み込むか、サンプル・新規作成から始めます。
 ・性別・学力・学習支援・体育など、均等にしたい項目と重みを決めます。
 ・「同じ組にする」「別の組にする」生徒を指定します。
-・クラス数を決めて「クラス編成を実行」。すべての項目が各クラスに均等に散らばり、ペアの指定も守られます。
+・クラス数を決めて「クラス編成を実行」。すべての項目が各クラスに均等に散らばります。同じ組の指定は必ず守り、別の組の指定はできる限り反映します（満たせなかった指定はすぐに表示されます）。
 ・バランス表を確認し、必要なら生徒をタップして別の組へ移動。集計はすぐに再計算されます。
 
 選ばれる理由

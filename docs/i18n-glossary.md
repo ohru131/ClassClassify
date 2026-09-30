@@ -42,13 +42,18 @@
 
 ## 2. 言語ごとの表記ルール
 
+### 全言語共通
+- **「別の組（keep apart）」は保証しない。** 同じ組の指定はソルバーが必ず守る（生徒をまとめて1つの塊として動かす）が、別の組の指定は目的関数の重い罰則で、組数・人数によっては満たせない。UI・掲載文とも「できる限り（as far as possible / en la medida de lo posible / so weit wie möglich / 최대한）離し、満たせなかった指定はすぐに表示する」と書き、「確実に」「必ず」「meets」「cumple」「atende」とは書かない。
+
 ### en
 - 米英豪で共通に通じる語だけを UI に使う（grade / year の区別が要る語は UI に出さない）。綴りは米式（behavior・color）を既定にし、`en-GB`・`en-AU` の掲載文だけ英式（behaviour）にする。
 - 「組」は **class**。homeroom（米）・form（英）は使わない。
 - 「FERPA 準拠」「GDPR compliant」などの**法的な保証と読める表現は書かない**（「nothing is uploaded」のように事実だけを書く）。
 
 ### ko
-- 敬体（합니다체）で統一する。ボタンは名詞形・動詞の基本形（「실행」「내보내기」）。
+- 敬体（합니다체）で統一する。ボタンは名詞形・動詞の基本形（「실행」「내보내기」）。依頼・指示は「-십시오」（다시 실행하십시오）、確認は「-시겠습니까?」（삭제하시겠습니까?）。「-세요」「-할까요?」は使わない。
+- 名簿の絞り込みは **필터**（필터 지우기・이 필터 지우기・필터 다시 적용）。「조건」は同じ組・別の組の指定（배정 조건）にだけ使う。
+- 数を括弧で補うときは単位を付ける（반 수({k}개)）。
 - 「반 편성」は分かち書きする（UI 全体で統一）。組の名前は「1반」。
 - **학교폭력（학폭）の語をアプリ内で使わない**。分離の必要な生徒は「분리 배정」「분리가 필요한 학생」と中立に書く。
 - **「다문화」を項目名の既定値・サンプルに置かない**（保護者に見られたときの問題）。
@@ -56,6 +61,8 @@
 ### es（中南米の語彙を基本にする）
 - 「組」は **grupo** に統一（`curso` はスペインでは学年、チリでは組を指し、階層がずれるので UI の固定文言に使わない。`sección`・`paralelo` も国で割れるので使わない）。
 - 生徒は **estudiante(s)**（包括的な語として中南米で好まれる。スペイン固有の `alumnado` は使わない）。
+- 引用符は **“…”**（«» は使わない。pt-BR も同じ）。
+- 設定・実行のタブは **Configurar**（「Ajustes」は Pro のタブ見出し「Pro y ajustes」と紛らわしい。pt-BR も Configurar）。
 - 呼びかけは **tú**（ustedes ではなく単数。スペインの vosotros は使わない）。`ordenador`・`móvil` などスペイン固有の語は避け、端末は中立の「dispositivo」と書く。
 - 小数点は中南米の多くと同じく Intl に任せる（es-419 はピリオド、es-ES はカンマ）。
 - 学力について「同質な組を作る」と読める表現は避け、「学力が偏らないように（equilibrar el desempeño）」と書く（スペインでは成績による同質な組分けが禁止されている）。
@@ -63,7 +70,10 @@
 ### de
 - **Sie** で統一する。
 - 生徒は表の見出し・ボタンでは「Schüler」、説明文では「Schülerinnen und Schüler」を基本にする（「Schüler:innen」「SuS」などの記号・略語は学校・州で表記が割れるので使わない）。
-- 語が長いので、ボタンは短い動詞（「Einteilen」「Exportieren」）を優先する。
+- 語が長いので、ボタンは短い動詞（「Einteilen」「Exportieren」）を優先する。設定・実行のタブと画面見出しは「Einteilen」で揃える（「Einstellungen」は Pro のタブ見出しと紛らわしい）。
+- 結果の「バランス」はタブ・集計とも **Ausgewogenheit**（Auswertung と混ぜない）。
+- ペア指定の記号は **Z / G**（zusammen / getrennt）。
+- 生徒を指すときに男性形の代名詞で受けない（「auf einen Schüler, um ihn …」ではなく「auf einen Namen, um ihn …」）。
 - 「DSGVO-konform」と断言しない（判断するのは学校・州）。「Alle Daten bleiben auf dem Gerät」と事実を書く。
 
 ### pt-BR
@@ -121,3 +131,14 @@
 - de: 「Unterstützung Anwesenheit」「Wünsche」（ペア指定の総称。保護者の友だち希望と区別がつくか）。
 - pt-BR: 「Enturmação」をシート名に使ってよいか（学校の事務用語として通じるか）。
 - サンプルの項目名・値: ko「교우 관계 지원」、「한국어 지원」／de「Unterstützung Verhalten」「Notenschnitt」の向き（1,0 が最良）／es「Convivencia escolar: Seguimiento」「NEE (PIE)」（チリ以外で通じるか）／pt-BR「Convivência: Acompanhamento」「AEE」。
+
+### 4.1 レビュー（PR #10）で直した箇所のうち、ネイティブに確かめてほしいもの
+
+語そのもの（분리 배정・Armar grupos・Wünsche）は上のとおり確認待ちのまま変えていない。今回直した言い回しで、自信が持ちきれないものを挙げる。
+
+- ko: 합니다체への統一（「-십시오」「-시겠습니까?」）が画面の短いボタン・トーストで硬すぎないか。「필터」（絞り込み）が教員に通じるか。
+- es: タブ名「Configurar」（「Armar」だけのタブにする案もあった）。「No se pueden compartir archivos…」「presiona Enter」。スペイン向け掲載文（es-ES）で UI が中南米の語彙であることを断っている一文の自然さ。
+- pt-BR: タブ名「Configurar」。掲載文の「Para a LGPD, vale saber que…」。
+- de: タブと画面見出しを「Einteilen」に揃えたこと。「Ausgewogenheit」をタブ名にしたこと（長いのでソフトハイフンで折っている）。ペア指定の記号 Z / G（zusammen / getrennt）が読み取れるか。「Noch keine Gruppen」「auf einen Namen, um ihn …」。サンプルの「Unterstützung Verhalten」。
+- 全言語: 「別の組」の説明を「できる限り離し、満たせなかった指定はすぐに表示する」に変えた掲載文の言い回し（en の "keeps apart the ones you separate as far as possible"、de の „trennt die anderen so weit wie möglich“ など）。
+- 全言語: 最大人数を無視したときの警告（「1クラス最大 {max} 人 × {k} クラスでは全員が入らないため、最大人数は無視しました」とその訳）。

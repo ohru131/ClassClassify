@@ -1,6 +1,6 @@
 import type { WebCopyKey } from './en'
 
-// Español con vocabulario latinoamericano (tú, «grupo», «estudiantes»). Términos: docs/i18n-glossary.md
+// Español con vocabulario latinoamericano (tú, “grupo”, “estudiantes”). Términos: docs/i18n-glossary.md
 export const ES_COPY: Record<WebCopyKey, string> = {
   docTitle: 'Mosaic — Distribución de estudiantes en grupos',
   metaDescription: 'Mosaic reparte a los estudiantes en grupos equilibrados de forma automática. Los datos se procesan solo en tu navegador.',
@@ -19,7 +19,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   heroDesc:
     'Mosaic reparte de forma pareja entre los grupos el género, el desempeño, las necesidades de apoyo y otros criterios. También respeta a quiénes mantener juntos o separar, y puedes ajustar el resultado al momento.',
   heroLocal: 'Los datos se procesan solo en tu navegador',
-  heroFree: 'Sin registro ni tokens, totalmente gratis',
+  heroFree: 'Sin registro ni cuenta, totalmente gratis',
   warningsTitle: 'Avisos al cargar',
 
   step1Title: 'Cargar la lista',
@@ -38,7 +38,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   samplePrefix: 'Ejemplo: {label}',
   sample1: 'Grupos (80 estudiantes, 4 grupos)',
   sample2: 'Grupos (80 estudiantes, simple)',
-  sampleGroup: 'Equipos de trabajo (30, 6 equipos)',
+  sampleGroup: 'Equipos de trabajo (30 estudiantes, 6 equipos)',
 
   step2Title: 'Ajustar las condiciones',
   step2Desc: 'Los criterios con más peso se equilibran primero. Con peso 0 no se toman en cuenta.',
@@ -112,7 +112,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   pairings: 'Condiciones',
   pairingsMet: '{ok} de {n} cumplidas',
   clickToHighlight: 'Haz clic para resaltar a los estudiantes',
-  colorize: 'Colorear «juntos»',
+  colorize: 'Colorear “juntos”',
   weightN: 'Peso {w}',
   average: 'Promedio',
   averageLevel: 'Promedio',
@@ -120,7 +120,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   offBy: 'Desvío {n}',
   ideal: 'Meta',
   allMet: 'Se cumplen todas las condiciones',
-  allMetBody: 'Se aplicaron las {w} condiciones de «mantener juntos» y las {u} de «separar».',
+  allMetBody: 'Se aplicaron las {w} condiciones de “mantener juntos” y las {u} de “separar”.',
   noPairsBody: 'No se indicaron condiciones.',
 
   rosterEditorAria: 'Editor de la lista',
@@ -131,7 +131,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   saveRosterTitle: 'Guardar con el formato de la plantilla (se puede volver a cargar)',
   saveRoster: 'Guardar lista',
   saveShort: 'Guardar',
-  conflict: 'Hay condiciones contradictorias (estudiantes unidos por «mantener juntos» también están marcados para «separar»): ',
+  conflict: 'Hay condiciones contradictorias (estudiantes unidos por “mantener juntos” también están marcados para “separar”): ',
   searchPlaceholder: 'Buscar por N.º o nombre',
   pairFilter: 'Condiciones',
   clearFilters: 'Quitar filtros',
@@ -153,8 +153,8 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   confirmDeleteStudent: '¿Quitar a {who} de la lista?',
   colNo: 'N.º',
   colName: 'Nombre',
-  deleteColumnTitle: 'Eliminar la columna «{name}»',
-  confirmDeleteColumn: '¿Eliminar la columna «{name}»?',
+  deleteColumnTitle: 'Eliminar la columna “{name}”',
+  confirmDeleteColumn: '¿Eliminar la columna “{name}”?',
   colPair: 'Condiciones',
   wantedTitleAttr: 'Mantener juntos: {names}',
   unwantedTitleAttr: 'Separar: {names}',
@@ -168,8 +168,8 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   clearSelection: 'Quitar selección',
   pairAll: 'Todos',
   pairAny: 'Con condición',
-  pairWantedF: 'Con «mantener juntos»',
-  pairUnwantedF: 'Con «separar»',
+  pairWantedF: 'Con “mantener juntos”',
+  pairUnwantedF: 'Con “separar”',
   pairNone: 'Sin condición',
   avg: 'Promedio {v}',
   notEntered: 'Sin datos',
@@ -209,11 +209,11 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   googlePickerTitle: 'Elige la hoja de cálculo con la lista',
   googleTemplateTitle: 'Plantilla de lista de Mosaic',
 
-  parseRosterMissing: 'No se encontró la hoja «{sheet}» o no tiene datos',
+  parseRosterMissing: 'No se encontró la hoja “{sheet}” o no tiene datos',
   parseNoStudents: 'No hay estudiantes (escribe el N.º y el nombre desde la fila 3)',
-  parseNoMissing: '{sheet}, fila {row}: «{name}» no tiene N.º y no se cargó',
+  parseNoMissing: '{sheet}, fila {row}: “{name}” no tiene N.º y no se cargó',
   parseDuplicateNo: 'El N.º {no} está repetido',
-  parseUnknownNo: '«{sheet}», fila {row}: el N.º {no} no está en la lista',
-  parseClassCountUnknown: 'No se pudo leer el número de grupos en «{sheet}»; se usaron {k} grupos',
-  parseMaxTooSmall: 'Con un máximo de {max} × {k} grupos no caben todos, así que se ignoró el máximo',
+  parseUnknownNo: '“{sheet}”, fila {row}: el N.º {no} no está en la lista',
+  parseClassCountUnknown: 'No se pudo leer el número de grupos en “{sheet}”; se usaron {k} grupos',
+  parseMaxTooSmall: 'Con un máximo de {max} estudiantes × {k} grupos no caben todos, así que se ignoró el máximo',
 }

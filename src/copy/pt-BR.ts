@@ -1,6 +1,6 @@
 import type { WebCopyKey } from './en'
 
-// Português do Brasil, tratamento «você». Termos: docs/i18n-glossary.md（turma, manter juntos, separar）
+// Português do Brasil, tratamento “você”. Termos: docs/i18n-glossary.md（turma, manter juntos, separar）
 export const PT_BR_COPY: Record<WebCopyKey, string> = {
   docTitle: 'Mosaic — Enturmação equilibrada',
   metaDescription: 'O Mosaic distribui os alunos em turmas equilibradas de forma automática. Os dados são processados só no seu navegador.',
@@ -19,7 +19,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   heroDesc:
     'O Mosaic distribui gênero, desempenho, necessidades de apoio e outros critérios de forma equilibrada entre as turmas. Também respeita quem manter juntos ou separar, e você pode ajustar o resultado na hora.',
   heroLocal: 'Os dados são processados só no navegador',
-  heroFree: 'Sem cadastro nem tokens, totalmente grátis',
+  heroFree: 'Sem cadastro nem conta, totalmente grátis',
   warningsTitle: 'Avisos ao carregar',
 
   step1Title: 'Carregar a lista de alunos',
@@ -112,7 +112,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   pairings: 'Condições',
   pairingsMet: '{ok} de {n} atendidas',
   clickToHighlight: 'Clique para destacar os alunos',
-  colorize: 'Colorir «juntos»',
+  colorize: 'Colorir “juntos”',
   weightN: 'Peso {w}',
   average: 'Média',
   averageLevel: 'Média',
@@ -120,7 +120,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   offBy: 'Desvio {n}',
   ideal: 'Meta',
   allMet: 'Todas as condições atendidas',
-  allMetBody: 'As {w} condições de «manter juntos» e as {u} de «separar» foram aplicadas.',
+  allMetBody: 'As {w} condições de “manter juntos” e as {u} de “separar” foram aplicadas.',
   noPairsBody: 'Nenhuma condição foi definida.',
 
   rosterEditorAria: 'Editor da lista de alunos',
@@ -131,7 +131,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   saveRosterTitle: 'Salvar no formato do modelo (pode ser carregado de novo)',
   saveRoster: 'Salvar lista',
   saveShort: 'Salvar',
-  conflict: 'Há condições contraditórias (alunos ligados por «manter juntos» também estão marcados para «separar»): ',
+  conflict: 'Há condições contraditórias (alunos ligados por “manter juntos” também estão marcados para “separar”): ',
   searchPlaceholder: 'Buscar por nº ou nome',
   pairFilter: 'Condições',
   clearFilters: 'Limpar filtros',
@@ -153,8 +153,8 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   confirmDeleteStudent: 'Remover {who} da lista?',
   colNo: 'Nº',
   colName: 'Nome',
-  deleteColumnTitle: 'Excluir a coluna «{name}»',
-  confirmDeleteColumn: 'Excluir a coluna «{name}»?',
+  deleteColumnTitle: 'Excluir a coluna “{name}”',
+  confirmDeleteColumn: 'Excluir a coluna “{name}”?',
   colPair: 'Condições',
   wantedTitleAttr: 'Manter juntos: {names}',
   unwantedTitleAttr: 'Separar: {names}',
@@ -168,8 +168,8 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   clearSelection: 'Limpar seleção',
   pairAll: 'Todos',
   pairAny: 'Com condição',
-  pairWantedF: 'Com «manter juntos»',
-  pairUnwantedF: 'Com «separar»',
+  pairWantedF: 'Com “manter juntos”',
+  pairUnwantedF: 'Com “separar”',
   pairNone: 'Sem condição',
   avg: 'Média {v}',
   notEntered: 'Vazio',
@@ -209,11 +209,11 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   googlePickerTitle: 'Escolha a planilha com a lista de alunos',
   googleTemplateTitle: 'Modelo de lista do Mosaic',
 
-  parseRosterMissing: 'A aba «{sheet}» não foi encontrada ou está vazia',
+  parseRosterMissing: 'A aba “{sheet}” não foi encontrada ou está vazia',
   parseNoStudents: 'Nenhum aluno encontrado (preencha nº e nome a partir da linha 3)',
-  parseNoMissing: '{sheet}, linha {row}: «{name}» está sem nº e não foi carregado',
+  parseNoMissing: '{sheet}, linha {row}: “{name}” está sem nº e não foi carregado',
   parseDuplicateNo: 'O nº {no} está repetido',
-  parseUnknownNo: '«{sheet}», linha {row}: o nº {no} não está na lista',
-  parseClassCountUnknown: 'Não foi possível ler o número de turmas em «{sheet}»; foram usadas {k} turmas',
-  parseMaxTooSmall: 'Com máximo de {max} × {k} turmas não cabem todos, então o máximo foi ignorado',
+  parseUnknownNo: '“{sheet}”, linha {row}: o nº {no} não está na lista',
+  parseClassCountUnknown: 'Não foi possível ler o número de turmas em “{sheet}”; foram usadas {k} turmas',
+  parseMaxTooSmall: 'Com no máximo {max} alunos × {k} turmas não cabem todos, então o máximo foi ignorado',
 }

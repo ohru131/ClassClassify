@@ -294,5 +294,5 @@ export const JA_PARSE_MESSAGES: ParseMessages = {
   duplicateNo: (no) => `出席番号 ${no} が重複しています`,
   unknownNo: (sheet, row, no) => `「${sheet}」${row}行目: 出席番号 ${no} は名簿にありません`,
   classCountUnknown: (k) => `「設定」シートのクラス数が読み取れないため ${k} クラスとしました`,
-  maxTooSmall: (max, k) => `1クラスの最大人数 ${max} × ${k} クラスでは全員が収まりません。最大人数を無視します`,
+  maxTooSmall: (max, k) => `1クラス最大 ${max} 人 × ${k} クラスでは全員が入らないため、最大人数は無視しました`,
 }
