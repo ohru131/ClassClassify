@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Text, View } from 'react-native'
 
 import { useI18n } from '@/lib/language-provider'
@@ -18,9 +18,13 @@ export function LoadPanel({ onDone }: { onDone?: () => void }) {
   const { isWide } = useLayout()
   const router = useRouter()
   const [busy, setBusy] = useState<null | 'pick' | 'template'>(null)
+  // 二度押し対策（busy は再描画後にしか効かない）
+  const lockRef = useRef(false)
   const fail = (e: unknown) => setError(e instanceof Error ? e.message : String(e))
 
   const pick = async () => {
+    if (lockRef.current) return
+    lockRef.current = true
     setBusy('pick')
     try {
       const f = await pickXlsx()
@@ -30,16 +34,23 @@ export function LoadPanel({ onDone }: { onDone?: () => void }) {
     } catch (e) {
       fail(e)
     } finally {
+      lockRef.current = false
       setBusy(null)
     }
   }
 
   const template = () => {
+    if (lockRef.current) return
+    lockRef.current = true
     setBusy('template')
     // ひな形はその言語のシート名・見出しで作る（どの言語のファイルも読み込める）
-    shareXlsx(rosterWorkbook(blankProblem(lang, 5), 2, fileLang), `${t('fileTemplate')}.xlsx`, t('sharingUnavailable'))
+    Promise.resolve()
+      .then(() => shareXlsx(rosterWorkbook(blankProblem(lang, 5), 2, fileLang), `${t('fileTemplate')}.xlsx`, t('sharingUnavailable')))
       .catch(fail)
-      .finally(() => setBusy(null))
+      .finally(() => {
+        lockRef.current = false
+        setBusy(null)
+      })
   }
 
   const grow = isWide ? undefined : { flexGrow: 1 }

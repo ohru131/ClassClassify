@@ -91,19 +91,30 @@ export function RevenueCatProvider({ children }: { children: ReactNode }) {
           Purchases.configure({ apiKey: platformKey })
           purchasesConfigured = true
         }
+      } catch {
+        if (active) {
+          setPurchaseMessageKey('customerInfoFetchFailed')
+          setIsNativeReady(true)
+        }
+        return
+      }
+      // リスナーは最初の取得の成否に関係なく登録する。起動時に圏外で取得に失敗しても、
+      // 通信が戻ったあとの更新（別端末での購入・復元など）で Pro に切り替わるように
+      if (!active) return
+      Purchases.addCustomerInfoUpdateListener(handleUpdate)
+      try {
         const info = await Purchases.getCustomerInfo()
         if (!active) return
         setIsPro(hasProEntitlement(info))
-        Purchases.addCustomerInfoUpdateListener(handleUpdate)
-        // 商品の取得失敗で Pro 表示まで巻き添えにしない
-        try {
-          const offerings = await Purchases.getOfferings()
-          if (active) setOneTimePackage(selectOneTimePackageFromOfferings(offerings))
-        } catch {
-          // 購入時にもう一度取りに行く
-        }
       } catch {
         if (active) setPurchaseMessageKey('customerInfoFetchFailed')
+      }
+      // 商品の取得失敗で Pro 表示まで巻き添えにしない
+      try {
+        const offerings = await Purchases.getOfferings()
+        if (active) setOneTimePackage(selectOneTimePackageFromOfferings(offerings))
+      } catch {
+        // 購入時にもう一度取りに行く
       } finally {
         if (active) setIsNativeReady(true)
       }

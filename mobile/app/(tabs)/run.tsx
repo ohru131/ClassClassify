@@ -1,4 +1,5 @@
-import { useRouter } from 'expo-router'
+import { useFocusEffect, useRouter } from 'expo-router'
+import { useCallback, useRef } from 'react'
 import { Text, View } from 'react-native'
 
 import { C } from '@/components/theme'
@@ -9,10 +10,20 @@ import { useProject } from '@/lib/project-store'
 import { defaultStarts } from '@/lib/runner'
 
 export default function RunScreen() {
-  const { problem, numClasses, setNumClasses, setMaxPerClass, timeSec, setTimeSec, run, cancel, running, progress, solution, error, setError } = useProject()
+  const { problem, numClasses, setNumClasses, stepMaxPerClass, timeSec, setTimeSec, run, cancel, running, progress, solution, error, setError } = useProject()
   const router = useRouter()
   const { isWide } = useLayout()
   const { t, num } = useI18n()
+  // 実行中に別のタブへ移った人を、終わった瞬間に結果画面へ引き戻さない
+  const focusedRef = useRef(true)
+  useFocusEffect(
+    useCallback(() => {
+      focusedRef.current = true
+      return () => {
+        focusedRef.current = false
+      }
+    }, []),
+  )
 
   if (!problem)
     return (
@@ -32,7 +43,7 @@ export default function RunScreen() {
   const starts = defaultStarts(timeSec * 1000)
 
   const start = async () => {
-    if (await run()) router.navigate('/results')
+    if ((await run()) && focusedRef.current) router.navigate('/results')
   }
 
   return (
@@ -51,7 +62,7 @@ export default function RunScreen() {
         </Card>
         <Card style={[{ gap: 6 }, isWide && { flex: 1 }]}>
           <Text style={styles.label}>{t('maxPerClass')}</Text>
-          <Stepper label={t('maxPerClass')} value={hi} min={1} max={Math.max(1, Math.ceil(n / 2))} onChange={setMaxPerClass} />
+          <Stepper label={t('maxPerClass')} value={hi} min={1} max={Math.max(1, Math.ceil(n / 2))} onChange={(v) => stepMaxPerClass(v > hi ? 1 : -1)} />
           <Text style={{ fontSize: 12, color: C.muted }}>{t('maxHint')}</Text>
         </Card>
         <Card style={[{ gap: 6 }, isWide && { flex: 1.3 }]}>

@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system/legacy'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
 
-import { safeFileName } from './xlsx-files'
+import { exportUri, removeFile } from './app-files'
 
 // A4 縦（ポイント）。expo-print の既定は US Letter
 const A4 = { width: 595, height: 842 }
@@ -16,10 +16,15 @@ export async function printHtml(html: string, _messages?: { popupBlocked: string
 export async function sharePdf(html: string, fileName: string, messages: { sharingUnavailable: string; popupBlocked?: string }): Promise<void> {
   if (!(await Sharing.isAvailableAsync())) throw new Error(messages.sharingUnavailable)
   const { uri } = await Print.printToFileAsync({ html, ...A4 })
-  const dest = `${FileSystem.cacheDirectory}${safeFileName(fileName)}`
-  await FileSystem.deleteAsync(dest, { idempotent: true })
-  await FileSystem.moveAsync({ from: uri, to: dest })
-  await Sharing.shareAsync(dest, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf', dialogTitle: fileName })
+  const dest = await exportUri(fileName)
+  try {
+    await FileSystem.deleteAsync(dest, { idempotent: true })
+    await FileSystem.moveAsync({ from: uri, to: dest })
+    await Sharing.shareAsync(dest, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf', dialogTitle: fileName })
+  } finally {
+    // 共有が終わったら PDF を残さない（移動に失敗したときは元の一時ファイルも消す）
+    await Promise.all([removeFile(dest), removeFile(uri)])
+  }
 }
 
 export const canSharePdf = true

@@ -14,6 +14,7 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       body: [
         '読み込んだ名簿（生徒の名前・特性・ペア指定）と編成結果は、この端末の中（アプリの保存領域）だけに保存します。開発者のサーバーやその他の外部へ送信することはありません。',
         '名簿の最適化（クラス編成の計算）も端末の中で行います。',
+        'Android 版はアプリのバックアップを無効にしているため、名簿は Google ドライブへの自動バックアップにも含まれません。iPhone・iPad では、利用者が管理する端末自体のバックアップ（iCloud バックアップやパソコンへのバックアップ）に含まれる場合があります。',
         'Excel ファイルや PDF として書き出した場合、そのファイルを送る先（Excel、Google ドライブ、メールなど）は OS の共有画面で利用者が選びます。送信先での取り扱いは各サービスの規約に従います。',
         '「Pro・設定」タブの「この端末の名簿と結果を消去」、またはアプリの削除で、保存したデータを消去できます。',
       ],
@@ -35,8 +36,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       body: [
         'The rosters you load (student names, attributes and pairings) and the class placements are stored only on this device, in the app’s own storage. They are never sent to the developer’s servers or anywhere else.',
         'The optimization (building the classes) also runs entirely on this device.',
+        'On Android, app backup is turned off, so rosters are not included in the automatic backup to Google Drive. On iPhone and iPad, they may be included in backups of the device itself that you manage (iCloud Backup or a backup to your computer).',
         'When you export an Excel file or PDF, you choose where it goes (Excel, Google Drive, email, etc.) in your device’s share sheet. That service’s own terms then apply.',
-        'You can erase the saved data with “Erase roster and results on this device” in the Pro & settings tab, or by uninstalling the app.',
+        'You can erase the saved data with “Erase roster and results on this device” in the Pro tab, or by uninstalling the app.',
       ],
     },
     {
@@ -56,6 +58,7 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       body: [
         '불러온 명단(학생 이름, 특성, 배정 조건)과 편성 결과는 이 기기(앱 저장 공간)에만 저장합니다. 개발자 서버나 그 밖의 외부로 전송하지 않습니다.',
         '반 편성 계산도 이 기기 안에서 합니다.',
+        'Android 버전은 앱 백업을 사용하지 않으므로 명단이 Google 드라이브 자동 백업에도 포함되지 않습니다. iPhone·iPad에서는 사용자가 관리하는 기기 자체의 백업(iCloud 백업, 컴퓨터 백업)에 포함될 수 있습니다.',
         '엑셀 파일이나 PDF로 내보낼 때는 보낼 곳(엑셀, Google 드라이브, 메일 등)을 기기의 공유 화면에서 직접 선택합니다. 보낸 곳에서의 처리는 해당 서비스의 약관을 따릅니다.',
         '"Pro·설정" 탭의 "이 기기의 명단과 결과 지우기" 또는 앱 삭제로 저장된 데이터를 지울 수 있습니다.',
       ],
@@ -77,8 +80,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       body: [
         'Las listas que cargas (nombres de los estudiantes, criterios y condiciones) y la distribución en grupos se guardan solo en este dispositivo, en el almacenamiento de la app. Nunca se envían a los servidores del desarrollador ni a ningún otro lugar.',
         'La optimización (armar los grupos) también se hace completamente en este dispositivo.',
+        'En Android, la copia de seguridad de la app está desactivada, así que las listas no se incluyen en la copia automática en Google Drive. En iPhone y iPad pueden incluirse en las copias de seguridad del propio dispositivo que tú administras (copia en iCloud o en tu computadora).',
         'Cuando exportas un Excel o un PDF, tú eliges a dónde enviarlo (Excel, Google Drive, correo, etc.) desde el menú de compartir del dispositivo. A partir de ahí se aplican las condiciones de ese servicio.',
-        'Puedes borrar los datos guardados con «Borrar la lista y los resultados de este dispositivo» en la pestaña Pro y ajustes, o desinstalando la app.',
+        'Puedes borrar los datos guardados con «Borrar la lista y los resultados de este dispositivo» en la pestaña Pro, o desinstalando la app.',
       ],
     },
     {
@@ -98,6 +102,7 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       body: [
         'Die geladenen Schülerlisten (Namen, Merkmale und Wünsche) und die Klasseneinteilung werden nur auf diesem Gerät im Speicher der App abgelegt. Sie werden weder an Server des Entwicklers noch an Dritte übertragen.',
         'Auch die Berechnung der Einteilung findet vollständig auf diesem Gerät statt.',
+        'Unter Android ist die App-Sicherung deaktiviert; die Listen sind daher nicht in der automatischen Sicherung in Google Drive enthalten. Auf iPhone und iPad können sie in Sicherungen des Geräts enthalten sein, die Sie selbst verwalten (iCloud-Backup oder Backup auf dem Computer).',
         'Beim Export als Excel-Datei oder PDF wählen Sie im Teilen-Menü des Geräts selbst, wohin die Datei geht (Excel, Google Drive, E-Mail usw.). Dort gelten die Bedingungen des jeweiligen Dienstes.',
         'Gespeicherte Daten löschen Sie über „Liste und Ergebnis auf diesem Gerät löschen“ im Tab Pro oder durch Deinstallieren der App.',
       ],
@@ -119,8 +124,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       body: [
         'As listas que você carrega (nomes dos alunos, critérios e condições) e a enturmação ficam salvas só neste aparelho, no armazenamento do app. Nunca são enviadas aos servidores do desenvolvedor nem a qualquer outro lugar.',
         'A otimização (montar as turmas) também é feita inteiramente neste aparelho.',
+        'No Android, o backup do app está desativado, então as listas não entram no backup automático do Google Drive. No iPhone e no iPad, elas podem entrar nos backups do próprio aparelho que você gerencia (backup do iCloud ou no computador).',
         'Ao exportar um Excel ou PDF, você escolhe para onde enviar (Excel, Google Drive, e-mail etc.) no menu de compartilhar do aparelho. A partir daí valem os termos desse serviço.',
-        'Você pode apagar os dados salvos em «Apagar a lista e o resultado deste aparelho», na aba Pro e ajustes, ou desinstalando o app.',
+        'Você pode apagar os dados salvos em «Apagar a lista e o resultado deste aparelho», na aba Pro, ou desinstalando o app.',
       ],
     },
     {

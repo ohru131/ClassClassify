@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
+import { clearAppFiles } from './app-files'
 import { useI18n } from './language-provider'
+import { stepClassCountByMax } from './class-size'
 import { CancelledError, runSliced } from './runner'
 import { compile, evaluate, type ColumnSpec, type Problem, type Report } from './solver'
 import { isStoredProject, type StoredProject } from './stored-project'
@@ -33,7 +35,8 @@ type ProjectContextValue = {
   modifyProblem: (f: (p: Problem) => Problem) => void
   updateColumn: (i: number, patch: Partial<ColumnSpec>) => void
   setNumClasses: (k: number) => void
-  setMaxPerClass: (m: number) => void
+  /** 最大人数を1段階増やす（+1）／減らす（-1）。クラス数はそれに合わせて決まる */
+  stepMaxPerClass: (dir: 1 | -1) => void
   setTimeSec: (s: number) => void
   dismissWarnings: () => void
   clearProject: () => void
@@ -53,6 +56,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const [problem, setProblem] = useState<Problem | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [numClasses, setNumClassesState] = useState(4)
+  const numClassesRef = useRef(4)
+  useEffect(() => {
+    numClassesRef.current = numClasses
+  }, [numClasses])
   const [timeSec, setTimeSec] = useState(10)
   const [solution, setSolution] = useState<Solution | null>(null)
   const [running, setRunning] = useState(false)
@@ -136,12 +143,19 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     if (p && p.maxPerClass !== null) updateProblem({ ...p, maxPerClass: null })
   }, [updateProblem])
 
-  const setMaxPerClass = useCallback((m: number) => {
-    const p = problemRef.current
-    if (!p || m < 1) return
-    setNumClassesState(Math.max(2, Math.ceil(p.students.length / m)))
-    updateProblem({ ...p, maxPerClass: m })
-  }, [updateProblem])
+  const stepMaxPerClass = useCallback(
+    (dir: 1 | -1) => {
+      const p = problemRef.current
+      if (!p) return
+      const next = stepClassCountByMax(p.students.length, numClassesRef.current, dir)
+      if (!next) return
+      numClassesRef.current = next.k
+      setNumClassesState(next.k)
+      // 保存する最大人数は表示と同じ値（ceil(n / k)）
+      updateProblem({ ...p, maxPerClass: next.max })
+    },
+    [updateProblem],
+  )
 
   const dismissWarnings = useCallback(() => modifyProblem((p) => ({ ...p, warnings: [] })), [modifyProblem])
 
@@ -152,6 +166,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     setFileName(null)
     setSolution(null)
     setError(null)
+    // 保存の遅延（400ms）を待たずに端末から消す。その間にアプリが終了しても名簿が残らないように
+    void AsyncStorage.removeItem(STORAGE_KEY).catch(() => undefined)
+    // 書き出した Excel・PDF とピッカーのコピーも消す
+    void clearAppFiles()
   }, [])
 
   const run = useCallback(async () => {
@@ -162,13 +180,14 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       return false
     }
     runningRef.current = true
-    const { compiled } = compile(start, numClasses)
     setRunning(true)
     setProgress(0)
     setError(null)
-    const job = runSliced(compiled, { timeMs: timeSec * 1000, onProgress: (f) => setProgress(f) })
-    cancelRef.current = job.cancel
     try {
+      // compile も try の中で（例外で実行中のまま固まらないように）
+      const { compiled } = compile(start, numClasses)
+      const job = runSliced(compiled, { timeMs: timeSec * 1000, onProgress: (f) => setProgress(f) })
+      cancelRef.current = job.cancel
       const res = await job.promise
       const now = problemRef.current
       // 実行中に生徒やペア指定が変わった場合は index が合わないので破棄（Web 版と同じ）
@@ -219,7 +238,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       modifyProblem,
       updateColumn,
       setNumClasses,
-      setMaxPerClass,
+      stepMaxPerClass,
       setTimeSec,
       dismissWarnings,
       clearProject,
@@ -229,7 +248,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       resetMoves,
       setError,
     }),
-    [hydrated, problem, fileName, numClasses, timeSec, solution, report, edited, running, progress, error, loadProblem, updateProblem, modifyProblem, updateColumn, setNumClasses, setMaxPerClass, dismissWarnings, clearProject, run, cancel, moveStudent, resetMoves],
+    [hydrated, problem, fileName, numClasses, timeSec, solution, report, edited, running, progress, error, loadProblem, updateProblem, modifyProblem, updateColumn, setNumClasses, stepMaxPerClass, dismissWarnings, clearProject, run, cancel, moveStudent, resetMoves],
   )
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
 }

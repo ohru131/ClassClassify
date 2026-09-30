@@ -24,6 +24,9 @@ const config: ExpoConfig = {
     // 追加の権限は宣言しない（通知・カメラ・マイク等は使わない）。
     // ネイティブ依存（課金 = Play Billing）が持つ権限はマニフェストのマージで自動的に入る。
     permissions: [],
+    // 名簿は端末の外へ出さない。Android の自動バックアップ（Google ドライブへのアプリデータの
+    // バックアップ）に AsyncStorage の名簿が含まれないよう、アプリのバックアップを無効にする。
+    allowBackup: false,
     // expo-file-system のプラグインが足す旧来のストレージ権限は使わない（取り込みは OS の
     // ファイル選択、書き出しはアプリのキャッシュ＋共有シートで、どちらも権限が要らない）。
     blockedPermissions: ['android.permission.READ_EXTERNAL_STORAGE', 'android.permission.WRITE_EXTERNAL_STORAGE'],

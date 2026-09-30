@@ -45,6 +45,24 @@ describe('保存データの検証', () => {
     // ペア指定が範囲外の生徒を指す
     expect(isStoredProject({ ...base, problem: { ...problem, wantedGroups: [[0, 9999]] }, solution: null })).toBe(false)
   })
+  it('クラス数・original・値の型も確かめる', () => {
+    const { problem } = loadSample('ja', 'sample1')
+    const classOf = problem.students.map((_, i) => i % 4)
+    const sol = { classOf, original: classOf, k: 4, iterations: 1, starts: 1 }
+    // original が k 以上の組を指す
+    expect(isStoredProject({ ...base, problem, solution: { ...sol, original: classOf.map(() => 4) } })).toBe(false)
+    // k が整数でない・2 未満
+    expect(isStoredProject({ ...base, problem, solution: { ...sol, k: 4.5 } })).toBe(false)
+    expect(isStoredProject({ ...base, problem, solution: { ...sol, k: 1, classOf: classOf.map(() => 0), original: classOf.map(() => 0) } })).toBe(false)
+    expect(isStoredProject({ ...base, numClasses: 2.5, problem, solution: null })).toBe(false)
+    expect(isStoredProject({ ...base, problem: { ...problem, numClasses: 0 }, solution: null })).toBe(false)
+    // values・levels・warnings の中身の型
+    const students = problem.students.map((st, i) => (i === 0 ? { ...st, values: { ...st.values, x: 1 } } : st))
+    expect(isStoredProject({ ...base, problem: { ...problem, students }, solution: null })).toBe(false)
+    const columns = problem.columns.map((c, i) => (i === 0 ? { ...c, levels: [1] } : c))
+    expect(isStoredProject({ ...base, problem: { ...problem, columns }, solution: null })).toBe(false)
+    expect(isStoredProject({ ...base, problem: { ...problem, warnings: [null] }, solution: null })).toBe(false)
+  })
 })
 
 describe('Excel の書き出し（スマホ版の経路: base64）', async () => {

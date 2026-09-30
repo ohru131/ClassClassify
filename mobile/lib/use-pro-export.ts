@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { WorkBook } from 'xlsx-js-style'
 
 import { useI18n } from './language-provider'
@@ -26,6 +26,8 @@ export function useProExport() {
   const { t } = useI18n()
   const router = useRouter()
   const [busy, setBusy] = useState<null | 'xlsx' | 'print' | 'pdf'>(null)
+  // busy は再描画後の値なので、同じフレームの2回目のタップはすり抜ける。同期のロックで止める
+  const lockRef = useRef(false)
   const messages = { sharingUnavailable: t('sharingUnavailable'), popupBlocked: t('popupBlocked') }
 
   const run = (kind: 'xlsx' | 'print' | 'pdf', task: () => Promise<void>) => {
@@ -33,10 +35,22 @@ export function useProExport() {
       router.navigate('/pro')
       return
     }
+    if (lockRef.current) return
+    lockRef.current = true
     setBusy(kind)
-    task()
+    // task() は同期で呼ぶ（Web の印刷をタップと同じ流れに保つ）。同期的に投げてもロックは必ず外す
+    let pending: Promise<void>
+    try {
+      pending = task()
+    } catch (e) {
+      pending = Promise.reject(e)
+    }
+    pending
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
-      .finally(() => setBusy(null))
+      .finally(() => {
+        lockRef.current = false
+        setBusy(null)
+      })
   }
 
   const exportXlsx = (build: () => WorkBook, baseName: string) => run('xlsx', () => shareXlsx(build(), `${baseName}_${today()}.xlsx`, messages.sharingUnavailable))
