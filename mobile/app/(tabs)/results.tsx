@@ -7,6 +7,8 @@ import { Btn, Card, Chip, Notice, Screen, Segmented, Stat, styles } from '@/comp
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { pairStatus, resultWorkbook, rowColor, type ColumnReport, type PairTag, type Problem, type Report } from '@/lib/solver'
+import { canSharePdf } from '@/lib/print'
+import { buildResultPrintHtml } from '@/lib/print-html'
 import { useProExport } from '@/lib/use-pro-export'
 
 type Tab = 'classes' | 'balance' | 'checks'
@@ -14,7 +16,7 @@ type Focus = { kind: 'wanted' | 'unwanted'; group: number } | null
 
 export default function ResultsScreen() {
   const { problem, solution, report, edited, moveStudent, resetMoves, error, setError } = useProject()
-  const { exportXlsx, busy, isPro } = useProExport()
+  const { exportXlsx, print, exportPdf, busy, isPro } = useProExport()
   const router = useRouter()
   const { isWide } = useLayout()
   const [tab, setTab] = useState<Tab>('classes')
@@ -35,6 +37,7 @@ export default function ResultsScreen() {
   const perfect = report.totalExcess === 0
   const sizeGap = Math.max(...report.sizes) - Math.min(...report.sizes)
   const sel = selected !== null && selected < problem.students.length ? selected : null
+  const printHtmlFor = () => buildResultPrintHtml({ problem, classOf: solution.classOf, k, report, createdAt: new Date() })
 
   return (
     <View style={{ flex: 1 }}>
@@ -63,10 +66,20 @@ export default function ResultsScreen() {
             variant="primary"
             icon={isPro ? 'share-outline' : 'lock-closed-outline'}
             label="結果を Excel で共有"
-            busy={busy}
+            busy={busy === 'xlsx'}
             onPress={() => exportXlsx(() => resultWorkbook(problem, solution.classOf, k, report), 'クラス編成結果')}
           />
-          {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>Excel での保存・共有は Pro の機能です</Text> : null}
+          <Btn
+            small
+            icon={isPro ? 'print-outline' : 'lock-closed-outline'}
+            label={canSharePdf ? '印刷' : '印刷・PDF'}
+            busy={busy === 'print'}
+            onPress={() => print(printHtmlFor)}
+          />
+          {canSharePdf ? (
+            <Btn small icon={isPro ? 'document-outline' : 'lock-closed-outline'} label="PDF で共有" busy={busy === 'pdf'} onPress={() => exportPdf(printHtmlFor, 'クラス編成結果')} />
+          ) : null}
+          {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>Excel・印刷・PDF は Pro（買い切り）の機能です</Text> : null}
         </View>
         <Segmented
           value={tab}

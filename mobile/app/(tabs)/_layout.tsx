@@ -3,7 +3,6 @@ import { Tabs } from 'expo-router'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { BannerAdSlot } from '@/components/banner-ad'
 import { C } from '@/components/theme'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
@@ -14,8 +13,6 @@ export default function TabsLayout() {
   const { report } = useProject()
   return (
     <View style={{ flex: 1, paddingTop: insets.top, backgroundColor: C.bg }}>
-      {/* 無料版の広告は画面の最上部（操作するボタンから離す） */}
-      <BannerAdSlot />
       <Tabs
         screenOptions={{
           headerShown: false,

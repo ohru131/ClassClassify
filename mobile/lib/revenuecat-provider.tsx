@@ -2,6 +2,7 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useM
 import { Platform } from 'react-native'
 import Purchases, { type CustomerInfo, LOG_LEVEL, type PurchasesPackage } from 'react-native-purchases'
 
+import { isWebProPreview } from './pro-preview'
 import { resolvePurchaseMessageKey } from './purchase-message'
 import { selectOneTimePackageFromOfferings } from './purchase-offering'
 
@@ -27,7 +28,7 @@ type PurchaseMessageKey = keyof typeof COPY
 
 type ProContextValue = {
   isPro: boolean
-  /** Pro 状態の復元が終わったか（終わるまで広告を出さない） */
+  /** Pro 状態の復元が終わったか */
   isReady: boolean
   isNativePurchaseAvailable: boolean
   purchaseMessage: string | null
@@ -56,7 +57,9 @@ function isUserCancelledError(error: unknown): boolean {
 }
 
 export function RevenueCatProvider({ children }: { children: ReactNode }) {
-  const [isPro, setIsPro] = useState(false)
+  const [isEntitled, setIsPro] = useState(false)
+  const [webPreview] = useState(() => isWebProPreview(Platform.OS, typeof window !== 'undefined' ? window.location?.search : undefined))
+  const isPro = isEntitled || webPreview
   const [isNativeReady, setIsNativeReady] = useState(false)
   const [purchaseMessageKey, setPurchaseMessageKey] = useState<PurchaseMessageKey | null>(null)
   const [oneTimePackage, setOneTimePackage] = useState<PurchasesPackage | null>(null)

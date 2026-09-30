@@ -1,15 +1,18 @@
 # Mosaic クラス編成（スマホ・タブレット版）
 
 Web 版（リポジトリ直下）と同じソルバー（`../src/solver`）を使う Expo / React Native アプリ。
-Web 版は従来どおり無料で、このアプリは無料版（広告あり）＋ Pro（買い切り）で配布する。
+Web 版は従来どおり無料。このアプリは**広告なしの無料版＋ Pro（買い切り）**で配布し、収益は買い切り一本にする（広告・サブスクは無い）。
 
 | | 無料 | Pro（買い切り） |
 | --- | --- | --- |
 | 名簿の読み込み（.xlsx・サンプル・新規作成） | ✓ | ✓ |
 | 名簿の編集（生徒・項目・重み・同じ組／別の組） | ✓ | ✓ |
 | 編成の実行・結果の確認・タップで手動移動 | ✓ | ✓ |
-| バナー広告 | 表示 | なし |
-| 結果・名簿を Excel（.xlsx）で書き出し → 共有シート | ボタンは表示（押すと Pro 画面へ） | ✓ |
+| 広告 | なし | なし |
+| 結果・名簿を Excel（.xlsx）で書き出し → 共有シート（Excel・Google ドライブ・メール等） | ボタンは表示（押すと Pro 画面へ） | ✓ |
+| 結果の印刷・PDF（A4 縦: クラス別名簿＋ペア指定の色分けと凡例＋集計・バランス表＋作成日） | ボタンは表示（押すと Pro 画面へ） | ✓ |
+
+**価格の目安は ¥980 程度**（`docs/research/competitors.md` 第5節の提案「個人の教員が自腹で払える ¥480〜¥980／¥610〜¥980 帯」に基づく）。価格はストア側で設定し、アプリはストアのローカライズ済みの価格文字列をそのまま表示する（コードでは決めない）。
 
 Google 連携（OAuth）は入れていない。書き出した .xlsx は OS の共有シートから Excel・Google ドライブ・メール等へ送る。
 
@@ -18,17 +21,19 @@ Google 連携（OAuth）は入れていない。書き出した .xlsx は OS の
 ```
 mobile/
   app/                  expo-router の画面（名簿 / 設定・実行 / 結果 / Pro・設定、プライバシーポリシー）
-  components/           画面の部品（名簿の表・生徒の編集・項目・ペア指定・広告バナー）
+  components/           画面の部品（名簿の表・生徒の編集・項目・ペア指定）
   lib/
     solver.ts           共有ソルバーへの唯一の入口（../../src/solver を re-export）
     runner.ts           時間を区切って焼きなましを進めるランナー（Web Worker の代わり）
     project-store.tsx   名簿・設定・結果の状態と AsyncStorage への保存
     revenuecat-provider.tsx / purchase-offering.ts / purchase-message.ts   課金（買い切りのみ）
-    ads-provider.tsx / ads-native-init(.web).ts                          広告
+    print-html.ts       印刷・PDF 用の結果の HTML（純関数・テストあり。利用者の入力は必ずエスケープ）
+    print(.web).ts      ネイティブ: expo-print（printAsync / printToFileAsync → 共有）、Web: 新しいウィンドウで window.print()
+    pro-preview.ts      Web 限定の Pro 表示プレビュー（?pro=preview。スクリーンショット用、ネイティブでは無効）
     xlsx-files(.web).ts ファイルの選択と書き出し（ネイティブ: ファイル＋共有シート、Web: ダウンロード）
     samples.generated.ts  public/sample*.xlsx を base64 で埋め込んだもの（npm run samples:generate）
-  plugins/              config plugin（AdMob の依存固定・大画面対応・release から不要な権限を外す）
-  test/                 vitest（ランナー・保存データ・課金の判定・Excel の往復）
+  plugins/              config plugin（大画面対応・release から不要な権限を外す）
+  test/                 vitest（ランナー・保存データ・課金の判定・Excel の往復・印刷用 HTML）
 ```
 
 ### ソルバーの共有
@@ -50,10 +55,10 @@ cd mobile
 npm install
 npm test            # vitest
 npm run check       # tsc --noEmit
-npx expo export --platform web   # Web で動作確認用に書き出す（広告・課金は無効）
+npx expo export --platform web   # Web で動作確認用に書き出す（課金は無効。?pro=preview で Pro の画面を確認できる）
 ```
 
-課金（react-native-purchases）と広告（react-native-google-mobile-ads）はネイティブモジュールなので
+課金（react-native-purchases）と印刷（expo-print）はネイティブモジュールなので
 **Expo Go では動かない**。実機では開発ビルドを使う:
 
 ```bash
@@ -71,9 +76,6 @@ npx expo start --dev-client
 | --- | --- | --- |
 | `EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY` | RevenueCat の Android 公開 SDK キー（`goog_…`） | 購入・復元ボタンは「キーが設定されていません」と出す |
 | `EXPO_PUBLIC_REVENUECAT_IOS_API_KEY` | RevenueCat の iOS 公開 SDK キー（`appl_…`） | 同上 |
-| `EXPO_PUBLIC_ADMOB_ANDROID_APP_ID` | AdMob の Android App ID（`ca-app-pub-…~…`） | Google のテスト App ID。**EAS production ビルドは失敗させる** |
-| `EXPO_PUBLIC_ADMOB_IOS_APP_ID` | AdMob の iOS App ID | 同上（iOS ビルド時） |
-| `EXPO_PUBLIC_ADMOB_BANNER_UNIT_ID` | バナー広告ユニット ID（`ca-app-pub-…/…`） | Google のテスト広告ユニット |
 
 ## EAS ビルド
 
@@ -103,12 +105,11 @@ npx expo start --dev-client
 - SDK キー未設定・Web では購入・復元を受け付けず、理由を出す。
 - 審査員向けには Play のプロモコード（ライセンステスター）を使う（買い切りに無料トライアルは無い）。
 
-## 広告（AdMob）
+## 印刷・PDF（Pro）
 
-- 無料版だけ、画面の最上部にバナーを出す（操作ボタンから離すため）。Web では出さない。
-- Pro の人には同意フォームの表示も SDK の初期化も行わない。
-- EEA などでは UMP の同意フォームを出してから広告をリクエストする（AdMob 側で「プライバシーとメッセージ」の GDPR メッセージを作成・公開しておく）。
-- `app.config.ts` の `userTrackingUsageDescription` は iOS の ATT ダイアログの文言。
+- HTML は `lib/print-html.ts` の純関数 `buildResultPrintHtml` で組む（`@page { size: A4 portrait }`、クラスのカードは `break-inside: avoid` で途中で切らず、集計・バランスは改ページして次のページから）。
+- ネイティブ: 「印刷」は `Print.printAsync`、「PDF で共有」は `Print.printToFileAsync` → `クラス編成結果_日付.pdf` に名前を変えて `expo-sharing`。
+- Web: `expo-print` の Web 実装は渡した HTML ではなく今の画面を印刷してしまうので使わず、新しいウィンドウに HTML を書いて `window.print()`（PDF はブラウザの印刷画面から保存）。
 
 ## 大画面・Chromebook 対応
 
@@ -122,29 +123,38 @@ npx expo start --dev-client
   - 結果: 大画面は**クラスを 2〜4 列のグリッド**で全部並べる、スマホは組を切り替えて1組ずつ。
   - 設定: 大画面はクラス数・最大人数・探索時間を横に並べる。
 - **マウス・キーボードで完結する**: 長押し・ドラッグ・スワイプ前提の操作は無い（生徒の移動も「タップ → 移動先の組を押す」）。ボタンはホバー・フォーカスで見た目が変わり、テキスト入力は Enter（物理キーボード）で確定する。
-- 追加の権限は宣言しない（`android.permissions: []`）。expo-file-system が足す旧来のストレージ権限は `blockedPermissions` で外している（取り込みは OS のファイル選択、書き出しはキャッシュ＋共有シートで権限が要らない）。
+- 追加の権限は宣言しない（`android.permissions: []`）。expo-file-system が足す旧来のストレージ権限は `blockedPermissions` で外している（取り込みは OS のファイル選択、書き出しはキャッシュ＋共有シートで権限が要らない）。広告 SDK を入れていないので `AD_ID`・`ACCESS_ADSERVICES_*` などの広告系の権限も載らない。
 
 **Play Console では「タブレット」（7インチ・10インチ）と「Chromebook」向けのスクリーンショットを別に登録する**と、大画面向けの掲載として表示される（1280×800 や 800×1280 の画面で撮る）。
 
 ## データとプライバシー
 
-- 名簿・設定・結果は AsyncStorage（端末内）にだけ保存する。外部へは送らない。「Pro・設定」から消去できる。
-- RevenueCat は購入確認のため端末生成の匿名 ID と購入・レシート情報を、AdMob は広告配信・計測のため端末 ID・広告 ID を受け取る（`app/privacy.tsx`）。**「個人情報を一切集めていない」とは書かないこと。** Play Console のデータセーフティもこれに合わせて申告する。
+- 名簿・設定・結果は AsyncStorage（端末内）にだけ保存し、端末の外へは送らない。「Pro・設定」から消去できる。
+- 外部へ送るのは **RevenueCat（購入検証のための端末生成の匿名 ID とレシート）だけ**。広告・解析 SDK は入れていない（`app/privacy.tsx`）。
 - ストアの掲載には、この画面と同じ内容のプライバシーポリシーを Web で公開した URL が要る。
+
+### Play Console のデータセーフティ（申告の目安）
+
+- 「データの収集」: **購入履歴**（アプリの機能＝購入の確認のため、RevenueCat 経由）と、**アプリ情報と動作 > その他の ID**（RevenueCat の匿名のアプリユーザー ID）。どちらも「任意ではない（購入時）」「暗号化して送信」。
+- 名簿（生徒の名前・特性）は端末外へ送らないので「収集」に当たらない。「共有」（第三者への提供）は無し。
+- 広告 ID は使わない（「広告 ID を使用しますか」→ いいえ）。広告は表示しない。
+- データ削除: アプリ内の「この端末の名簿と結果を消去」またはアンインストール。
+- 申告前に RevenueCat のドキュメント（データセーフティ／App Privacy の案内）で、SDK の収集項目が変わっていないか確認すること。
 
 ## 検証状況
 
 確認済み（この環境）:
 
-- `npm test`（vitest 36件）: ランナーが3つのサンプルで条件違反0・人数差1以内・全項目が理想範囲内に到達すること、中止、UI へ返した時間を探索時間に数えないこと、保存データの検証、課金の判定、Excel（base64 経路）の往復。
+- `npm test`（vitest 41件）: ランナーが3つのサンプルで条件違反0・人数差1以内・全項目が理想範囲内に到達すること、中止、UI へ返した時間を探索時間に数えないこと、保存データの検証、課金の判定、Excel（base64 経路）の往復、印刷用 HTML（エスケープ・A4 縦・各組・凡例・改ページ）、Web 限定の Pro プレビュー。
 - `npx tsc --noEmit`、`npx expo export --platform web`。
-- Web 書き出しを Playwright で 390×844・1280×800・800×1280 で操作: サンプル読み込み → 生徒編集 → 実行（進捗バーが進む）→ 結果（人数差0・バランス完全・違反0）→ 手動移動で即時再計算 → Pro 限定ボタンで Pro 画面へ。名前の Enter 確定・項目の追加・同じ組の作成・再読み込み後の復元・ウィンドウ幅を狭めたときのレイアウト切り替え。
+- Web 書き出しを Playwright で 390×844・1280×800・800×1280 で操作: サンプル読み込み → 生徒編集 → 実行（進捗バーが進む）→ 結果（人数差0・バランス完全・違反0）→ 手動移動で即時再計算 → 無料時に Excel・印刷ボタンが Pro 画面へ案内する。`?pro=preview` で印刷用ウィンドウ（A4 の HTML）が開く。名前の Enter 確定・項目の追加・同じ組の作成・再読み込み後の復元・ウィンドウ幅を狭めたときのレイアウト切り替え。
 
 **実機では未検証**（ネイティブのビルドはこの環境で行っていない）:
 
 - Hermes 上のソルバーの速度。V8（Web）より大幅に遅い見込みで、同じ探索時間でも反復回数は少ない。サンプル規模（80名）で違反0に届くか、240名規模で十分かを実機で確認すること。足りなければ `lib/runner.ts` のスタート回数を減らす（1回あたりを長くする）のが最初の調整点。
 - 計算中の UI の滑らかさ（`sliceMs` 24ms ごとに制御を返す）。
 - `expo-document-picker` で .xlsx が選べるか（端末によって MIME が違う。`application/octet-stream` も受け付けている）、共有シートから Excel・Google ドライブ・Gmail へ .xlsx が渡るか。
-- 購入・復元・Pro の反映、広告の表示と同意フォーム（本番の RevenueCat・AdMob 設定が必要）。
+- 購入・復元・Pro の反映（本番の RevenueCat 設定が必要）。
+- `expo-print` の印刷画面・PDF の見た目（Android の WebView / iOS の WKWebView で組版がブラウザと違うことがある。日本語フォント、改ページ、背景色の印刷）。
 - Chromebook（タッチなし機を含む）・Android タブレットでの表示、フリーフォーム窓のリサイズ、物理キーボードでの Tab 移動・Enter 確定、戻るキー。
 - iOS 版（`supportsTablet` 含む）は一度もビルドしていない。

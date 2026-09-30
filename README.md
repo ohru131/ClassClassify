@@ -15,8 +15,8 @@
 ### スマホ・タブレット版（`mobile/`）
 
 同じソルバーを使う Expo / React Native アプリ（Android・iOS、学校の Chromebook・タブレット対応）。
-名簿の読み込み・編集・編成・手動移動は無料（広告あり）、Excel での書き出しと広告の非表示は Pro（買い切り）。
-データは端末内だけに保存する。セットアップ・ビルド・課金の設定は [mobile/README.md](mobile/README.md)。
+名簿の読み込み・編集・編成・手動移動は無料（広告なし）、Excel での書き出しと印刷・PDF は Pro（買い切り・サブスクなし）。
+名簿データは端末内だけに保存し、外部へ送るのは購入確認（RevenueCat）の匿名 ID とレシートだけ。セットアップ・ビルド・課金の設定は [mobile/README.md](mobile/README.md)。
 Web 版はこれまでどおり無料のまま。
 
 ## 使い方

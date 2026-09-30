@@ -68,13 +68,13 @@ export default function RosterScreen() {
                   small
                   icon={isPro ? 'share-outline' : 'lock-closed-outline'}
                   label="名簿を Excel で保存"
-                  busy={busy}
+                  busy={busy === 'xlsx'}
                   onPress={() => exportXlsx(() => rosterWorkbook(problem, numClasses), '名簿')}
                 />
                 <Btn small variant="primary" icon="arrow-forward" label="設定・実行へ" onPress={() => router.navigate('/run')} />
               </View>
             </View>
-            {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>Excel での保存・共有は Pro の機能です。</Text> : null}
+            {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>Excel での保存・共有は Pro（買い切り）の機能です。</Text> : null}
           </Card>
 
           {problem.warnings.length ? (

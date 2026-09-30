@@ -8,9 +8,9 @@ import { useProject } from '@/lib/project-store'
 import { usePro } from '@/lib/revenuecat-provider'
 
 const FEATURES = [
-  { title: '広告を非表示', body: '画面上部のバナー広告が出なくなります。' },
-  { title: '結果を Excel で共有', body: '組分け・クラス別名簿・各組・ペア指定・集計のシートを .xlsx で書き出し、Excel・Google ドライブ・メールなどへ送れます。' },
-  { title: '名簿を Excel で保存', body: '編集した名簿をひな形と同じ形式で保存できます（Web 版でもそのまま読み込めます）。' },
+  { title: '結果を Excel・Google ドライブへ書き出し', body: '組分け・クラス別名簿・各組・ペア指定・集計のシートを .xlsx にして、共有画面から Excel・Google ドライブ・メールなどへ送れます。編集した名簿もひな形と同じ形式で保存できます（Web 版でもそのまま読み込めます）。' },
+  { title: '会議用に印刷・PDF', body: 'クラスごとの名簿（ペア指定の色分けと凡例つき）と集計・バランス表を A4 縦にまとめ、印刷または PDF にできます。' },
+  { title: '一度の購入でずっと使える', body: '買い切りです。定期購入（サブスクリプション）ではないので、継続して請求されることはありません。' },
 ]
 
 export default function ProScreen() {
@@ -26,7 +26,7 @@ export default function ProScreen() {
           <Text style={{ fontSize: 20, fontWeight: '900', color: C.text }}>Mosaic Pro</Text>
           {isPro ? <Text style={{ color: C.good, fontWeight: '800' }}>✓ 利用中</Text> : null}
         </View>
-        <Text style={{ fontSize: 13, color: C.sub }}>買い切り（1回のお支払い）です。定期購入（サブスクリプション）ではないので、継続して請求されることはありません。</Text>
+        <Text style={{ fontSize: 13, color: C.sub }}>名簿の読み込み・編集・編成・手直しは無料で、広告もありません。書き出しと印刷が必要になったら Pro をどうぞ。</Text>
         {FEATURES.map((f) => (
           <View key={f.title} style={{ flexDirection: 'row', gap: 10 }}>
             <Text style={{ color: C.primary, fontWeight: '900' }}>✓</Text>
