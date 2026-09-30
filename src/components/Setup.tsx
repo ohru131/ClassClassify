@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Download, ExternalLink, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
+import { ChevronRight, Download, ExternalLink, Pencil, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
 import type { ColumnSpec, Problem } from '../solver/types'
 import { Segmented, StepHeader } from './ui'
 
@@ -135,7 +135,9 @@ export function SettingsStep({
   timeSec,
   setTimeSec,
   onColumnChange,
+  onOpenEditor,
 }: {
+  onOpenEditor: (tab: 'students' | 'wanted' | 'unwanted') => void
   problem: Problem
   numClasses: number
   setNumClasses: (n: number) => void
@@ -151,14 +153,24 @@ export function SettingsStep({
       <StepHeader n={2} title="条件を調整する" desc="重みが大きい項目ほど優先して均等にします。0 にすると無視します。" />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl bg-slate-50 p-4">
-          <div className="text-xs font-semibold text-slate-500">生徒数</div>
+        <button
+          type="button"
+          onClick={() => onOpenEditor('students')}
+          className="group rounded-2xl bg-slate-50 p-4 text-left ring-indigo-200 transition hover:bg-indigo-50/70 hover:ring-1"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+            生徒数
+            <span className="inline-flex items-center gap-0.5 text-indigo-600 opacity-70 transition group-hover:opacity-100">
+              名簿を開く <ChevronRight className="size-3.5" />
+            </span>
+          </div>
           <div className="mt-1 flex items-center gap-2 text-2xl font-extrabold text-slate-900">
             <Users className="size-5 text-indigo-500" />
             {n}
             <span className="text-sm font-medium text-slate-400">名</span>
           </div>
-        </div>
+          <div className="mt-1 text-xs text-slate-400">一覧・絞り込み・編集</div>
+        </button>
         <div className="rounded-2xl bg-slate-50 p-4">
           <div className="text-xs font-semibold text-slate-500">クラス（グループ）数</div>
           <div className="mt-1 flex items-center gap-3">
@@ -235,23 +247,41 @@ export function SettingsStep({
       </div>
 
       <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-        <PairBox title="同じ組にする" tone="indigo" groups={problem.wantedGroups} problem={problem} />
-        <PairBox title="別の組にする" tone="rose" groups={problem.unwantedGroups} problem={problem} />
+        <PairBox title="同じ組にする" tone="indigo" groups={problem.wantedGroups} problem={problem} onEdit={() => onOpenEditor('wanted')} />
+        <PairBox title="別の組にする" tone="rose" groups={problem.unwantedGroups} problem={problem} onEdit={() => onOpenEditor('unwanted')} />
       </div>
     </section>
   )
 }
 
-function PairBox({ title, groups, problem, tone }: { title: string; groups: number[][]; problem: Problem; tone: 'indigo' | 'rose' }) {
+function PairBox({
+  title,
+  groups,
+  problem,
+  tone,
+  onEdit,
+}: {
+  title: string
+  groups: number[][]
+  problem: Problem
+  tone: 'indigo' | 'rose'
+  onEdit: () => void
+}) {
   const cls = tone === 'indigo' ? 'bg-indigo-50 text-indigo-700' : 'bg-rose-50 text-rose-700'
   return (
     <div className="rounded-2xl border border-slate-100 p-4">
       <div className="mb-2 flex items-center justify-between">
-        <span className="font-semibold text-slate-700">{title}</span>
-        <span className="text-xs text-slate-400">{groups.length} 件</span>
+        <span className="font-semibold text-slate-700">
+          {title} <span className="ml-1 text-xs font-normal text-slate-400">{groups.length} 件</span>
+        </span>
+        <button type="button" onClick={onEdit} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50">
+          <Pencil className="size-3.5" /> 編集
+        </button>
       </div>
       {groups.length === 0 ? (
-        <div className="text-xs text-slate-400">指定なし</div>
+        <button type="button" onClick={onEdit} className="text-xs text-slate-400 hover:text-indigo-600">
+          指定なし — クリックして追加
+        </button>
       ) : (
         <div className="flex flex-wrap gap-1.5">
           {groups.map((g, i) => (

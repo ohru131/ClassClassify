@@ -26,8 +26,6 @@ export interface Problem {
   wantedGroups: number[][]
   /** 別の組にしたいグループ（生徒 index、グループ内の全ペアが対象） */
   unwantedGroups: number[][]
-  /** 元の生徒名簿シート（出力用） */
-  rosterSheet: (string | number | null)[][]
   warnings: string[]
 }
 

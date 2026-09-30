@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx'
 import type { Problem } from './types'
 import type { Report } from './evaluate'
+import { rosterRows } from './roster'
 
 export type Cell = string | number | null
 export interface SheetData {
@@ -52,7 +53,7 @@ export function exportWorkbook(p: Problem, classOf: number[], k: number, report:
   }
   add(summary.name, summary.rows)
   add(failed.name, failed.rows)
-  add('生徒名簿', p.rosterSheet)
+  add('生徒名簿', rosterRows(p))
 
   const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
   return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
