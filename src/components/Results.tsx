@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Download, ExternalLink, GripVertical, Loader2, RotateCcw, Sheet, X } from 'lucide-react'
 import type { Problem } from '../solver/types'
 import type { ColumnReport, Report } from '../solver/evaluate'
@@ -104,7 +104,7 @@ export function Results({
       {tab === 'checks' && <Checks problem={problem} report={report} />}
 
       {selected !== null && (
-        <div className="fixed inset-x-0 bottom-4 z-30 mx-auto flex w-fit max-w-[calc(100%-2rem)] flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
+        <div className="fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 mx-auto flex w-fit max-w-[calc(100%-2rem)] flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
           <span className="text-sm font-semibold text-slate-800">
             {problem.students[selected].no}:{problem.students[selected].name} を移動 →
           </span>
@@ -149,6 +149,7 @@ function ClassBoard({
   report: Report
 }) {
   const [over, setOver] = useState<number | null>(null)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const flagged = useMemo(() => new Set(report.violations.flatMap((v) => v.students)), [report])
   const tags = useMemo(() => {
     // 各生徒の「該当」項目を短いタグで表示
@@ -158,14 +159,34 @@ function ClassBoard({
 
   return (
     <>
-      <p className="text-xs text-slate-500">生徒をドラッグ、またはクリックして別の組へ移動できます。集計は即座に再計算されます。</p>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <p className="text-xs text-slate-500">
+        <span className="hidden sm:inline">生徒をドラッグ、またはクリックして別の組へ移動できます。</span>
+        <span className="sm:hidden">左右にスワイプしてクラスを切り替え。生徒をタップすると別の組へ移動できます。</span>
+        集計は即座に再計算されます。
+      </p>
+      {/* スマホ: クラスへジャンプ */}
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:hidden">
+        {Array.from({ length: k }, (_, c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => cardRefs.current[c]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+            className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ring-1 ${classColor(c).soft}`}
+          >
+            {c + 1}組 {report.sizes[c]}名
+          </button>
+        ))}
+      </div>
+      <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 xl:grid-cols-4">
         {Array.from({ length: k }, (_, c) => {
           const members = problem.students.map((_, i) => i).filter((i) => classOf[i] === c)
           const color = classColor(c)
           return (
             <div
               key={c}
+              ref={(el) => {
+                cardRefs.current[c] = el
+              }}
               onDragOver={(e) => {
                 e.preventDefault()
                 setOver(c)
@@ -177,7 +198,7 @@ function ClassBoard({
                 const s = Number(e.dataTransfer.getData('text/plain'))
                 if (Number.isFinite(s)) onMove(s, c)
               }}
-              className={`card overflow-hidden transition ${over === c ? 'ring-2 ring-indigo-400' : ''}`}
+              className={`card w-[85%] shrink-0 snap-center overflow-hidden transition sm:w-auto ${over === c ? 'ring-2 ring-indigo-400' : ''}`}
             >
               <div className={`h-1.5 bg-gradient-to-r ${color.bar}`} />
               <div className="flex items-center justify-between px-5 pb-2 pt-4">

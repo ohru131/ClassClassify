@@ -38,7 +38,7 @@ export function DataStep({
   }
 
   return (
-    <section className="card p-6 sm:p-8">
+    <section className="card p-5 sm:p-8">
       <StepHeader
         n={1}
         done={!!fileName}
@@ -149,7 +149,7 @@ export function SettingsStep({
   const lo = Math.floor(n / numClasses)
   const hi = Math.ceil(n / numClasses)
   return (
-    <section className="card p-6 sm:p-8">
+    <section className="card p-5 sm:p-8">
       <StepHeader n={2} title="条件を調整する" desc="重みが大きい項目ほど優先して均等にします。0 にすると無視します。" />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -205,22 +205,22 @@ export function SettingsStep({
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-xs font-semibold text-slate-500">
             <tr>
-              <th className="px-4 py-2.5">項目</th>
+              <th className="px-3 py-2.5 sm:px-4">項目</th>
               <th className="hidden px-4 py-2.5 sm:table-cell">種類 / 値</th>
-              <th className="w-56 px-4 py-2.5">重み</th>
+              <th className="w-40 px-3 py-2.5 sm:w-56 sm:px-4">重み</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {problem.columns.map((c, i) => (
               <tr key={c.name} className={c.enabled && c.weight > 0 ? '' : 'opacity-45'}>
-                <td className="px-4 py-3 font-semibold text-slate-800">{c.name}</td>
+                <td className="whitespace-nowrap px-3 py-3 font-semibold text-slate-800 sm:px-4">{c.name}</td>
                 <td className="hidden px-4 py-3 sm:table-cell">
                   <span className="mr-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{KIND_LABEL[c.kind]}</span>
                   <span className="text-xs text-slate-500">
                     {c.kind === 'numeric' ? `${c.levels[0]}〜${c.levels[c.levels.length - 1]}` : c.levels.join(' / ') || '（空欄のみ）'}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 py-3 sm:px-4">
                   <div className="flex items-center gap-3">
                     <input
                       type="range"

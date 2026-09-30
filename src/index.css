@@ -34,3 +34,12 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
 }
+
+/* iOS Safari が 16px 未満の入力欄でフォーカス時に拡大するのを防ぐ */
+@media (max-width: 640px) {
+  input:not([type='checkbox']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
