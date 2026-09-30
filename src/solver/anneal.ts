@@ -37,12 +37,29 @@ class UnionFind {
   }
 }
 
+/** 途中で止めて再開できる焼きなまし（Web Worker の無い React Native でも UI を止めずに回すため） */
+export interface Annealer {
+  /**
+   * 最大 sliceMs ミリ秒だけ探索を進める。探索時間を使い切って仕上げまで終えたら true。
+   * 時間割り当て（opt.timeMs）は、この関数の中で実際に計算していた時間だけで消費する。
+   */
+  run(sliceMs: number): boolean
+  /** run() が true を返した後に呼ぶ */
+  result(): SolveResult
+}
+
 /**
  * 焼きなまし法によるクラス分け。
  * 「同じ組ペア」は union-find で1ブロックにまとめて常に同じ組に置く（ハード制約）。
  * ブロック単位の「移動」「交換」を近傍とし、人数・別の組ペアはペナルティで扱う。
  */
 export function anneal(p: CompiledProblem, opt: AnnealOptions): SolveResult {
+  const a = createAnnealer(p, opt)
+  while (!a.run(Infinity));
+  return a.result()
+}
+
+export function createAnnealer(p: CompiledProblem, opt: AnnealOptions): Annealer {
   const t0 = performance.now()
   const rand = rng(opt.seed)
   const { n, k, attr, weights, lo, hi, target } = p
@@ -191,73 +208,116 @@ export function anneal(p: CompiledProblem, opt: AnnealOptions): SolveResult {
   let bestCost = cost
   let bestCls = Int32Array.from(cls)
   let iter = 0
-  let T = T0
-  let lastReport = t0
-  if (B > 1 && k > 1) {
-    for (;;) {
-      if ((iter & 1023) === 0) {
-        const now = performance.now()
-        const frac = (now - t0) / opt.timeMs
-        if (frac >= 1) break
-        T = T0 * Math.pow(Tend / T0, frac)
-        if (opt.onProgress && now - lastReport > 150) {
-          lastReport = now
-          opt.onProgress(bestCost, frac)
-        }
-      }
-      iter++
-      const b1 = (rand() * B) | 0
-      if (rand() < 0.3) {
-        const to = (rand() * k) | 0
-        if (to === cls[b1]) continue
-        const d = deltaMove(b1, to)
-        if (d <= 0 || rand() < Math.exp(-d / T)) {
-          applyMove(b1, to)
-          cost += d
-        }
-      } else {
-        const b2 = (rand() * B) | 0
-        if (cls[b1] === cls[b2]) continue
-        const d = deltaSwap(b1, b2)
-        if (d <= 0 || rand() < Math.exp(-d / T)) {
-          applySwap(b1, b2)
-          cost += d
-        }
-      }
-      if (cost < bestCost - 1e-9) {
-        bestCost = cost
-        bestCls = Int32Array.from(cls)
-      }
-    }
-  }
+  /** これまでの run() で探索に使った時間の合計 */
+  let activeMs = 0
+  let lastReport = -Infinity
+  let finished = !(B > 1 && k > 1)
+  let polished = false
+  let res: SolveResult | null = null
 
   // --- 最良解に戻して貪欲に仕上げ ---
-  for (let b = 0; b < B; b++) if (cls[b] !== bestCls[b]) applyMove(b, bestCls[b])
-  cost = bestCost
-  for (let improved = true, pass = 0; improved && pass < 20; pass++) {
-    improved = false
-    for (let b1 = 0; b1 < B; b1++) {
-      for (let to = 0; to < k; to++) {
-        if (to === cls[b1]) continue
-        const d = deltaMove(b1, to)
-        if (d < -1e-9) {
-          applyMove(b1, to)
-          cost += d
-          improved = true
+  const polish = () => {
+    for (let b = 0; b < B; b++) if (cls[b] !== bestCls[b]) applyMove(b, bestCls[b])
+    cost = bestCost
+    for (let improved = true, pass = 0; improved && pass < 20; pass++) {
+      improved = false
+      for (let b1 = 0; b1 < B; b1++) {
+        for (let to = 0; to < k; to++) {
+          if (to === cls[b1]) continue
+          const d = deltaMove(b1, to)
+          if (d < -1e-9) {
+            applyMove(b1, to)
+            cost += d
+            improved = true
+          }
         }
-      }
-      for (let b2 = b1 + 1; b2 < B; b2++) {
-        if (cls[b1] === cls[b2]) continue
-        const d = deltaSwap(b1, b2)
-        if (d < -1e-9) {
-          applySwap(b1, b2)
-          cost += d
-          improved = true
+        for (let b2 = b1 + 1; b2 < B; b2++) {
+          if (cls[b1] === cls[b2]) continue
+          const d = deltaSwap(b1, b2)
+          if (d < -1e-9) {
+            applySwap(b1, b2)
+            cost += d
+            improved = true
+          }
         }
       }
     }
+    const classOf = Array.from({ length: n }, (_, i) => cls[blockOf[i]])
+    res = { classOf, cost, elapsedMs: performance.now() - t0, iterations: iter }
   }
 
-  const classOf = Array.from({ length: n }, (_, i) => cls[blockOf[i]])
-  return { classOf, cost, elapsedMs: performance.now() - t0, iterations: iter }
+  const run = (sliceMsIn: number): boolean => {
+    // 0・負・NaN だと1回も進まずに戻り、呼び出し側のループが永久に終わらない。最低 1ms は進める
+    const sliceMs = Math.max(1, sliceMsIn || 0)
+    if (polished) return true
+    if (!finished) {
+      const sliceStart = performance.now()
+      // ホットループではクロージャ変数ではなくローカル変数を使う
+      let c = cost
+      let bc = bestCost
+      let it = iter
+      let T = T0
+      let best = bestCls
+      const nB = B
+      const nK = k
+      const r = rand
+      for (;;) {
+        if ((it & 1023) === 0) {
+          const now = performance.now()
+          const frac = (activeMs + now - sliceStart) / opt.timeMs
+          if (frac >= 1) {
+            finished = true
+            break
+          }
+          if (now - sliceStart >= sliceMs) break
+          T = T0 * Math.pow(Tend / T0, frac)
+          if (opt.onProgress && now - lastReport > 150) {
+            lastReport = now
+            opt.onProgress(bc, frac)
+          }
+        }
+        it++
+        const b1 = (r() * nB) | 0
+        if (r() < 0.3) {
+          const to = (r() * nK) | 0
+          if (to === cls[b1]) continue
+          const d = deltaMove(b1, to)
+          if (d <= 0 || r() < Math.exp(-d / T)) {
+            applyMove(b1, to)
+            c += d
+          }
+        } else {
+          const b2 = (r() * nB) | 0
+          if (cls[b1] === cls[b2]) continue
+          const d = deltaSwap(b1, b2)
+          if (d <= 0 || r() < Math.exp(-d / T)) {
+            applySwap(b1, b2)
+            c += d
+          }
+        }
+        if (c < bc - 1e-9) {
+          bc = c
+          best = Int32Array.from(cls)
+        }
+      }
+      bestCls = best
+      activeMs += performance.now() - sliceStart
+      cost = c
+      bestCost = bc
+      iter = it
+      // 途中で止めた: 次の run() で続きから（it & 1023 === 0 の地点なので時間判定から再開する）
+      if (!finished) return false
+    }
+    polish()
+    polished = true
+    return true
+  }
+
+  return {
+    run,
+    result: () => {
+      if (!res) throw new Error('annealer has not finished')
+      return res
+    },
+  }
 }

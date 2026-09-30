@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useT } from '../i18n/web'
 
 export const CLASS_COLORS = [
   { dot: 'bg-indigo-500', soft: 'bg-indigo-50 text-indigo-700 ring-indigo-200', bar: 'from-indigo-500 to-indigo-400' },
@@ -13,6 +14,7 @@ export const CLASS_COLORS = [
 export const classColor = (c: number) => CLASS_COLORS[c % CLASS_COLORS.length]
 
 export function Logo() {
+  const { t } = useT()
   return (
     <div className="flex items-center gap-2.5">
       <svg viewBox="0 0 32 32" className="size-9 drop-shadow-sm" aria-hidden>
@@ -32,7 +34,7 @@ export function Logo() {
       </svg>
       <div className="leading-tight">
         <div className="text-lg font-extrabold tracking-tight text-slate-900">Mosaic</div>
-        <div className="text-[11px] font-medium tracking-wide text-slate-500">クラス編成オプティマイザー</div>
+        <div className="text-[11px] font-medium tracking-wide text-slate-500">{t('tagline')}</div>
       </div>
     </div>
   )
@@ -60,7 +62,7 @@ export function Stat({ label, value, sub, tone = 'default' }: { label: string; v
   const toneCls = tone === 'good' ? 'text-emerald-600' : tone === 'bad' ? 'text-rose-600' : 'text-slate-900'
   return (
     <div className="card p-5">
-      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</div>
+      <div className="hyphens-auto text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</div>
       <div className={`mt-1 text-3xl font-extrabold tabular-nums tracking-tight ${toneCls}`}>{value}</div>
       {sub && <div className="mt-1 text-xs text-slate-500">{sub}</div>}
     </div>

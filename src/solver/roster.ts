@@ -132,12 +132,12 @@ export function findConflicts(p: Problem): [number, number][] {
 export const toCell = (v: string | undefined): string | number =>
   v === undefined || v === '' ? '' : String(Number(v)) === v ? Number(v) : v
 
-/** 出力用の元名簿シートを現在の内容から作り直す */
-export function rosterRows(p: Problem): (string | number | null)[][] {
+/** 出力用の元名簿シートを現在の内容から作り直す（見出しの語は labels、既定は日本語） */
+export function rosterRows(p: Problem, labels: { weight: string; no: string; name: string } = { weight: '重み', no: 'NO', name: '名前' }): (string | number | null)[][] {
   return [
     // 無効にした項目は重み 0 で保存（再読み込み時も無効のまま）
-    ['', '重み', ...p.columns.map((c) => (c.enabled ? c.weight : 0))],
-    ['NO', '名前', ...p.columns.map((c) => c.name)],
+    ['', labels.weight, ...p.columns.map((c) => (c.enabled ? c.weight : 0))],
+    [labels.no, labels.name, ...p.columns.map((c) => c.name)],
     ...p.students.map((s) => [s.no, s.name, ...p.columns.map((c) => toCell(s.values[c.name]))]),
   ]
 }

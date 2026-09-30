@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { parseWorkbook } from '../src/solver/parse'
 import { compile } from '../src/solver/compile'
-import { anneal } from '../src/solver/anneal'
+import { anneal, createAnnealer } from '../src/solver/anneal'
 import { evaluate } from '../src/solver/evaluate'
 import { exportRoster, exportWorkbook } from '../src/solver/export'
 
@@ -163,5 +163,17 @@ describe('ペア指定の出力', () => {
     expect(pairs[1][4]).toBe('×')
     const st = pairStatus(p, classOf)
     expect(st.groups.find((g) => g.label === '同1')!.ok).toBe(false)
+  })
+})
+
+describe('createAnnealer', () => {
+  it('run(0) や run(NaN) でも探索が進み、いずれ終わる', () => {
+    const { compiled } = compile(load('sample1.xlsx'))
+    const a = createAnnealer(compiled, { timeMs: 30, seed: 1 })
+    let done = false
+    const t0 = Date.now()
+    for (let i = 0; i < 1e6 && !done && Date.now() - t0 < 5000; i++) done = a.run(i % 2 ? 0 : NaN)
+    expect(done).toBe(true)
+    expect(a.result().classOf.length).toBe(compiled.n)
   })
 })

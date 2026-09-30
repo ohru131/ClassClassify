@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, Cpu, Loader2, X, Lock, Play, Square, Zap } from 'lucide-react'
 import { compile } from './solver/compile'
 import { evaluate } from './solver/evaluate'
-import { downloadAsXlsx, googleEnabled, pickSpreadsheet, writeResults, type GoogleFile } from './google/google'
+import { downloadAsXlsx, googleEnabled, pickSpreadsheet, setGoogleMessages, writeResults, type GoogleFile } from './google/google'
+import { useT } from './i18n/web'
+import { APP_LANGUAGES, LANGUAGE_META, type AppLanguage } from './i18n/languages'
 import { runParallel } from './solver/run'
 import type { ColumnSpec, Problem } from './solver/types'
 
@@ -24,6 +26,12 @@ interface Solution {
 }
 
 export default function App() {
+  const i18n = useT()
+  const { t, lang, fileLang, parseMessages, num } = i18n
+  // Google 連携のエラー文言も選択中の言語で
+  useEffect(() => {
+    setGoogleMessages({ scriptFailed: (src) => t('googleScriptFailed', { src }), authFailed: (msg) => t('googleAuthFailed', { msg }), apiError: (msg) => t('googleApiError', { msg }), pickerTitle: t('googlePickerTitle'), locale: lang })
+  }, [t, lang])
   const [problem, setProblem] = useState<Problem | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -49,7 +57,7 @@ export default function App() {
   const onLoad = async (data: ArrayBuffer, name: string, source: GoogleFile | null = null) => {
     try {
       const { parseWorkbook } = await loadParse()
-      const p = parseWorkbook(data)
+      const p = parseWorkbook(data, parseMessages)
       setGoogleFile(source)
       setSavedUrl(null)
       setProblem(p)
@@ -84,7 +92,7 @@ export default function App() {
     // 自動でタブは開かない（Google 認証ポップアップと競合するため）。ボタンが「作成したひな形を開く」に変わる
     try {
       const { createTemplateSpreadsheet } = await import('./google/template')
-      const file = await createTemplateSpreadsheet()
+      const file = await createTemplateSpreadsheet(lang, t('googleTemplateTitle'))
       setTemplateUrl(file.url)
     } catch (e) {
       showError(e)
@@ -98,8 +106,8 @@ export default function App() {
     setSavingGoogle(true)
     try {
       const { buildResultSheets } = await loadExport()
-      const sheets = buildResultSheets(problem, solution.classOf, solution.k, report)
-      const title = `クラス編成結果 ${new Date().toLocaleString('ja-JP')}`
+      const sheets = buildResultSheets(problem, solution.classOf, solution.k, report, fileLang)
+      const title = t('googleResultTitle', { date: new Date().toLocaleString(LANGUAGE_META[lang].intl) })
       setSavedUrl(await writeResults(sheets, googleFile, title))
     } catch (e) {
       showError(e)
@@ -141,7 +149,7 @@ export default function App() {
       const now = problemRef.current
       // 実行中に生徒やペア指定が変わった場合、結果の index が合わないので破棄
       if (!now || now.students !== start.students || now.wantedGroups !== start.wantedGroups || now.unwantedGroups !== start.unwantedGroups) {
-        setError('実行中に名簿が変更されたため、結果を破棄しました。もう一度実行してください。')
+        setError(t('discarded'))
         return
       }
       setSavedUrl(null)
@@ -163,7 +171,7 @@ export default function App() {
     if (!problem || !solution || !report) return
     try {
       const { exportWorkbook } = await loadExport()
-      saveBlob(exportWorkbook(problem, solution.classOf, solution.k, report), `クラス編成結果_${new Date().toISOString().slice(0, 10)}.xlsx`)
+      saveBlob(exportWorkbook(problem, solution.classOf, solution.k, report, fileLang), `${t('fileResults')}_${new Date().toISOString().slice(0, 10)}.xlsx`)
     } catch (e) {
       showError(e)
     }
@@ -174,6 +182,23 @@ export default function App() {
       <header className="sticky top-0 z-20 border-b border-white/60 bg-white/60 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-5">
           <Logo />
+          <div className="flex items-center gap-1">
+          <label className="sr-only" htmlFor="lang-select">
+            {t('language')}
+          </label>
+          <select
+            id="lang-select"
+            value={lang}
+            onChange={(e) => i18n.setLang(e.target.value as AppLanguage)}
+            aria-label={t('language')}
+            className="w-28 rounded-xl border border-slate-200 bg-white/80 px-2 py-1.5 text-sm font-semibold text-slate-600 outline-none transition hover:border-slate-300 focus:border-indigo-400 sm:w-auto"
+          >
+            {APP_LANGUAGES.map((l) => (
+              <option key={l} value={l}>
+                {LANGUAGE_META[l].endonym}
+              </option>
+            ))}
+          </select>
           <a
             href="https://github.com/ohru131/ClassClassify"
             target="_blank"
@@ -183,32 +208,40 @@ export default function App() {
           >
             <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
           </a>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl space-y-4 px-4 pb-24 pt-8 sm:space-y-6 sm:px-5 sm:pt-10">
         <div className="max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/70 px-3 py-1 text-xs font-semibold text-indigo-700">
-            <Zap className="size-3.5" /> 焼きなまし法 × 並列マルチスタート
+            <Zap className="size-3.5" /> {t('heroBadge')}
           </div>
           <h1 className="text-[1.9rem] font-black leading-tight tracking-tight text-slate-900 [word-break:keep-all] sm:text-5xl">
-            個性が響き合う、
+            {t('heroTitle1')}
             <br />
             <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-              <span className="inline-block">バランスの良い</span>
-              <span className="inline-block">クラスを。</span>
+              {/* 日本語は語の途中で折り返さないよう塊ごとに。他の言語は通常の折り返し（inline-block だと
+                  塊の中で折り返した1行目がグラデーションの切り抜きから外れて見えなくなる） */}
+              {lang === 'ja' ? (
+                <>
+                  <span className="inline-block">{t('heroTitle2a')}</span>
+                  <span className="inline-block">{t('heroTitle2b')}</span>
+                </>
+              ) : (
+                `${t('heroTitle2a')} ${t('heroTitle2b')}`
+              )}
             </span>
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
-            性別・学力・支援の必要性など、生徒の特性が各クラスに均等に散らばるよう自動で編成します。
-            「同じ組にしたい」「別の組にしたい」組み合わせも考慮。結果はその場で手直しできます。
+            {t('heroDesc')}
           </p>
           <div className="mt-5 flex flex-wrap gap-4 text-xs font-medium text-slate-500">
             <span className="inline-flex items-center gap-1.5">
-              <Lock className="size-3.5 text-emerald-500" /> データはブラウザ内だけで処理
+              <Lock className="size-3.5 text-emerald-500" /> {t('heroLocal')}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Cpu className="size-3.5 text-indigo-500" /> 登録・トークン不要、完全無料
+              <Cpu className="size-3.5 text-indigo-500" /> {t('heroFree')}
             </span>
           </div>
         </div>
@@ -232,8 +265,8 @@ export default function App() {
         {problem && problem.warnings.length > 0 && (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
             <div className="mb-1 flex items-center justify-between font-semibold">
-              読み込み時の注意
-              <button type="button" onClick={() => setProblem({ ...problem, warnings: [] })} className="rounded p-0.5 hover:bg-amber-100" aria-label="閉じる">
+              {t('warningsTitle')}
+              <button type="button" onClick={() => setProblem({ ...problem, warnings: [] })} className="rounded p-0.5 hover:bg-amber-100" aria-label={t('close')}>
                 <X className="size-4" />
               </button>
             </div>
@@ -259,7 +292,7 @@ export default function App() {
 
         {problem && (
           <section className="card p-5 sm:p-8">
-            <StepHeader n={3} done={!!solution && !running} title="編成する" desc="複数の CPU コアで同時に探索し、最もバランスの良い案を採用します。" />
+            <StepHeader n={3} done={!!solution && !running} title={t('runTitle')} desc={t('runDesc')} />
             {running ? (
               <div className="space-y-3">
                 <div className="h-3 overflow-hidden rounded-full bg-slate-100">
@@ -270,21 +303,21 @@ export default function App() {
                 </div>
                 <div className="flex items-center justify-between text-sm text-slate-500">
                   <span className="inline-flex items-center gap-2">
-                    <Loader2 className="size-4 animate-spin" /> 最適な組み合わせを探索中… {Math.round(progress * 100)}%
+                    <Loader2 className="size-4 animate-spin" /> {t('searching', { p: Math.round(progress * 100) })}
                   </span>
                   <button type="button" className="btn-ghost !py-1.5" onClick={() => cancelRef.current()}>
-                    <Square className="size-3.5" /> 中止
+                    <Square className="size-3.5" /> {t('stop')}
                   </button>
                 </div>
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-4">
                 <button type="button" className="btn-primary !px-6 !py-3 !text-base" onClick={run}>
-                  <Play className="size-4 fill-current" /> {solution ? 'もう一度編成する' : 'クラス編成を実行'}
+                  <Play className="size-4 fill-current" /> {solution ? t('rerun') : t('runBtn')}
                 </button>
                 {solution && (
                   <span className="text-xs text-slate-400">
-                    前回: {solution.workers} 並列 · {(solution.iterations / 1e6).toFixed(1)}M 回の探索
+                    {t('lastRun', { workers: solution.workers, m: num(solution.iterations / 1e6, 1) })}
                   </span>
                 )}
               </div>
@@ -308,7 +341,7 @@ export default function App() {
               google={
                 googleEnabled
                   ? {
-                      label: googleFile?.mimeType === 'application/vnd.google-apps.spreadsheet' ? '元のシートに書き出す' : 'スプレッドシートに保存',
+                      label: googleFile?.mimeType === 'application/vnd.google-apps.spreadsheet' ? t('googleWriteBack') : t('googleSave'),
                       busy: savingGoogle,
                       url: savedUrl,
                       onSave: saveToGoogle,
@@ -329,7 +362,7 @@ export default function App() {
           onClose={() => setEditorTab(null)}
           onExport={async () => {
             try {
-              saveBlob((await loadExport()).exportRoster(problem, numClasses), `名簿_${new Date().toISOString().slice(0, 10)}.xlsx`)
+              saveBlob((await loadExport()).exportRoster(problem, numClasses, fileLang), `${t('fileRoster')}_${new Date().toISOString().slice(0, 10)}.xlsx`)
             } catch (e) {
               showError(e)
             }
@@ -338,7 +371,7 @@ export default function App() {
       )}
 
       <footer className="border-t border-slate-200/70 py-8 text-center text-xs text-slate-400">
-        Mosaic · クラス編成オプティマイザー — MIT License
+        {t('footer')}
       </footer>
     </div>
   )

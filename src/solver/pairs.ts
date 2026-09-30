@@ -47,19 +47,20 @@ export interface PairGroupStatus {
 }
 
 /** 編成結果に対する、生徒ごとのペア指定タグとグループごとの達成状況 */
-export function pairStatus(p: Problem, classOf: number[]) {
+/** prefix: ラベルの接頭辞（既定は日本語の「同」「別」） */
+export function pairStatus(p: Problem, classOf: number[], prefix: { wanted: string; unwanted: string } = { wanted: '同', unwanted: '別' }) {
   const tags: PairTag[][] = p.students.map(() => [])
   const groups: PairGroupStatus[] = []
 
   p.wantedGroups.forEach((g, gi) => {
     const ok = new Set(g.map((i) => classOf[i])).size <= 1
     const color = wantedColor(gi)
-    const label = `同${gi + 1}`
+    const label = `${prefix.wanted}${gi + 1}`
     groups.push({ kind: 'wanted', group: gi, label, members: g, ok, color })
     for (const i of g) tags[i]?.push({ kind: 'wanted', group: gi, label, ok, color })
   })
   p.unwantedGroups.forEach((g, gi) => {
-    const label = `別${gi + 1}`
+    const label = `${prefix.unwanted}${gi + 1}`
     let groupOk = true
     for (const i of g) {
       const ok = !g.some((j) => j !== i && classOf[j] === classOf[i])

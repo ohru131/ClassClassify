@@ -2,12 +2,15 @@ import { useRef, useState } from 'react'
 import { ChevronRight, Download, ExternalLink, Pencil, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
 import type { ColumnSpec, Problem } from '../solver/types'
 import { Segmented, StepHeader } from './ui'
+import { useT } from '../i18n/web'
+import { sampleUrl, templateZipUrl } from '../copy/core'
 
+// サンプルは言語ごとに、その国の学校で配慮される項目で作ってある（public/samples/<lang>/）
 const SAMPLES = [
-  { file: 'sample1.xlsx', label: 'クラス分け（80名・4組）' },
-  { file: 'sample2.xlsx', label: 'クラス分け（80名・シンプル）' },
-  { file: 'sample-group.xlsx', label: 'グループ分け（30名・6班）' },
-]
+  { id: 'sample1', label: 'sample1' },
+  { id: 'sample2', label: 'sample2' },
+  { id: 'sample-group', label: 'sampleGroup' },
+] as const
 
 export function DataStep({
   onLoad,
@@ -28,13 +31,14 @@ export function DataStep({
   templateBusy?: boolean
   templateUrl?: string | null
 }) {
+  const { t, lang } = useT()
   const input = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
 
   const readFile = async (f: File) => onLoad(await f.arrayBuffer(), f.name)
-  const loadSample = async (file: string, label: string) => {
-    const res = await fetch(`./${file}`)
-    onLoad(await res.arrayBuffer(), `サンプル: ${label}`)
+  const loadSample = async (id: (typeof SAMPLES)[number]['id'], label: string) => {
+    const res = await fetch(sampleUrl(lang, id))
+    onLoad(await res.arrayBuffer(), t('samplePrefix', { label }))
   }
 
   return (
@@ -42,12 +46,8 @@ export function DataStep({
       <StepHeader
         n={1}
         done={!!fileName}
-        title="名簿を読み込む"
-        desc={
-          onGoogle
-            ? 'ひな形に生徒の特性を記入し、Excel または Google スプレッドシートから読み込み。データはブラウザと Google の間でのみやり取りします。'
-            : 'ひな形の Excel に生徒の特性を記入してアップロード。データはブラウザの外に送信されません。'
-        }
+        title={t('step1Title')}
+        desc={onGoogle ? t('step1DescGoogle') : t('step1Desc')}
       />
       <div className={onGoogle ? 'grid gap-3 md:grid-cols-[1fr_16rem]' : ''}>
       <div
@@ -70,8 +70,8 @@ export function DataStep({
         <div className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30 transition group-hover:scale-105">
           {fileName ? <FileSpreadsheet className="size-6" /> : <Upload className="size-6" />}
         </div>
-        <div className="mt-4 font-semibold text-slate-800">{fileName ?? 'Excel ファイルをドロップ'}</div>
-        <div className="mt-1 text-sm text-slate-500">{fileName ? 'クリックして別のファイルを選択' : 'またはクリックして選択（.xlsx）'}</div>
+        <div className="mt-4 font-semibold text-slate-800">{fileName ?? t('dropTitle')}</div>
+        <div className="mt-1 text-sm text-slate-500">{fileName ? t('dropAgain') : t('dropSub')}</div>
         <input
           ref={input}
           type="file"
@@ -94,31 +94,31 @@ export function DataStep({
           <span className="grid size-12 place-items-center rounded-2xl bg-white shadow-md ring-1 ring-slate-100">
             {googleBusy ? <Loader2 className="size-6 animate-spin text-emerald-600" /> : <SheetsIcon />}
           </span>
-          <span className="font-semibold text-slate-800">Google スプレッドシート</span>
-          <span className="text-xs text-slate-500">Google アカウントで選択</span>
+          <span className="font-semibold text-slate-800">{t('googleSheets')}</span>
+          <span className="text-xs text-slate-500">{t('googleSelect')}</span>
         </button>
       )}
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <a href="./template.zip" download className="btn-ghost">
-          <Download className="size-4" /> {onCreateTemplate ? 'Excel ひな形' : 'ひな形をダウンロード'}
+        <a href={templateZipUrl(lang)} download className="btn-ghost">
+          <Download className="size-4" /> {onCreateTemplate ? t('templateExcel') : t('templateDownload')}
         </a>
         {onCreateTemplate &&
           (templateUrl ? (
             <a href={templateUrl} target="_blank" rel="noreferrer" className="btn-ghost !border-emerald-200 !bg-emerald-50 !text-emerald-800">
-              <SheetsIcon small /> 作成したひな形を開く <ExternalLink className="size-3.5" />
+              <SheetsIcon small /> {t('openTemplate')} <ExternalLink className="size-3.5" />
             </a>
           ) : (
             <button type="button" className="btn-ghost" onClick={onCreateTemplate} disabled={templateBusy}>
-              {templateBusy ? <Loader2 className="size-4 animate-spin" /> : <SheetsIcon small />} スプレッドシートでひな形を作成
+              {templateBusy ? <Loader2 className="size-4 animate-spin" /> : <SheetsIcon small />} {t('createTemplate')}
             </button>
           ))}
         <span className="mx-1 hidden h-5 w-px bg-slate-200 sm:block" />
-        <span className="text-xs font-semibold text-slate-400">サンプルで試す</span>
+        <span className="text-xs font-semibold text-slate-400">{t('trySamples')}</span>
         {SAMPLES.map((s) => (
-          <button key={s.file} type="button" onClick={() => loadSample(s.file, s.label)} className="btn-ghost !px-3 !py-1.5 !text-xs">
-            <Sparkles className="size-3.5 text-fuchsia-500" /> {s.label}
+          <button key={s.id} type="button" onClick={() => loadSample(s.id, t(s.label))} className="btn-ghost !px-3 !py-1.5 !text-xs">
+            <Sparkles className="size-3.5 text-fuchsia-500" /> {t(s.label)}
           </button>
         ))}
       </div>
@@ -126,7 +126,7 @@ export function DataStep({
   )
 }
 
-const KIND_LABEL: Record<ColumnSpec['kind'], string> = { flag: '該当', category: 'カテゴリ', numeric: '数値' }
+const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', numeric: 'kindNumeric' } as const
 
 export function SettingsStep({
   problem,
@@ -145,12 +145,14 @@ export function SettingsStep({
   setTimeSec: (n: number) => void
   onColumnChange: (i: number, patch: Partial<ColumnSpec>) => void
 }) {
+  const { t, num, lang } = useT()
+  const dash = lang === 'ja' ? '〜' : '–'
   const n = problem.students.length
   const lo = Math.floor(n / numClasses)
   const hi = Math.ceil(n / numClasses)
   return (
     <section className="card p-5 sm:p-8">
-      <StepHeader n={2} title="条件を調整する" desc="重みが大きい項目ほど優先して均等にします。0 にすると無視します。" />
+      <StepHeader n={2} title={t('step2Title')} desc={t('step2Desc')} />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <button
@@ -159,45 +161,45 @@ export function SettingsStep({
           className="group rounded-2xl bg-slate-50 p-4 text-left ring-indigo-200 transition hover:bg-indigo-50/70 hover:ring-1"
         >
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-            生徒数
+            {t('studentsLabel')}
             <span className="inline-flex items-center gap-0.5 text-indigo-600 opacity-70 transition group-hover:opacity-100">
-              名簿を開く <ChevronRight className="size-3.5" />
+              {t('openRoster')} <ChevronRight className="size-3.5" />
             </span>
           </div>
           <div className="mt-1 flex items-center gap-2 text-2xl font-extrabold text-slate-900">
             <Users className="size-5 text-indigo-500" />
             {n}
-            <span className="text-sm font-medium text-slate-400">名</span>
+            <span className="text-sm font-medium text-slate-400">{t('personUnit')}</span>
           </div>
-          <div className="mt-1 text-xs text-slate-400">一覧・絞り込み・編集</div>
+          <div className="mt-1 text-xs text-slate-400">{t('rosterHint')}</div>
         </button>
         <div className="rounded-2xl bg-slate-50 p-4">
-          <div className="text-xs font-semibold text-slate-500">クラス（グループ）数</div>
+          <div className="text-xs font-semibold text-slate-500">{t('classCount')}</div>
           <div className="mt-1 flex items-center gap-3">
-            <button type="button" className="btn-ghost !p-1.5" onClick={() => setNumClasses(Math.max(2, numClasses - 1))} aria-label="減らす">
+            <button type="button" className="btn-ghost !p-1.5" onClick={() => setNumClasses(Math.max(2, numClasses - 1))} aria-label={t('decrease')}>
               <Minus className="size-4" />
             </button>
             <span className="w-8 text-center text-2xl font-extrabold tabular-nums text-slate-900">{numClasses}</span>
-            <button type="button" className="btn-ghost !p-1.5" onClick={() => setNumClasses(Math.min(n, numClasses + 1))} aria-label="増やす">
+            <button type="button" className="btn-ghost !p-1.5" onClick={() => setNumClasses(Math.min(n, numClasses + 1))} aria-label={t('increase')}>
               <Plus className="size-4" />
             </button>
           </div>
-          <div className="mt-1 text-xs text-slate-400">1組あたり {lo === hi ? lo : `${lo}〜${hi}`} 名</div>
+          <div className="mt-1 text-xs text-slate-400">{t('perClass', { range: lo === hi ? lo : `${lo}${dash}${hi}` })}</div>
         </div>
         <div className="rounded-2xl bg-slate-50 p-4">
-          <div className="text-xs font-semibold text-slate-500">探索時間</div>
+          <div className="text-xs font-semibold text-slate-500">{t('searchTime')}</div>
           <div className="mt-2">
             <Segmented
               value={timeSec}
               onChange={setTimeSec}
               options={[
-                { value: 3, label: '高速' },
-                { value: 10, label: '標準' },
-                { value: 30, label: '徹底' },
+                { value: 3, label: t('quick') },
+                { value: 10, label: t('standard') },
+                { value: 30, label: t('thorough') },
               ]}
             />
           </div>
-          <div className="mt-1 text-xs text-slate-400">{timeSec} 秒 × 並列探索</div>
+          <div className="mt-1 text-xs text-slate-400">{t('timeInfo', { s: timeSec })}</div>
         </div>
       </div>
 
@@ -205,9 +207,9 @@ export function SettingsStep({
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-xs font-semibold text-slate-500">
             <tr>
-              <th className="px-3 py-2.5 sm:px-4">項目</th>
-              <th className="hidden px-4 py-2.5 sm:table-cell">種類 / 値</th>
-              <th className="w-40 px-3 py-2.5 sm:w-56 sm:px-4">重み</th>
+              <th className="px-3 py-2.5 sm:px-4">{t('colItem')}</th>
+              <th className="hidden px-4 py-2.5 sm:table-cell">{t('colKind')}</th>
+              <th className="w-40 px-3 py-2.5 sm:w-56 sm:px-4">{t('colWeight')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -215,9 +217,9 @@ export function SettingsStep({
               <tr key={c.name} className={c.enabled && c.weight > 0 ? '' : 'opacity-45'}>
                 <td className="whitespace-nowrap px-3 py-3 font-semibold text-slate-800 sm:px-4">{c.name}</td>
                 <td className="hidden px-4 py-3 sm:table-cell">
-                  <span className="mr-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{KIND_LABEL[c.kind]}</span>
+                  <span className="mr-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{t(KIND_KEY[c.kind])}</span>
                   <span className="text-xs text-slate-500">
-                    {c.kind === 'numeric' ? `${c.levels[0]}〜${c.levels[c.levels.length - 1]}` : c.levels.join(' / ') || '（空欄のみ）'}
+                    {c.kind === 'numeric' ? `${c.levels[0]}${dash}${c.levels[c.levels.length - 1]}` : c.levels.join(' / ') || t('blankOnly')}
                   </span>
                 </td>
                 <td className="px-3 py-3 sm:px-4">
@@ -236,7 +238,7 @@ export function SettingsStep({
                       className="h-1.5 w-full cursor-pointer accent-indigo-600"
                     />
                     <span className="w-8 text-right font-mono text-xs font-semibold tabular-nums text-slate-600">
-                      {(c.enabled ? c.weight : 0).toFixed(1)}
+                      {num(c.enabled ? c.weight : 0, 1)}
                     </span>
                   </div>
                 </td>
@@ -247,8 +249,8 @@ export function SettingsStep({
       </div>
 
       <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-        <PairBox title="同じ組にする" tone="indigo" groups={problem.wantedGroups} problem={problem} onEdit={() => onOpenEditor('wanted')} />
-        <PairBox title="別の組にする" tone="rose" groups={problem.unwantedGroups} problem={problem} onEdit={() => onOpenEditor('unwanted')} />
+        <PairBox title={t('pairWanted')} tone="indigo" groups={problem.wantedGroups} problem={problem} onEdit={() => onOpenEditor('wanted')} />
+        <PairBox title={t('pairUnwanted')} tone="rose" groups={problem.unwantedGroups} problem={problem} onEdit={() => onOpenEditor('unwanted')} />
       </div>
     </section>
   )
@@ -267,20 +269,21 @@ function PairBox({
   tone: 'indigo' | 'rose'
   onEdit: () => void
 }) {
+  const { t } = useT()
   const cls = tone === 'indigo' ? 'bg-indigo-50 text-indigo-700' : 'bg-rose-50 text-rose-700'
   return (
     <div className="rounded-2xl border border-slate-100 p-4">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-semibold text-slate-700">
-          {title} <span className="ml-1 text-xs font-normal text-slate-400">{groups.length} 件</span>
+          {title} <span className="ml-1 text-xs font-normal text-slate-400">{t('countItems', { n: groups.length })}</span>
         </span>
         <button type="button" onClick={onEdit} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50">
-          <Pencil className="size-3.5" /> 編集
+          <Pencil className="size-3.5" /> {t('edit')}
         </button>
       </div>
       {groups.length === 0 ? (
         <button type="button" onClick={onEdit} className="text-xs text-slate-400 hover:text-indigo-600">
-          指定なし — クリックして追加
+          {t('noPairsAdd')}
         </button>
       ) : (
         <div className="flex flex-wrap gap-1.5">

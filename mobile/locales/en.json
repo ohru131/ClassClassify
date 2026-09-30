@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Mosaic Class Placement"
+  },
+  "android": {
+    "app_name": "Mosaic Class Placement"
+  }
+}

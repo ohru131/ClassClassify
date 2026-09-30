@@ -34,6 +34,7 @@ import {
   updateStudent,
   type GroupKind,
 } from '../solver/roster'
+import { useT } from '../i18n/web'
 
 export type EditorTab = 'students' | GroupKind
 
@@ -67,6 +68,7 @@ export function RosterEditor({
   onClose: () => void
   onExport: () => void
 }) {
+  const { t, file } = useT()
   const conflicts = useMemo(() => findConflicts(problem), [problem])
 
   useEffect(() => {
@@ -80,9 +82,9 @@ export function RosterEditor({
   }, [onClose])
 
   const tabs: { id: EditorTab; label: string; count: number; icon: ReactNode }[] = [
-    { id: 'students', label: '生徒一覧', count: problem.students.length, icon: <Users className="size-4" /> },
-    { id: 'wanted', label: '同じ組', count: problem.wantedGroups.length, icon: <Link2 className="size-4" /> },
-    { id: 'unwanted', label: '別の組', count: problem.unwantedGroups.length, icon: <Split className="size-4" /> },
+    { id: 'students', label: t('tabStudentsList'), count: problem.students.length, icon: <Users className="size-4" /> },
+    { id: 'wanted', label: t('tabWanted'), count: problem.wantedGroups.length, icon: <Link2 className="size-4" /> },
+    { id: 'unwanted', label: t('tabUnwanted'), count: problem.unwantedGroups.length, icon: <Split className="size-4" /> },
   ]
 
   return (
@@ -93,11 +95,11 @@ export function RosterEditor({
       <div
         role="dialog"
         aria-modal
-        aria-label="名簿エディタ"
+        aria-label={t('rosterEditorAria')}
         className="flex w-full max-w-[90rem] flex-col overflow-hidden bg-white shadow-2xl sm:rounded-3xl"
       >
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-3 py-2 sm:gap-3 sm:px-5 sm:py-3">
-          <div className="mr-2 text-lg font-extrabold text-slate-900">名簿</div>
+          <div className="mr-2 text-lg font-extrabold text-slate-900">{t('rosterTitle')}</div>
           <div className="order-last flex w-full rounded-xl bg-slate-100 p-1 sm:order-none sm:inline-flex sm:w-auto">
             {tabs.map((t) => (
               <button
@@ -115,10 +117,10 @@ export function RosterEditor({
             ))}
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <button type="button" className="btn-ghost !py-2" onClick={onExport} title="ひな形と同じ形式で保存（再読み込み可能）">
-              <Download className="size-4" /> <span className="hidden sm:inline">名簿を保存</span><span className="sm:hidden">保存</span>
+            <button type="button" className="btn-ghost !py-2" onClick={onExport} title={t('saveRosterTitle')}>
+              <Download className="size-4" /> <span className="hidden sm:inline">{t('saveRoster')}</span><span className="sm:hidden">{t('saveShort')}</span>
             </button>
-            <button type="button" onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100" aria-label="閉じる">
+            <button type="button" onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100" aria-label={t('close')}>
               <X className="size-5" />
             </button>
           </div>
@@ -128,8 +130,8 @@ export function RosterEditor({
           <div className="flex items-start gap-2 border-b border-amber-100 bg-amber-50 px-5 py-2.5 text-sm text-amber-800">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" />
             <div>
-              矛盾する指定があります（同じ組でつながる生徒が別の組にも指定）:{' '}
-              {conflicts.map(([a, b]) => `${label(problem, a)} ⇔ ${label(problem, b)}`).join('、')}
+              {t('conflict')}
+              {conflicts.map(([a, b]) => `${label(problem, a)} ⇔ ${label(problem, b)}`).join(file.listSep)}
             </div>
           </div>
         )}
@@ -156,6 +158,7 @@ type Filters = Record<string, Set<string>>
 type PairFilter = 'all' | 'any' | 'wanted' | 'unwanted' | 'none'
 
 function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onChange: (p: Problem) => void; openGroups: (t: EditorTab) => void }) {
+  const { t, file, compare } = useT()
   const [query, setQuery] = useState('')
   const [filters, setFilters] = useState<Filters>({})
   const [pairFilter, setPairFilter] = useState<PairFilter>('all')
@@ -202,14 +205,14 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         const ny = Number(y)
         if (x === '' && y !== '') return 1
         if (y === '' && x !== '') return -1
-        const c = Number.isFinite(nx) && Number.isFinite(ny) && x !== '' && y !== '' ? nx - ny : String(x).localeCompare(String(y), 'ja')
+        const c = Number.isFinite(nx) && Number.isFinite(ny) && x !== '' && y !== '' ? nx - ny : compare(String(x), String(y))
         return c * sort.dir
       })
     }
     return rows.map((r) => r.i)
     // 生徒数・ペア指定が変わったとき（index が変わりうる）も再計算
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, filters, pairFilter, sort, applyTick, problem.students.length, problem.wantedGroups, problem.unwantedGroups])
+  }, [query, filters, pairFilter, sort, applyTick, problem.students.length, problem.wantedGroups, problem.unwantedGroups, compare])
   useEffect(() => setDirty(false), [order])
   const visible = useMemo(
     () => order.filter((i) => i < problem.students.length).map((i) => ({ s: problem.students[i], i })),
@@ -261,7 +264,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
             autoFocus={desktop}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="NO・名前で検索"
+            placeholder={t('searchPlaceholder')}
             className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none lg:w-52 transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
           />
         </div>
@@ -279,7 +282,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         <Popover
           button={(open) => (
             <FilterButton active={pairFilter !== 'all'} open={open}>
-              ペア{pairFilter !== 'all' && `: ${PAIR_LABEL[pairFilter]}`}
+              {t('pairFilter')}{pairFilter !== 'all' && `: ${t(PAIR_LABEL[pairFilter])}`}
             </FilterButton>
           )}
         >
@@ -295,7 +298,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                   }}
                   className="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left text-sm hover:bg-slate-50"
                 >
-                  {PAIR_LABEL[k]}
+                  {t(PAIR_LABEL[k])}
                   {pairFilter === k && <Check className="size-4 text-indigo-600" />}
                 </button>
               ))}
@@ -304,7 +307,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         </Popover>
         {activeFilterCount > 0 && (
           <button type="button" onClick={clearFilters} className="text-xs font-semibold text-indigo-600 hover:underline">
-            条件をクリア
+            {t('clearFilters')}
           </button>
         )}
         </div>
@@ -314,13 +317,13 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               type="button"
               onClick={() => setApplyTick((t) => t + 1)}
               className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 hover:bg-amber-100"
-              title="編集内容に合わせて絞り込み・並べ替えをやり直す"
+              title={t('reapplyTitle')}
             >
-              <RefreshCw className="size-3.5" /> 絞り込みを再適用
+              <RefreshCw className="size-3.5" /> {t('reapply')}
             </button>
           )}
           <span className="mr-auto text-xs tabular-nums text-slate-500 lg:mr-0">
-            {visible.length === problem.students.length ? `${visible.length} 名` : `${visible.length} / ${problem.students.length} 名`}
+            {visible.length === problem.students.length ? t('countAll', { n: visible.length }) : t('countSome', { shown: visible.length, total: problem.students.length })}
           </span>
           {newCol !== null ? (
             <form
@@ -337,29 +340,29 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                 value={newCol}
                 onChange={(e) => setNewCol(e.target.value)}
                 onKeyDown={(e) => e.key === 'Escape' && (e.stopPropagation(), setNewCol(null))}
-                placeholder="項目名（例: リーダー）"
+                placeholder={t('newColPlaceholder')}
                 className="min-w-0 flex-1 rounded-xl border border-indigo-300 px-3 py-2 text-sm outline-none ring-2 ring-indigo-100 sm:w-44 sm:flex-none"
               />
               <select
                 value={newKind}
                 onChange={(e) => setNewKind(e.target.value as ColumnKind)}
                 className="rounded-xl border border-slate-200 px-2 py-2 text-sm outline-none focus:border-indigo-400"
-                title="値の種類"
+                title={t('kindTitle')}
               >
-                <option value="flag">○ / 空欄</option>
-                <option value="category">段階・カテゴリ</option>
-                <option value="numeric">数値（点数など）</option>
+                <option value="flag">{t('kindOptFlag')}</option>
+                <option value="category">{t('kindOptCategory')}</option>
+                <option value="numeric">{t('kindOptNumeric')}</option>
               </select>
               <button type="button" className="btn-ghost !py-2" onClick={() => setNewCol(null)}>
-                取消
+                {t('cancelShort')}
               </button>
               <button type="submit" className="btn-primary !py-2">
-                追加
+                {t('add')}
               </button>
             </form>
           ) : (
             <button type="button" className="btn-ghost !py-2" onClick={() => setNewCol('')}>
-              <Plus className="size-4" /> 項目
+              <Plus className="size-4" /> {t('addColumn')}
             </button>
           )}
           <button
@@ -376,7 +379,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               }, 50)
             }}
           >
-            <UserPlus className="size-4" /> 生徒
+            <UserPlus className="size-4" /> {t('addStudent')}
           </button>
         </div>
       </div>
@@ -388,7 +391,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         <div className="space-y-2 p-3">
           {visible.length > 0 && (
             <label className="flex items-center gap-2 px-1 text-xs font-semibold text-slate-500">
-              <Checkbox checked={allVisibleSelected} onChange={toggleAll} /> 表示中をすべて選択
+              <Checkbox checked={allVisibleSelected} onChange={toggleAll} /> {t('selectAllVisible')}
             </label>
           )}
           {visible.map(({ s, i }) => {
@@ -399,21 +402,21 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                   <Checkbox checked={isSel} onChange={() => toggleOne(i)} />
                   <NoInput
                     value={s.no}
-                    validate={(no) => (isNoTaken(problem, no, i) ? `NO ${no} は他の生徒が使っています` : null)}
+                    validate={(no) => (isNoTaken(problem, no, i) ? t('noTaken', { no }) : null)}
                     onCommit={(no) => change(updateStudent(problem, i, { no }))}
                   />
                   <input
                     data-name
                     value={s.name}
-                    placeholder="名前を入力"
+                    placeholder={t('namePlaceholder')}
                     onChange={(e) => change(updateStudent(problem, i, { name: e.target.value }))}
                     className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1 text-base font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-indigo-400 focus:bg-white"
                   />
                   <button
                     type="button"
-                    aria-label="削除"
+                    aria-label={t('delete')}
                     onClick={() => {
-                      if (confirm(`${label(problem, i)} を名簿から削除しますか？`)) {
+                      if (confirm(t('confirmDeleteStudent', { who: label(problem, i) }))) {
                         onChange(removeStudents(problem, [i]))
                         setSelected(new Set())
                       }
@@ -427,12 +430,12 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                   <div className="mt-1 flex flex-wrap gap-1 pl-7">
                     {wanted[i].map((g) => (
                       <button key={`w${g}`} type="button" onClick={() => openGroups('wanted')} className="rounded-md bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-600">
-                        同{g + 1}: {problem.wantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join('・')}
+                        {file.tagPrefix.wanted}{g + 1}: {problem.wantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join(file.joinSep)}
                       </button>
                     ))}
                     {unwanted[i].map((g) => (
                       <button key={`u${g}`} type="button" onClick={() => openGroups('unwanted')} className="rounded-md bg-rose-50 px-2 py-1 text-xs font-bold text-rose-600">
-                        別{g + 1}: {problem.unwantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join('・')}
+                        {file.tagPrefix.unwanted}{g + 1}: {problem.unwantedGroups[g].filter((j) => j !== i).map((j) => problem.students[j].name).join(file.joinSep)}
                       </button>
                     ))}
                   </div>
@@ -459,16 +462,16 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               <th className="sticky left-0 z-10 w-10 border-b border-slate-200 bg-white px-3 py-2">
                 <Checkbox checked={allVisibleSelected} onChange={toggleAll} />
               </th>
-              <SortHeader label="NO" sort={sort} onSort={toggleSort} className="w-20" />
-              <SortHeader label="名前" sort={sort} onSort={toggleSort} className="min-w-40" />
+              <SortHeader id="NO" label={t('colNo')} sort={sort} onSort={toggleSort} className="w-20" />
+              <SortHeader id="名前" label={t('colName')} sort={sort} onSort={toggleSort} className="min-w-40" />
               {problem.columns.map((c) => (
                 <SortHeader key={c.name} label={c.name} sort={sort} onSort={toggleSort} sub={<Distribution column={c} problem={problem} />}>
                   <button
                     type="button"
-                    title={`「${c.name}」列を削除`}
+                    title={t('deleteColumnTitle', { name: c.name })}
                     onClick={(e) => {
                       e.stopPropagation()
-                      if (confirm(`「${c.name}」列を削除しますか？`)) onChange(removeColumn(problem, c.name))
+                      if (confirm(t('confirmDeleteColumn', { name: c.name }))) onChange(removeColumn(problem, c.name))
                     }}
                     className="rounded p-0.5 text-slate-300 opacity-0 transition hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
                   >
@@ -476,7 +479,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                   </button>
                 </SortHeader>
               ))}
-              <th className="border-b border-slate-200 px-3 py-2 font-semibold">ペア</th>
+              <th className="border-b border-slate-200 px-3 py-2 font-semibold">{t('colPair')}</th>
               <th className="w-10 border-b border-slate-200" />
             </tr>
           </thead>
@@ -491,7 +494,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                   <td className="border-b border-slate-100 px-2 py-1">
                     <NoInput
                       value={s.no}
-                      validate={(no) => (isNoTaken(problem, no, i) ? `NO ${no} は他の生徒が使っています` : null)}
+                      validate={(no) => (isNoTaken(problem, no, i) ? t('noTaken', { no }) : null)}
                       onCommit={(no) => change(updateStudent(problem, i, { no }))}
                     />
                   </td>
@@ -499,7 +502,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                     <input
                       data-name
                       value={s.name}
-                      placeholder="名前を入力"
+                      placeholder={t('namePlaceholder')}
                       onChange={(e) => change(updateStudent(problem, i, { name: e.target.value }))}
                       className="w-full min-w-32 rounded-lg border border-transparent bg-transparent px-2 py-1 font-medium text-slate-800 outline-none placeholder:text-slate-300 hover:border-slate-200 focus:border-indigo-400 focus:bg-white"
                     />
@@ -520,10 +523,11 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                           key={`w${g}`}
                           type="button"
                           onClick={() => openGroups('wanted')}
-                          title={`同じ組: ${problem.wantedGroups[g].map((j) => label(problem, j)).join('・')}`}
+                          title={t('wantedTitleAttr', { names: problem.wantedGroups[g].map((j) => label(problem, j)).join(file.joinSep) })}
                           className="rounded-md bg-indigo-50 px-1.5 py-0.5 text-[11px] font-bold text-indigo-600 hover:bg-indigo-100"
                         >
-                          同{g + 1}
+                          {file.tagPrefix.wanted}
+                          {g + 1}
                         </button>
                       ))}
                       {unwanted[i].map((g) => (
@@ -531,10 +535,11 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                           key={`u${g}`}
                           type="button"
                           onClick={() => openGroups('unwanted')}
-                          title={`別の組: ${problem.unwantedGroups[g].map((j) => label(problem, j)).join('・')}`}
+                          title={t('unwantedTitleAttr', { names: problem.unwantedGroups[g].map((j) => label(problem, j)).join(file.joinSep) })}
                           className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] font-bold text-rose-600 hover:bg-rose-100"
                         >
-                          別{g + 1}
+                          {file.tagPrefix.unwanted}
+                          {g + 1}
                         </button>
                       ))}
                     </div>
@@ -542,9 +547,9 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                   <td className="border-b border-slate-100 pr-3">
                     <button
                       type="button"
-                      aria-label="削除"
+                      aria-label={t('delete')}
                       onClick={() => {
-                        if (confirm(`${label(problem, i)} を名簿から削除しますか？`)) {
+                        if (confirm(t('confirmDeleteStudent', { who: label(problem, i) }))) {
                           onChange(removeStudents(problem, [i]))
                           setSelected(new Set())
                         }
@@ -562,9 +567,9 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         )}
         {visible.length === 0 && (
           <div className="py-16 text-center text-sm text-slate-400">
-            条件に合う生徒がいません。
+            {t('noMatch')}
             <button type="button" onClick={clearFilters} className="ml-1 font-semibold text-indigo-600 hover:underline">
-              条件をクリア
+              {t('clearFilters')}
             </button>
           </div>
         )}
@@ -574,8 +579,8 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
       {selected.size > 0 && (
         <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 bg-slate-900 px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] text-sm text-white sm:px-5 sm:py-3">
           <span className="mr-1 font-semibold tabular-nums">
-            {sel.length} 名を選択
-            {hiddenSelected > 0 && <span className="ml-1 text-xs font-normal text-slate-400">（非表示の {hiddenSelected} 名は対象外）</span>}
+            {t('selectedN', { n: sel.length })}
+            {hiddenSelected > 0 && <span className="ml-1 text-xs font-normal text-slate-400">{t('hiddenSelected', { n: hiddenSelected })}</span>}
           </span>
           <button
             type="button"
@@ -586,7 +591,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
             }}
             className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500 px-3 py-1.5 font-semibold hover:bg-indigo-400 disabled:opacity-40"
           >
-            <Link2 className="size-4" /> 同じ組にする
+            <Link2 className="size-4" /> {t('makeWanted')}
           </button>
           <button
             type="button"
@@ -597,24 +602,24 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
             }}
             className="inline-flex items-center gap-1.5 rounded-lg bg-rose-500 px-3 py-1.5 font-semibold hover:bg-rose-400 disabled:opacity-40"
           >
-            <Split className="size-4" /> 別の組にする
+            <Split className="size-4" /> {t('makeUnwanted')}
           </button>
           {sel.length > 0 && <BulkSet problem={problem} onApply={(col, v) => change(setValueFor(problem, sel, col, v))} />}
           <button
             type="button"
             disabled={sel.length === 0}
             onClick={() => {
-              if (confirm(`${sel.length} 名を名簿から削除しますか？`)) {
+              if (confirm(t('confirmDeleteN', { n: sel.length }))) {
                 onChange(removeStudents(problem, sel))
                 setSelected(new Set())
               }
             }}
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold text-rose-300 hover:bg-white/10 disabled:opacity-40"
           >
-            <Trash2 className="size-4" /> 削除
+            <Trash2 className="size-4" /> {t('delete')}
           </button>
-          <span className="ml-auto hidden text-xs text-slate-400 lg:inline">選択中はセルの変更が選択した全員に反映されます</span>
-          <button type="button" onClick={() => setSelected(new Set())} className="rounded-lg p-1.5 hover:bg-white/10" aria-label="選択解除">
+          <span className="ml-auto hidden text-xs text-slate-400 lg:inline">{t('bulkHint')}</span>
+          <button type="button" onClick={() => setSelected(new Set())} className="rounded-lg p-1.5 hover:bg-white/10" aria-label={t('clearSelection')}>
             <X className="size-4" />
           </button>
         </div>
@@ -623,15 +628,16 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
   )
 }
 
-const PAIR_LABEL: Record<PairFilter, string> = {
-  all: 'すべて',
-  any: '指定あり',
-  wanted: '同じ組の指定あり',
-  unwanted: '別の組の指定あり',
-  none: '指定なし',
-}
+const PAIR_LABEL = {
+  all: 'pairAll',
+  any: 'pairAny',
+  wanted: 'pairWantedF',
+  unwanted: 'pairUnwantedF',
+  none: 'pairNone',
+} as const satisfies Record<PairFilter, string>
 
 function SortHeader({
+  id,
   label,
   sort,
   onSort,
@@ -639,6 +645,8 @@ function SortHeader({
   sub,
   children,
 }: {
+  /** 並べ替えのキー（省略時は label。NO・名前は表示名と別に固定のキーを使う） */
+  id?: string
   label: string
   sort: { col: string; dir: 1 | -1 } | null
   onSort: (c: string) => void
@@ -646,11 +654,12 @@ function SortHeader({
   sub?: ReactNode
   children?: ReactNode
 }) {
-  const active = sort?.col === label
+  const key = id ?? label
+  const active = sort?.col === key
   return (
     <th className={`group border-b border-slate-200 px-3 py-2 align-bottom font-semibold ${className}`}>
       <div className="flex items-center gap-1">
-        <button type="button" onClick={() => onSort(label)} className={`inline-flex items-center gap-1 whitespace-nowrap hover:text-slate-900 ${active ? 'text-indigo-600' : ''}`}>
+        <button type="button" onClick={() => onSort(key)} className={`inline-flex items-center gap-1 whitespace-nowrap hover:text-slate-900 ${active ? 'text-indigo-600' : ''}`}>
           {label}
           {active ? sort.dir === 1 ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" /> : null}
         </button>
@@ -662,23 +671,25 @@ function SortHeader({
 }
 
 function Distribution({ column, problem }: { column: ColumnSpec; problem: Problem }) {
+  const { t, num } = useT()
   if (column.kind === 'numeric') {
     const xs = problem.students.map((s) => Number(s.values[column.name])).filter((x, i) => problem.students[i].values[column.name] !== '' && Number.isFinite(x))
     const avg = xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0
-    return <div className="mt-0.5 text-[10px] font-normal text-slate-400">平均 {avg.toFixed(1)}</div>
+    return <div className="mt-0.5 text-[10px] font-normal text-slate-400">{t('avg', { v: num(avg, 1) })}</div>
   }
   const counts = column.levels.map((l) => problem.students.filter((s) => s.values[column.name] === l).length)
   return (
     <div className="mt-0.5 whitespace-nowrap text-[10px] font-normal tabular-nums text-slate-400">
-      {column.levels.length === 0 ? '未入力' : column.levels.map((l, j) => `${column.kind === 'flag' ? '' : `${l}:`}${counts[j]}`).join(' ')}
+      {column.levels.length === 0 ? t('notEntered') : column.levels.map((l, j) => `${column.kind === 'flag' ? '' : `${l}:`}${counts[j]}`).join(' ')}
     </div>
   )
 }
 
 function ValueCell({ column, value, onChange }: { column: ColumnSpec; value: string; onChange: (v: string) => void }) {
+  const { t } = useT()
   // 値が1種類（○など）または未入力の列はトグル
   if (column.kind === 'flag' && (column.levels.length <= 1)) {
-    const mark = column.levels[0] ?? '○'
+    const mark = column.levels[0] ?? t('flagMark')
     const on = value !== ''
     return (
       <button
@@ -706,12 +717,13 @@ function ValueCell({ column, value, onChange }: { column: ColumnSpec; value: str
 }
 
 function CategorySelect({ levels, value, onChange }: { levels: string[]; value: string; onChange: (v: string) => void }) {
+  const { t } = useT()
   return (
     <select
       value={value}
       onChange={(e) => {
         if (e.target.value === '__new__') {
-          const v = prompt('新しい値を入力')?.trim()
+          const v = prompt(t('newValuePrompt'))?.trim()
           if (v) onChange(v)
         } else onChange(e.target.value)
       }}
@@ -723,19 +735,20 @@ function CategorySelect({ levels, value, onChange }: { levels: string[]; value: 
           {l}
         </option>
       ))}
-      <option value="__new__">＋ 新しい値…</option>
+      <option value="__new__">{t('newValueOption')}</option>
     </select>
   )
 }
 
 function BulkSet({ problem, onApply }: { problem: Problem; onApply: (col: string, v: string) => void }) {
+  const { t } = useT()
   return (
     <Popover
       dark
       up
       button={(open) => (
         <span className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold hover:bg-white/10 ${open ? 'bg-white/10' : ''}`}>
-          項目を一括設定 <ChevronDown className="size-4" />
+          {t('bulkSet')} <ChevronDown className="size-4" />
         </span>
       )}
     >
@@ -745,7 +758,7 @@ function BulkSet({ problem, onApply }: { problem: Problem; onApply: (col: string
             <div key={c.name} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
               <span className="truncate text-sm font-semibold">{c.name}</span>
               <div className="flex shrink-0 gap-1">
-                {(c.levels.length ? c.levels : c.kind === 'flag' ? ['○'] : []).slice(0, 6).map((l) => (
+                {(c.levels.length ? c.levels : c.kind === 'flag' ? [t('flagMark')] : []).slice(0, 6).map((l) => (
                   <button
                     key={l}
                     type="button"
@@ -765,9 +778,9 @@ function BulkSet({ problem, onApply }: { problem: Problem; onApply: (col: string
                     close()
                   }}
                   className="rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-bold text-slate-500 hover:bg-slate-200"
-                  title="空欄にする"
+                  title={t('setBlankTitle')}
                 >
-                  空
+                  {t('blankShort')}
                 </button>
               </div>
             </div>
@@ -779,26 +792,27 @@ function BulkSet({ problem, onApply }: { problem: Problem; onApply: (col: string
 }
 
 function FilterMenu({ column, problem, value, onChange }: { column: ColumnSpec; problem: Problem; value: Set<string>; onChange: (s: Set<string>) => void }) {
+  const { t, file } = useT()
   const options = useMemo(() => {
     const levels = column.kind === 'numeric' ? [...column.levels] : column.levels
     const count = (l: string) => problem.students.filter((s) => (s.values[column.name] ?? '') === l).length
-    return [...levels.map((l) => ({ key: l, label: l, n: count(l) })), { key: EMPTY, label: '（空欄）', n: count('') }].filter((o) => o.n > 0)
-  }, [column, problem])
+    return [...levels.map((l) => ({ key: l, label: l, n: count(l) })), { key: EMPTY, label: t('blankLabel'), n: count('') }].filter((o) => o.n > 0)
+  }, [column, problem, t])
   const toggle = (k: string) => {
     const next = new Set(value)
     if (next.has(k)) next.delete(k)
     else next.add(k)
     onChange(next)
   }
-  const names = [...value].map((k) => (k === EMPTY ? '空欄' : k))
+  const names = [...value].map((k) => (k === EMPTY ? t('blankName') : k))
   const summary =
     value.size === 0
       ? ''
       : column.kind === 'flag' && value.size === 1
-        ? `: ${value.has(EMPTY) ? 'なし' : 'あり'}`
+        ? `: ${value.has(EMPTY) ? t('filterNo') : t('filterYes')}`
         : value.size <= 2
-          ? `: ${names.join('・')}`
-          : `: ${value.size}件`
+          ? `: ${names.join(file.joinSep)}`
+          : `: ${t('filterCount', { n: value.size })}`
   return (
     <Popover
       button={(open) => (
@@ -813,13 +827,13 @@ function FilterMenu({ column, problem, value, onChange }: { column: ColumnSpec; 
           {options.map((o) => (
             <label key={o.key} className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-sm hover:bg-slate-50">
               <Checkbox checked={value.has(o.key)} onChange={() => toggle(o.key)} />
-              <span className="flex-1">{column.kind === 'flag' && o.key !== EMPTY ? `${o.label}（該当）` : o.label}</span>
+              <span className="flex-1">{column.kind === 'flag' && o.key !== EMPTY ? t('flagOption', { v: o.label }) : o.label}</span>
               <span className="text-xs tabular-nums text-slate-400">{o.n}</span>
             </label>
           ))}
           {value.size > 0 && (
             <button type="button" onClick={() => onChange(new Set())} className="mt-1 w-full rounded-lg px-3 py-1.5 text-left text-xs font-semibold text-indigo-600 hover:bg-slate-50">
-              この条件をクリア
+              {t('clearThis')}
             </button>
           )}
         </div>
@@ -939,6 +953,8 @@ function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => voi
 /* ------------------------------------------------------------------ */
 
 function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; problem: Problem; onChange: (p: Problem) => void; conflicts: [number, number][] }) {
+  const { t, file } = useT()
+  const prefix = file.tagPrefix[kind]
   const groups = kind === 'wanted' ? problem.wantedGroups : problem.unwantedGroups
   const [draft, setDraft] = useState<number[] | null>(null)
   const tone = kind === 'wanted' ? TONE.wanted : TONE.unwanted
@@ -948,17 +964,15 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
     <div className="h-full overflow-auto px-3 py-4 sm:px-5 sm:py-5">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="font-bold text-slate-900">{kind === 'wanted' ? '同じ組にするグループ' : '別の組にするグループ'}</div>
+          <div className="font-bold text-slate-900">{kind === 'wanted' ? t('groupsWantedTitle') : t('groupsUnwantedTitle')}</div>
           <p className="mt-0.5 text-sm text-slate-500">
-            {kind === 'wanted'
-              ? 'グループ内の生徒は必ず同じ組に配置されます。'
-              : 'グループ内の生徒はできる限り互いに別の組に配置されます（3人以上なら全員が別々）。'}
-            <span className="text-slate-400"> 生徒一覧でチェックして一括作成もできます。</span>
+            {kind === 'wanted' ? t('groupsWantedDesc') : t('groupsUnwantedDesc')}
+            <span className="text-slate-400">{t('groupsBulkHint')}</span>
           </p>
         </div>
         {draft === null && (
           <button type="button" className="btn-primary" onClick={() => setDraft([])}>
-            <Plus className="size-4" /> 新しいグループ
+            <Plus className="size-4" /> {t('newGroup')}
           </button>
         )}
       </div>
@@ -966,11 +980,11 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {draft !== null && (
           <div className={`rounded-2xl border-2 border-dashed p-4 ${tone.border}`}>
-            <div className="mb-2 text-xs font-bold text-slate-500">新しいグループ（2人以上）</div>
+            <div className="mb-2 text-xs font-bold text-slate-500">{t('newGroupLabel')}</div>
             <Members problem={problem} members={draft} tone={tone} onChange={setDraft} autoFocus />
             <div className="mt-3 flex justify-end gap-2">
               <button type="button" className="btn-ghost !py-1.5" onClick={() => setDraft(null)}>
-                キャンセル
+                {t('cancel')}
               </button>
               <button
                 type="button"
@@ -981,7 +995,7 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
                   setDraft(null)
                 }}
               >
-                作成
+                {t('create')}
               </button>
             </div>
           </div>
@@ -992,16 +1006,16 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
             <div key={gi} className={`group rounded-2xl border bg-white p-4 transition hover:shadow-md ${bad ? 'border-amber-300' : 'border-slate-200'}`}>
               <div className="mb-2 flex items-center justify-between">
                 <span className={`rounded-md px-2 py-0.5 text-xs font-bold ${tone.badge}`}>
-                  {kind === 'wanted' ? '同' : '別'}
+                  {prefix}
                   {gi + 1}
                 </span>
                 <div className="flex items-center gap-1">
                   {bad && <AlertTriangle className="size-4 text-amber-500" />}
                   <button
                     type="button"
-                    onClick={() => confirm(`${kind === 'wanted' ? '同' : '別'}${gi + 1} のグループを削除しますか？`) && onChange(removeGroup(problem, kind, gi))}
+                    onClick={() => confirm(t('confirmDeleteGroup', { label: `${prefix}${gi + 1}` })) && onChange(removeGroup(problem, kind, gi))}
                     className="rounded-lg p-1 text-slate-300 opacity-0 transition hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
-                    aria-label="グループを削除"
+                    aria-label={t('deleteGroup')}
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -1012,7 +1026,7 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
                 members={g}
                 tone={tone}
                 onChange={(m) => {
-                  if (m.length < 2 && !confirm('メンバーが1人になるため、このグループは削除されます。よろしいですか？')) return
+                  if (m.length < 2 && !confirm(t('confirmGroupDissolve'))) return
                   onChange(setGroup(problem, kind, gi, m))
                 }}
               />
@@ -1022,7 +1036,7 @@ function GroupsTab({ kind, problem, onChange, conflicts }: { kind: GroupKind; pr
       </div>
       {groups.length === 0 && draft === null && (
         <div className="rounded-2xl border border-dashed border-slate-200 py-16 text-center text-sm text-slate-400">
-          まだ指定はありません
+          {t('noGroups')}
         </div>
       )}
     </div>
@@ -1047,17 +1061,18 @@ function Members({
   onChange: (m: number[]) => void
   autoFocus?: boolean
 }) {
+  const { t } = useT()
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {members.map((i) => (
         <span key={i} className={`inline-flex items-center gap-1 rounded-lg py-1 pl-2 pr-1 text-sm font-medium ring-1 ${tone.chip}`}>
           <span className="font-mono text-[11px] opacity-60">{problem.students[i].no}</span>
-          {problem.students[i].name || '（名前なし）'}
+          {problem.students[i].name || t('noName')}
           <button
             type="button"
             onClick={() => onChange(members.filter((x) => x !== i))}
             className="rounded p-0.5 opacity-50 hover:bg-white/60 hover:opacity-100"
-            aria-label="外す"
+            aria-label={t('removeMember')}
           >
             <X className="size-3" />
           </button>
@@ -1070,6 +1085,7 @@ function Members({
 
 /** NO・名前で検索して生徒を追加するコンボボックス */
 function StudentPicker({ problem, exclude, onPick, autoFocus }: { problem: Problem; exclude: number[]; onPick: (i: number) => void; autoFocus?: boolean }) {
+  const { t } = useT()
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
   const [cursor, setCursor] = useState(0)
@@ -1110,7 +1126,7 @@ function StudentPicker({ problem, exclude, onPick, autoFocus }: { problem: Probl
             pick(results[cursor].i)
           }
         }}
-        placeholder="＋ NO か名前で追加"
+        placeholder={t('addMemberPlaceholder')}
         className="w-44 rounded-lg border border-dashed border-slate-300 bg-transparent px-2 py-1 text-sm outline-none placeholder:text-slate-400 focus:border-solid focus:border-indigo-400 focus:bg-white"
       />
       {open && results.length > 0 && (
@@ -1125,7 +1141,7 @@ function StudentPicker({ problem, exclude, onPick, autoFocus }: { problem: Probl
                 className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm ${j === cursor ? 'bg-indigo-50 text-indigo-800' : 'text-slate-700'}`}
               >
                 <span className="w-8 font-mono text-xs text-slate-400">{s.no}</span>
-                {s.name || '（名前なし）'}
+                {s.name || t('noName')}
               </button>
             </li>
           ))}
@@ -1137,6 +1153,7 @@ function StudentPicker({ problem, exclude, onPick, autoFocus }: { problem: Probl
 
 /** NO 入力: 入力中は下書きとして保持し、確定（Enter / フォーカスアウト）時に 1 以上の整数・重複なしを検証 */
 function NoInput({ value, validate, onCommit }: { value: number; validate: (no: number) => string | null; onCommit: (no: number) => void }) {
+  const { t } = useT()
   const [draft, setDraft] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -1144,7 +1161,7 @@ function NoInput({ value, validate, onCommit }: { value: number; validate: (no: 
   const commit = () => {
     if (draft === null) return
     const no = Number(draft)
-    const err = !Number.isInteger(no) || no < 1 ? 'NO は 1 以上の整数で入力してください' : validate(no)
+    const err = !Number.isInteger(no) || no < 1 ? t('noInvalid') : validate(no)
     if (err) {
       setError(err)
       clearTimeout(timer.current)

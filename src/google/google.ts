@@ -4,6 +4,8 @@
  * 通信はブラウザ ⇔ Google の間だけで行い、第三者のサーバーは経由しない。
  */
 
+import { isAppLanguage, type AppLanguage } from '../i18n/languages'
+
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY as string | undefined
 /** Google Cloud プロジェクト番号。Picker で選んだファイルへのアクセス権付与に必要 */
@@ -14,6 +16,26 @@ const SHEET_MIME = 'application/vnd.google-apps.spreadsheet'
 const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 export const googleEnabled = !!(CLIENT_ID && API_KEY && APP_ID)
+
+/** エラー・Picker の文言（既定は日本語。App が選択中の言語に差し替える） */
+interface GoogleMessages {
+  scriptFailed: (src: string) => string
+  authFailed: (msg: string) => string
+  apiError: (msg: string) => string
+  pickerTitle: string
+  /** Picker の表示言語（Google の言語コード） */
+  locale?: string
+}
+let MSG: GoogleMessages = {
+  scriptFailed: (src) => `${src} を読み込めませんでした`,
+  authFailed: (msg) => `Google 認証に失敗しました: ${msg}`,
+  apiError: (msg) => `Google API エラー: ${msg}`,
+  pickerTitle: '名簿のスプレッドシートを選択',
+  locale: 'ja',
+}
+export function setGoogleMessages(m: GoogleMessages) {
+  MSG = { ...MSG, ...m }
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -41,7 +63,7 @@ function loadScript(src: string) {
       s.onload = () => resolve()
       s.onerror = () => {
         loaded.delete(src)
-        reject(new Error(`${src} を読み込めませんでした`))
+        reject(new Error(MSG.scriptFailed(src)))
       }
       document.head.appendChild(s)
     })
@@ -62,13 +84,13 @@ async function getToken(): Promise<string> {
       client_id: CLIENT_ID,
       scope: SCOPE,
       callback: (res: any) => {
-        if (res.error) return reject(new Error(`Google 認証に失敗しました: ${res.error_description ?? res.error}`))
+        if (res.error) return reject(new Error(MSG.authFailed(res.error_description ?? res.error)))
         token = { value: res.access_token, expires: Date.now() + Number(res.expires_in) * 1000 }
         consented = true
         resolve(res.access_token)
       },
       error_callback: (err: any) =>
-        reject(new Error(err?.type === 'popup_closed' ? 'cancelled' : `Google 認証に失敗しました: ${err?.message ?? err?.type}`)),
+        reject(new Error(err?.type === 'popup_closed' ? 'cancelled' : MSG.authFailed(err?.message ?? err?.type))),
     })
     client.requestAccessToken({ prompt: consented ? '' : undefined })
   })
@@ -89,7 +111,7 @@ async function api(url: string, init: RequestInit = {}, retried = false): Promis
     } catch {
       /* ignore */
     }
-    throw new Error(`Google API エラー: ${msg}`)
+    throw new Error(MSG.apiError(msg))
   }
   return res
 }
@@ -107,8 +129,8 @@ export async function pickSpreadsheet(): Promise<GoogleFile | null> {
       .setOAuthToken(t)
       .setDeveloperKey(API_KEY)
       .setAppId(APP_ID)
-      .setLocale('ja')
-      .setTitle('名簿のスプレッドシートを選択')
+      .setLocale(MSG.locale ?? 'ja')
+      .setTitle(MSG.pickerTitle)
       .setCallback((data: any) => {
         if (data.action === g.Action.PICKED) {
           const d = data.docs[0]
@@ -216,10 +238,15 @@ const hex = (h: string) => {
   return { red: ((n >> 16) & 255) / 255, green: ((n >> 8) & 255) / 255, blue: (n & 255) / 255 }
 }
 
-/** 書式付きの新しいスプレッドシートを作成する */
+// 新しく作るスプレッドシートのロケール（小数点・日付・関数の区切りに効く）。
+// スペイン語は中南米の語彙に合わせてメキシコ（es_419 はスプレッドシートのロケールに無い）
+const SHEETS_LOCALE: Record<AppLanguage, string> = { ja: 'ja_JP', en: 'en_US', ko: 'ko_KR', es: 'es_MX', de: 'de_DE', 'pt-BR': 'pt_BR' }
+export const spreadsheetLocale = (lang: string | undefined) => (isAppLanguage(lang) ? SHEETS_LOCALE[lang] : 'ja_JP')
+
+/** 書式付きの新しいスプレッドシートを作成する（ロケールは setGoogleMessages で渡した表示言語） */
 export async function createSpreadsheet(title: string, sheets: SheetSpec[]): Promise<GoogleFile> {
   const res = await post('https://sheets.googleapis.com/v4/spreadsheets', {
-    properties: { title, locale: 'ja_JP' },
+    properties: { title, locale: spreadsheetLocale(MSG.locale) },
     sheets: sheets.map((t, i) => ({
       properties: { sheetId: i, title: t.name, gridProperties: { frozenRowCount: t.frozenRows ?? 0, frozenColumnCount: t.frozenCols ?? 0 } },
     })),

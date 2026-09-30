@@ -1,8 +1,10 @@
-import * as XLSX from 'xlsx-js-style'
+import type { WorkBook } from 'xlsx-js-style'
+import XLSX from './xlsx'
 import type { Problem } from './types'
 import type { Report } from './evaluate'
 import { rosterRows, toCell } from './roster'
 import { pairStatus, rowColor, tagText, UNWANTED_COLOR, VIOLATION_COLOR, type PairTag } from './pairs'
+import { FILE_LABELS, violationText, type FileLanguage } from './labels'
 
 export type Cell = string | number | null
 
@@ -24,7 +26,6 @@ export interface SheetData {
   widths?: number[]
 }
 
-const className = (c: number) => `${c + 1}組`
 const round2 = (v: number) => Math.round(v * 100) / 100
 const HEADER: Omit<Fill, 'row' | 'col'> = { bg: '#F1F5F9', bold: true }
 
@@ -47,15 +48,18 @@ function pairFills(tags: PairTag[], row: number, nameCols: [number, number], tag
 }
 
 /** 結果の各シート（組分け・クラス別名簿・ペア指定・集計・組み合わせ失敗）の中身を作る */
-export function buildResultSheets(p: Problem, classOf: number[], k: number, report: Report): SheetData[] {
+/** lang: シート名・見出しの言語（既定は日本語。Web 版はこの既定のまま） */
+export function buildResultSheets(p: Problem, classOf: number[], k: number, report: Report, lang: FileLanguage = 'ja'): SheetData[] {
+  const L = FILE_LABELS[lang]
+  const className = L.className
   const cols = p.columns.map((c) => c.name)
-  const { tags, groups } = pairStatus(p, classOf)
+  const { tags, groups } = pairStatus(p, classOf, L.tagPrefix)
   const byClass = Array.from({ length: k }, (_, c) => p.students.map((_, i) => i).filter((i) => classOf[i] === c))
 
   // 組分け（全員）
   const assign: SheetData = {
-    name: '組分け',
-    rows: [['NO', '名前', '組', 'ペア指定', ...cols]],
+    name: L.sheets.assign,
+    rows: [[L.no, L.name, L.classCol, L.pairCol, ...cols]],
     fills: [{ row: 0, col: 0, cols: 4 + cols.length, ...HEADER }],
     widths: [6, 14, 6, 12, ...cols.map(() => 10)],
   }
@@ -66,7 +70,7 @@ export function buildResultSheets(p: Problem, classOf: number[], k: number, repo
 
   // クラス別名簿（横並び: NO / 名前 / 指定）
   const side: SheetData = {
-    name: 'クラス別名簿',
+    name: L.sheets.byClass,
     rows: [byClass.flatMap((_, c) => [className(c), '', ''])],
     fills: [{ row: 0, col: 0, cols: k * 3, ...HEADER }],
     widths: byClass.flatMap(() => [6, 14, 10]),
@@ -81,48 +85,51 @@ export function buildResultSheets(p: Problem, classOf: number[], k: number, repo
 
   // ペア指定の一覧
   const pairs: SheetData = {
-    name: 'ペア指定',
-    rows: [['指定', '種類', 'メンバー', '配置', '判定']],
+    name: L.sheets.pairs,
+    rows: [[L.pairLabel, L.kind, L.members, L.placed, L.judged]],
     fills: [{ row: 0, col: 0, cols: 5, ...HEADER }],
     widths: [6, 8, 40, 16, 8],
   }
   groups.forEach((g, r) => {
     pairs.rows.push([
       g.label,
-      g.kind === 'wanted' ? '同じ組' : '別の組',
-      g.members.map((i) => `${p.students[i].no} ${p.students[i].name}`).join('、'),
-      [...new Set(g.members.map((i) => className(classOf[i])))].join('・'),
+      g.kind === 'wanted' ? L.wantedKind : L.unwantedKind,
+      g.members.map((i) => `${p.students[i].no} ${p.students[i].name}`).join(L.listSep),
+      [...new Set(g.members.map((i) => className(classOf[i])))].join(L.joinSep),
       g.ok ? '○' : '×',
     ])
     pairs.fills!.push({ row: r + 1, col: 0, cols: 4, bg: g.color.bg, fg: g.color.fg })
     if (!g.ok) pairs.fills!.push({ row: r + 1, col: 4, bg: VIOLATION_COLOR.bg, fg: VIOLATION_COLOR.fg, bold: true })
   })
-  if (groups.length === 0) pairs.rows.push(['指定なし'])
+  if (groups.length === 0) pairs.rows.push([L.noPairs])
 
   const summary: SheetData = {
-    name: '集計',
-    rows: [['項目', '値', ...byClass.map((_, c) => className(c)), '理想']],
+    name: L.sheets.summary,
+    rows: [[L.item, L.value, ...byClass.map((_, c) => className(c)), L.ideal]],
     fills: [{ row: 0, col: 0, cols: k + 3, ...HEADER }],
   }
-  summary.rows.push(['人数', '', ...report.sizes, round2(p.students.length / k)])
+  summary.rows.push([L.count, '', ...report.sizes, round2(p.students.length / k)])
   for (const col of report.columns)
-    col.levels.forEach((level, l) => summary.rows.push([col.column, level, ...col.rows[l].map(round2), round2(col.ideal[l])]))
+    col.levels.forEach((level, l) =>
+      summary.rows.push([col.column, col.kind === 'numeric' ? L.average : level, ...col.rows[l].map(round2), round2(col.ideal[l])]),
+    )
 
   return [
     assign,
     side,
     pairs,
     summary,
-    { name: '組み合わせ失敗', rows: report.violations.length ? report.violations.map((v) => [v.message]) : [['なし']] },
+    { name: L.sheets.failed, rows: report.violations.length ? report.violations.map((v) => [violationText(lang, v, p, classOf)]) : [[L.none]] },
   ]
 }
 
 /** 各組のシート（Excel のみ） */
-function classSheet(p: Problem, classOf: number[], c: number, tags: PairTag[][]): SheetData {
+function classSheet(p: Problem, classOf: number[], c: number, tags: PairTag[][], lang: FileLanguage): SheetData {
+  const L = FILE_LABELS[lang]
   const cols = p.columns.map((col) => col.name)
   const sheet: SheetData = {
-    name: className(c),
-    rows: [['NO', '名前', 'ペア指定', ...cols]],
+    name: L.className(c),
+    rows: [[L.no, L.name, L.pairCol, ...cols]],
     fills: [{ row: 0, col: 0, cols: 3 + cols.length, ...HEADER }],
     widths: [6, 14, 12, ...cols.map(() => 10)],
   }
@@ -151,38 +158,58 @@ function toWorksheet(sheet: SheetData) {
   return ws
 }
 
-export function exportWorkbook(p: Problem, classOf: number[], k: number, report: Report): Blob {
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+/**
+ * ブックを .xlsx のバイト列にする。React Native の Blob は ArrayBuffer から作れないため、
+ * スマホ版は 'base64' で受け取ってファイルに書き出す。
+ */
+export function writeXlsx(wb: WorkBook, type: 'base64'): string
+export function writeXlsx(wb: WorkBook, type: 'array'): ArrayBuffer
+export function writeXlsx(wb: WorkBook, type: 'array' | 'base64'): ArrayBuffer | string {
+  return XLSX.write(wb, { bookType: 'xlsx', type })
+}
+
+export function exportWorkbook(p: Problem, classOf: number[], k: number, report: Report, lang: FileLanguage = 'ja'): Blob {
+  return new Blob([writeXlsx(resultWorkbook(p, classOf, k, report, lang), 'array')], { type: XLSX_MIME })
+}
+
+/** 結果のブック（組分け・クラス別名簿・各組・ペア指定・集計・組み合わせ失敗・生徒名簿） */
+export function resultWorkbook(p: Problem, classOf: number[], k: number, report: Report, lang: FileLanguage = 'ja'): WorkBook {
+  const L = FILE_LABELS[lang]
   const wb = XLSX.utils.book_new()
   const add = (sheet: SheetData) => XLSX.utils.book_append_sheet(wb, toWorksheet(sheet), sheet.name)
-  const [assign, side, pairs, summary, failed] = buildResultSheets(p, classOf, k, report)
-  const { tags } = pairStatus(p, classOf)
+  const [assign, side, pairs, summary, failed] = buildResultSheets(p, classOf, k, report, lang)
+  const { tags } = pairStatus(p, classOf, L.tagPrefix)
 
   add(assign)
   add(side)
-  for (let c = 0; c < k; c++) add(classSheet(p, classOf, c, tags))
+  for (let c = 0; c < k; c++) add(classSheet(p, classOf, c, tags, lang))
   add(pairs)
   add(summary)
   add(failed)
-  add({ name: '生徒名簿', rows: rosterRows(p) })
-
-  const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-  return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  add({ name: L.sheets.roster, rows: rosterRows(p, L) })
+  return wb
 }
 
 /** 現在の名簿を、ひな形と同じ形式の Excel（再読み込み可能）にする */
-export function exportRoster(p: Problem, numClasses: number): Blob {
+export function exportRoster(p: Problem, numClasses: number, lang: FileLanguage = 'ja'): Blob {
+  return new Blob([writeXlsx(rosterWorkbook(p, numClasses, lang), 'array')], { type: XLSX_MIME })
+}
+
+export function rosterWorkbook(p: Problem, numClasses: number, lang: FileLanguage = 'ja'): WorkBook {
+  const L = FILE_LABELS[lang]
   const wb = XLSX.utils.book_new()
   const add = (name: string, rows: unknown[][]) => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), name)
   const n = p.students.length
-  add('設定', [
-    ['生徒人数', n],
-    ['1クラスの最大人数', p.maxPerClass !== null && p.maxPerClass * numClasses >= n ? p.maxPerClass : Math.ceil(n / numClasses)],
-    ['クラス数', numClasses],
+  add(L.sheets.settings, [
+    [L.studentCount, n],
+    [L.maxPerClass, p.maxPerClass !== null && p.maxPerClass * numClasses >= n ? p.maxPerClass : Math.ceil(n / numClasses)],
+    [L.classCount, numClasses],
   ])
-  add('生徒名簿', rosterRows(p))
+  add(L.sheets.roster, rosterRows(p, L))
   const nos = (groups: number[][]) => groups.map((g) => g.map((i) => p.students[i].no))
-  add('同じ組ペア', nos(p.wantedGroups))
-  add('別の組ペア', nos(p.unwantedGroups))
-  const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-  return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  add(L.sheets.wanted, nos(p.wantedGroups))
+  add(L.sheets.unwanted, nos(p.unwantedGroups))
+  return wb
 }

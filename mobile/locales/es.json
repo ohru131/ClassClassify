@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Mosaic Grupos"
+  },
+  "android": {
+    "app_name": "Mosaic Grupos"
+  }
+}

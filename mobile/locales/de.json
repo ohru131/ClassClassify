@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Mosaic Klassen"
+  },
+  "android": {
+    "app_name": "Mosaic Klassen"
+  }
+}
