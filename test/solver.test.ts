@@ -24,3 +24,22 @@ describe.each(['sample1.xlsx', 'sample2.xlsx', 'sample-group.xlsx'])('%s', (file
     expect(exportWorkbook(p, res.classOf, p.numClasses, report).size).toBeGreaterThan(0)
   })
 })
+
+describe('Google ひな形', () => {
+  it('ひな形の内容が sample1.xlsx と同じ問題として読み込める', async () => {
+    const XLSX = await import('xlsx')
+    const { buildTemplateSheets } = await import('../src/google/template')
+    const b = readFileSync(new URL('../public/sample1.xlsx', import.meta.url))
+    const buf = b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)
+    const wb = XLSX.utils.book_new()
+    for (const s of buildTemplateSheets(buf)) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s.rows), s.name)
+    const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
+    const a = parseWorkbook(buf)
+    const t = parseWorkbook(out)
+    expect(t.students).toEqual(a.students)
+    expect(t.columns).toEqual(a.columns)
+    expect(t.numClasses).toBe(a.numClasses)
+    expect(t.wantedGroups).toEqual(a.wantedGroups)
+    expect(t.unwantedGroups).toEqual(a.unwantedGroups)
+  })
+})

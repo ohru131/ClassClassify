@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Download, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
+import { Download, ExternalLink, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
 import type { ColumnSpec, Problem } from '../solver/types'
 import { Segmented, StepHeader } from './ui'
 
@@ -14,12 +14,19 @@ export function DataStep({
   fileName,
   onGoogle,
   googleBusy,
+  onCreateTemplate,
+  templateBusy,
+  templateUrl,
 }: {
   onLoad: (data: ArrayBuffer, name: string) => void
   fileName: string | null
   /** Google 連携が有効なときだけ渡す */
   onGoogle?: () => void
   googleBusy?: boolean
+  /** Google 連携が有効なときだけ渡す: ひな形スプレッドシートを作成 */
+  onCreateTemplate?: () => void
+  templateBusy?: boolean
+  templateUrl?: string | null
 }) {
   const input = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
@@ -95,8 +102,18 @@ export function DataStep({
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <a href="./template.zip" download className="btn-ghost">
-          <Download className="size-4" /> ひな形をダウンロード
+          <Download className="size-4" /> {onCreateTemplate ? 'Excel ひな形' : 'ひな形をダウンロード'}
         </a>
+        {onCreateTemplate &&
+          (templateUrl ? (
+            <a href={templateUrl} target="_blank" rel="noreferrer" className="btn-ghost !border-emerald-200 !bg-emerald-50 !text-emerald-800">
+              <SheetsIcon small /> 作成したひな形を開く <ExternalLink className="size-3.5" />
+            </a>
+          ) : (
+            <button type="button" className="btn-ghost" onClick={onCreateTemplate} disabled={templateBusy}>
+              {templateBusy ? <Loader2 className="size-4 animate-spin" /> : <SheetsIcon small />} スプレッドシートでひな形を作成
+            </button>
+          ))}
         <span className="mx-1 hidden h-5 w-px bg-slate-200 sm:block" />
         <span className="text-xs font-semibold text-slate-400">サンプルで試す</span>
         {SAMPLES.map((s) => (
@@ -248,9 +265,9 @@ function PairBox({ title, groups, problem, tone }: { title: string; groups: numb
   )
 }
 
-function SheetsIcon() {
+function SheetsIcon({ small }: { small?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" className="size-7" aria-hidden>
+    <svg viewBox="0 0 24 24" className={small ? 'size-4' : 'size-7'} aria-hidden>
       <path fill="#0F9D58" d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2Z" />
       <path fill="#87CEAC" d="M14.5 2v4a1.5 1.5 0 0 0 1.5 1.5h4L14.5 2Z" />
       <path fill="#F1F1F1" d="M7.5 11h9v7h-9v-7Zm1.2 1.2v1.7h2.7v-1.7H8.7Zm3.9 0v1.7h2.7v-1.7h-2.7Zm-3.9 2.9v1.7h2.7v-1.7H8.7Zm3.9 0v1.7h2.7v-1.7h-2.7Z" />
