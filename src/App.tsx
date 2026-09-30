@@ -9,8 +9,7 @@ import type { ColumnSpec, Problem } from './solver/types'
 // Excel 読み書き（SheetJS）は大きいので、必要になった時点で読み込む
 const loadParse = () => import('./solver/parse')
 const loadExport = () => import('./solver/export')
-// 起動後の空き時間に先読み
-if (typeof window !== 'undefined') (window.requestIdleCallback ?? setTimeout)(() => void loadParse())
+
 import { DataStep, SettingsStep } from './components/Setup'
 import { RosterEditor, type EditorTab } from './components/RosterEditor'
 import { Results } from './components/Results'
@@ -162,8 +161,12 @@ export default function App() {
 
   const download = async () => {
     if (!problem || !solution || !report) return
-    const { exportWorkbook } = await loadExport()
-    saveBlob(exportWorkbook(problem, solution.classOf, solution.k, report), `クラス編成結果_${new Date().toISOString().slice(0, 10)}.xlsx`)
+    try {
+      const { exportWorkbook } = await loadExport()
+      saveBlob(exportWorkbook(problem, solution.classOf, solution.k, report), `クラス編成結果_${new Date().toISOString().slice(0, 10)}.xlsx`)
+    } catch (e) {
+      showError(e)
+    }
   }
 
   return (
@@ -324,7 +327,13 @@ export default function App() {
           setTab={setEditorTab}
           onChange={onProblemChange}
           onClose={() => setEditorTab(null)}
-          onExport={async () => saveBlob((await loadExport()).exportRoster(problem, numClasses), `名簿_${new Date().toISOString().slice(0, 10)}.xlsx`)}
+          onExport={async () => {
+            try {
+              saveBlob((await loadExport()).exportRoster(problem, numClasses), `名簿_${new Date().toISOString().slice(0, 10)}.xlsx`)
+            } catch (e) {
+              showError(e)
+            }
+          }}
         />
       )}
 

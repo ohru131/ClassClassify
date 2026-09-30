@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Download, ExternalLink, GripVertical, Loader2, RotateCcw, Sheet, X } from 'lucide-react'
 import type { Problem } from '../solver/types'
 import type { ColumnReport, Report } from '../solver/evaluate'
@@ -160,6 +160,8 @@ function ClassBoard({
   const pairs = useMemo(() => pairStatus(problem, classOf), [problem, classOf])
   const [colorize, setColorize] = useState(true)
   const [focus, setFocus] = useState<{ kind: 'wanted' | 'unwanted'; group: number } | null>(null)
+  // 名簿エディタでグループが変わったら強調を解除（index がずれるため）
+  useEffect(() => setFocus(null), [problem.wantedGroups, problem.unwantedGroups])
   const focusMembers = useMemo(() => {
     if (!focus) return null
     const g = (focus.kind === 'wanted' ? problem.wantedGroups : problem.unwantedGroups)[focus.group]
@@ -243,7 +245,7 @@ function ClassBoard({
                       style={bg && selected !== i ? { backgroundColor: bg.bg } : undefined}
                       className={`group flex cursor-grab items-center gap-2 rounded-xl px-2 py-1.5 text-sm transition active:cursor-grabbing ${
                         selected === i ? 'bg-indigo-50 ring-1 ring-indigo-300' : bg ? 'hover:brightness-95' : 'hover:bg-slate-50'
-                      } ${dim ? 'opacity-25' : ''} ${focusMembers?.has(i) ? 'ring-2 ring-slate-900/70' : ''}`}
+                      } ${dim ? 'opacity-25' : ''} ${focusMembers?.has(i) && selected !== i ? 'ring-2 ring-slate-900/70' : ''}`}
                     >
                       <GripVertical className="size-3.5 shrink-0 text-slate-300 group-hover:text-slate-400" />
                       <span className="w-7 shrink-0 font-mono text-xs tabular-nums text-slate-400">{s.no}</span>
