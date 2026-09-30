@@ -1,4 +1,5 @@
-import * as XLSX from 'xlsx-js-style'
+import type { WorkBook } from 'xlsx-js-style'
+import XLSX from './xlsx'
 import type { Problem } from './types'
 import type { Report } from './evaluate'
 import { rosterRows, toCell } from './roster'
@@ -163,9 +164,9 @@ const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.s
  * ブックを .xlsx のバイト列にする。React Native の Blob は ArrayBuffer から作れないため、
  * スマホ版は 'base64' で受け取ってファイルに書き出す。
  */
-export function writeXlsx(wb: XLSX.WorkBook, type: 'base64'): string
-export function writeXlsx(wb: XLSX.WorkBook, type: 'array'): ArrayBuffer
-export function writeXlsx(wb: XLSX.WorkBook, type: 'array' | 'base64'): ArrayBuffer | string {
+export function writeXlsx(wb: WorkBook, type: 'base64'): string
+export function writeXlsx(wb: WorkBook, type: 'array'): ArrayBuffer
+export function writeXlsx(wb: WorkBook, type: 'array' | 'base64'): ArrayBuffer | string {
   return XLSX.write(wb, { bookType: 'xlsx', type })
 }
 
@@ -174,7 +175,7 @@ export function exportWorkbook(p: Problem, classOf: number[], k: number, report:
 }
 
 /** 結果のブック（組分け・クラス別名簿・各組・ペア指定・集計・組み合わせ失敗・生徒名簿） */
-export function resultWorkbook(p: Problem, classOf: number[], k: number, report: Report, lang: FileLanguage = 'ja'): XLSX.WorkBook {
+export function resultWorkbook(p: Problem, classOf: number[], k: number, report: Report, lang: FileLanguage = 'ja'): WorkBook {
   const L = FILE_LABELS[lang]
   const wb = XLSX.utils.book_new()
   const add = (sheet: SheetData) => XLSX.utils.book_append_sheet(wb, toWorksheet(sheet), sheet.name)
@@ -196,7 +197,7 @@ export function exportRoster(p: Problem, numClasses: number, lang: FileLanguage 
   return new Blob([writeXlsx(rosterWorkbook(p, numClasses, lang), 'array')], { type: XLSX_MIME })
 }
 
-export function rosterWorkbook(p: Problem, numClasses: number, lang: FileLanguage = 'ja'): XLSX.WorkBook {
+export function rosterWorkbook(p: Problem, numClasses: number, lang: FileLanguage = 'ja'): WorkBook {
   const L = FILE_LABELS[lang]
   const wb = XLSX.utils.book_new()
   const add = (name: string, rows: unknown[][]) => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), name)

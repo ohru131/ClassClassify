@@ -9,6 +9,6 @@
       "xlsx-js-style": ["./node_modules/xlsx-js-style"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "../src/solver/**/*.ts", "expo-env.d.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "../src/solver/**/*.ts", "../src/i18n/**/*.ts", "expo-env.d.ts"],
   "exclude": ["node_modules", "dist", "../src/solver/worker.ts", "../src/solver/run.ts"]
 }

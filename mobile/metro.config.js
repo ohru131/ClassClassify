@@ -1,5 +1,5 @@
 // スマホ版は Web 版と同じソルバー（../src/solver）を共有する。
-// - watchFolders: リポジトリ直下の src/solver をバンドル対象に入れる
+// - watchFolders: リポジトリ直下の src/solver と src/i18n をバンドル対象に入れる
 // - resolveRequest: 共有コードが import する xlsx-js-style を、リポジトリ直下ではなく
 //   mobile/node_modules から解決する（EAS ビルドでは直下の node_modules が無いため）
 // - xlsx-js-style が require する旧 .xls 用の文字コード表（約470KB）はスタブに差し替える
@@ -10,11 +10,13 @@ const path = require('path')
 const projectRoot = __dirname
 const repoRoot = path.resolve(projectRoot, '..')
 const sharedSolver = path.join(repoRoot, 'src', 'solver')
+// 言語の定義・判定（Web 版と共通）
+const sharedI18n = path.join(repoRoot, 'src', 'i18n')
 const cpexcelStub = path.join(projectRoot, 'stubs', 'cpexcel.cjs')
 const SHARED_DEPENDENCIES = new Set(['xlsx-js-style'])
 
 const config = getDefaultConfig(projectRoot)
-config.watchFolders = [...(config.watchFolders ?? []), sharedSolver]
+config.watchFolders = [...(config.watchFolders ?? []), sharedSolver, sharedI18n]
 config.resolver.nodeModulesPaths = [path.join(projectRoot, 'node_modules')]
 
 const upstream = config.resolver.resolveRequest

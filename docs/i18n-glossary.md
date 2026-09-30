@@ -71,27 +71,46 @@
 - 「組」は **turma**、学年は **ano**。
 - 「LGPD に準拠」と断言しない。「os dados dos alunos não saem do aparelho」と事実を書く。
 
-## 3. 配慮の必要な項目名（サンプル・ひな形）
+## 3. サンプル名簿の項目（国ごとに作り替え）
 
-性別や支援の必要性は、ラベルそのものが生徒を指す言葉になる。サンプルでは次の表現を使う（`mobile/scripts/generate-samples.ts`）。
+サンプル（`public/samples/<lang>/`、生成は `scripts/generate-samples.ts`、Web 版・スマホ版で共通）は、
+**翻訳ではなく、その国の学校がクラス分けで実際に配慮する項目**で作ってある。各サンプルに
+「該当（✓）」「カテゴリ（数種類）」「数値（7種類以上の点数 → 平均を揃える）」の3種類と、
+同じ組・別の組の指定が入る（`test/samples.test.ts` が全言語で違反0・全項目が理想範囲内を確認）。
 
-| 日本語のサンプル | en | ko | es | de | pt-BR |
-|---|---|---|---|---|---|
-| 性別♀（該当＝女子） | Girl | 여학생 | Niña | Mädchen | Menina |
-| 学習支援 | Learning support | 학습 지원 | Apoyo en el aprendizaje | Lernförderung | Apoio à aprendizagem |
-| 登校支援 | Attendance support | 등교 지원 | Apoyo a la asistencia | Unterstützung Anwesenheit | Apoio à frequência |
-| 視覚配慮 | Vision support | 시각 지원 | Apoyo visual | Unterstützung Sehen | Apoio visual |
-| 情緒面の配慮 | Emotional support | 정서 지원 | Apoyo emocional | Emotionale Unterstützung | Apoio emocional |
-| 走力 | Running | 달리기 | Velocidad | Laufen | Corrida |
-| ピアノ | Piano | 피아노 | Piano | Klavier | Piano |
-| 学習 | Academics | 학업 | Desempeño académico | Leistung | Desempenho |
-| 体育 | PE | 체육 | Educación física | Sport | Educação física |
-| PTA | Parent committee | 학부모회 | Comité de familias | Elternbeirat | Conselho de pais |
-| 協調性 | Teamwork | 협동심 | Trabajo en equipo | Teamfähigkeit | Cooperação |
-| 前回の組 | Previous group | 이전 모둠 | Grupo anterior | Vorherige Gruppe | Grupo anterior |
+### 3.1 項目の一覧
 
-- 診断名・制度名（IEP・NEE・Förderbedarf・특수교육대상 など）は**サンプルに入れない**（制度は国ごとに違い、診断名は機微な情報のため）。学校が自分の名簿で使う名前を入れる。
-- 「該当」の印はサンプルでは ja `○`、他言語 `✓`。どちらも1種類の値なら「該当」として扱われる。
+| 言語 | sample1（80名・4組） | sample2（80名・シンプル） | sample-group（30名・6班） |
+|---|---|---|---|
+| ja | 性別♀・学習支援・登校支援・視覚配慮（該当）、情緒面の配慮・走力・ピアノ・学習・体育（1〜3）、PTA（該当）、**テスト平均（点数）** | 性別♀・学習支援・登校支援・学習・協調性（該当）、走力・ピアノ（カテゴリ）、**テスト平均** | 性別♀・走力・ピアノ・学習（該当）、体育・前回の組（カテゴリ）、**50m走（秒）** |
+| en | Gender (F/M)、Reading score（点数）、Math level（1〜3）、IEP/504 plan・English learner・Behavior support・Leadership（✓） | Gender、Reading score、IEP/504 plan、Previous class（A〜D） | Gender、Reading score、Leadership、Previous group（1〜6） |
+| ko | 성별(여/남)、학업 성취도（点数）、교우 관계（원만/보통/지원 필요）、특수교육 대상・한국어 지원・리더십（✓）、출신 초등학교（4校） | 성별、학업 성취도、특수교육 대상、이전 반（1〜4반） | 성별、학업 성취도、리더십、이전 모둠（1〜6） |
+| es | Género (F/M)、Promedio de notas（4,0〜7,0）、NEE (PIE)・Liderazgo（✓）、Convivencia escolar（Sin observaciones/Seguimiento）、Grupo de origen（A〜D） | Género、Promedio de notas、NEE (PIE)、Grupo de origen | Género、Promedio de notas、Liderazgo、Equipo anterior（1〜6） |
+| de | Geschlecht (w/m)、Notenschnitt（1,0〜4,0）、Förderbedarf・DaZ（✓）、Verhalten（unauffällig/Unterstützung）、Herkunftsgrundschule（4校） | Geschlecht、Notenschnitt、Förderbedarf、Herkunftsgrundschule | Geschlecht、Notenschnitt、Teamfähigkeit、Vorherige Gruppe（1〜6） |
+| pt-BR | Gênero (F/M)、Média（5,0〜10,0）、AEE・Liderança（✓）、Convivência（Tranquila/Acompanhamento）、Turma de origem（A〜D） | Gênero、Média、AEE、Turma de origem | Gênero、Média、Liderança、Grupo anterior（1〜6） |
+
+全言語共通で、同じ組（友だちの希望）と別の組（離す必要のある生徒）の指定を入れてある（sample-group は別の組のみ。日本語の元サンプルに合わせた）。
+
+### 3.2 根拠
+
+| 項目 | 根拠（資料と節） |
+|---|---|
+| 学力の平均を揃える（点数・成績の平均） | `pain-points-and-target.md` 1.2「学力: 平均点・成績分布を均等化」、`overseas-demand.md` A.1（ブラジルは学力の異質性＝混ぜる）、O 節 es（スペインは成績で同質な組を作るのが禁止 → 平均を揃える） |
+| 前の組・出身校を散らす（Previous class / 출신 초등학교 / Herkunftsgrundschule / Grupo・Turma de origen） | `pain-points-and-target.md` 0 節 10「前年度クラスの分散」、`overseas-demand.md` C（韓国の中学は出身小学校の割合を考慮）、D（Klasse 5 の「出身小学校の大集団は避ける」） |
+| 支援の必要性（IEP/504・특수교육 대상・Förderbedarf・NEE (PIE)・AEE・学習支援） | `pain-points-and-target.md` 1.2「支援の必要性」、`overseas-demand.md` O 節（米 IEP/504、韓 특수교육대상、独 Förderbedarf、es-419 NEE、チリ PIE、pt-BR AEE）、A.7 |
+| 言語の支援（English learner・한국어 지원・DaZ） | `overseas-demand.md` O 節 en（EAL/ESL/ELL）・de（DaZ）。韓国は O 節 ko の「다문화 を属性名の既定値に置かない」に従い、**家庭の属性ではなく必要な支援（한국어 지원）**で表す |
+| 行動・関係（Behavior support・교우 관계・Verhalten・Convivencia escolar・Convivência） | `pain-points-and-target.md` 1.2「行動面: 海外では学力・社会性・行動の3軸」、`overseas-demand.md` B.2（米の基準に behavior）、A.1（ブラジルの「行動の異質性」）。値は「支援が要る/要らない」の中立な語にし、子どもを評価する語（良い/悪い）は使わない |
+| リーダー性（Leadership・리더십・Liderazgo・Liderança・Teamfähigkeit） | `pain-points-and-target.md` 1.2「リーダー性・積極性: 学級委員候補を分散」 |
+| 別の組（離す） | `pain-points-and-target.md` 1.2「人間関係（分離）」、`overseas-demand.md` C（学校暴力予防法の分離義務。ただしアプリ内では 학교폭력 の語を使わず「분리 배정」と書く） |
+| 同じ組（友だちの希望） | `pain-points-and-target.md` 1.2「海外では友だち4人を書かせ最低1人と同じ組」、`overseas-demand.md` B.1・D（Freundschaftswunsch） |
+| 日本語だけの項目（ピアノ・PTA・走力・登校支援） | `pain-points-and-target.md` 1.2（合唱の伴奏者を各組1人以上、運動会の戦力、欠席がちな子への配慮）。日本の学校行事に固有なので他言語には入れない |
+
+### 3.3 表現のルール
+
+- 性別は各言語の中立な略記（F/M、여/남、w/m）にし、男女を半々にした。選択肢は学校が自由に決められる（アプリは値の種類を固定しない）。
+- 診断名・国籍・家庭事情は項目名にしない。**必要な支援**の名前にする（「障害」ではなく IEP/504・특수교육 대상、「外国籍・多文化」ではなく English learner・한국어 지원・DaZ）。
+- es の「Grupo de origen」: 調査資料は「curso de origen」も挙げているが、`curso` はスペインで学年・チリで組を指して階層がずれる（A.7）ため、UI と同じ **grupo** に揃えた。
+- 氏名は、その国で一般的な名と姓を機械的に組み合わせた架空のもの（性別は半々）。
 
 ## 4. ネイティブスピーカーに確認してほしい箇所
 
@@ -99,3 +118,4 @@
 - es: 「Armar grupos」（チリ・アルゼンチンでは自然、メキシコで違和感が無いか）、「Comité de familias」。
 - de: 「Unterstützung Anwesenheit」「Wünsche」（ペア指定の総称。保護者の友だち希望と区別がつくか）。
 - pt-BR: 「Enturmação」をシート名に使ってよいか（学校の事務用語として通じるか）。
+- サンプルの項目名・値: ko「교우 관계」の値「지원 필요」、「한국어 지원」／de「Verhalten: unauffällig / Unterstützung」「Notenschnitt」の向き（1,0 が最良）／es「Convivencia escolar: Seguimiento」「NEE (PIE)」（チリ以外で通じるか）／pt-BR「Convivência: Acompanhamento」「AEE」。

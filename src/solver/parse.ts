@@ -1,4 +1,5 @@
-import * as XLSX from 'xlsx-js-style'
+import type { WorkBook } from 'xlsx-js-style'
+import XLSX from './xlsx'
 import { detectKind } from './columns'
 import type { ColumnSpec, Problem, Student } from './types'
 import { isClassCountKey, isMaxPerClassKey, isNameHeader, isNoHeader, JA_PARSE_MESSAGES, SHEET_ALIASES, type ParseMessages } from './labels'
@@ -14,14 +15,14 @@ const toNumber = (v: unknown): number | null => {
   return Number.isFinite(x) ? x : null
 }
 
-function sheetRows(wb: XLSX.WorkBook, name: string): Row[] | null {
+function sheetRows(wb: WorkBook, name: string): Row[] | null {
   const ws = wb.Sheets[name]
   if (!ws) return null
   return XLSX.utils.sheet_to_json<Row>(ws, { header: 1, defval: null, raw: true, blankrows: true })
 }
 
 /** 別名のうち最初に見つかったシート（日本語の名前を最初に探す）。名前も返す（警告に使う） */
-function findSheet(wb: XLSX.WorkBook, aliases: string[]): { rows: Row[] | null; name: string } {
+function findSheet(wb: WorkBook, aliases: string[]): { rows: Row[] | null; name: string } {
   for (const a of aliases) if (wb.Sheets[a]) return { rows: sheetRows(wb, a), name: a }
   return { rows: null, name: aliases[0] }
 }

@@ -54,11 +54,12 @@ describe('UI 文言', () => {
 })
 
 describe.each(APP_LANGUAGES)('%s のサンプル', (lang) => {
-  it.each(samplesFor(lang).map((s) => s.id))('%s: 条件違反0・人数差1以内に到達する', async (id) => {
+  it.each(samplesFor(lang).map((s) => s.id))('%s: 条件違反0・全項目が理想範囲内・人数差1以内に到達する', async (id) => {
     const { problem } = loadSample(lang, id)
-    const res = await runSliced(compile(problem).compiled, { timeMs: 700, starts: 1, seed: 7, yieldToUi: async () => {} }).promise
+    const res = await runSliced(compile(problem).compiled, { timeMs: 800, starts: 1, seed: 7, yieldToUi: async () => {} }).promise
     const report = evaluate(problem, res.classOf, problem.numClasses)
     expect(report.violations).toEqual([])
+    expect(report.totalExcess).toBe(0)
     expect(Math.max(...report.sizes) - Math.min(...report.sizes)).toBeLessThanOrEqual(1)
   })
 

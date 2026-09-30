@@ -6,23 +6,20 @@ import { readFileSync } from 'node:fs'
 import { SAMPLE_FILES } from '../lib/samples.generated'
 
 describe('サンプル', () => {
-  it('埋め込んだ base64 が public/ の Excel と一致する（npm run samples:generate し忘れの検出）', () => {
-    for (const s of SAMPLE_FILES.ja) {
-      const b = readFileSync(new URL(`../../public/${s.id}.xlsx`, import.meta.url))
-      expect(s.base64).toBe(b.toString('base64'))
-    }
+  it('埋め込んだ base64 が public/samples/ の Excel と一致する（npm run samples:embed し忘れの検出）', () => {
+    for (const lang of APP_LANGUAGES)
+      for (const s of SAMPLE_FILES[lang]) {
+        const b = readFileSync(new URL(`../../public/samples/${lang}/${s.id}.xlsx`, import.meta.url))
+        expect(s.base64, `${lang}/${s.id}`).toBe(b.toString('base64'))
+      }
   })
-  it.each(APP_LANGUAGES)('%s: 全サンプルが警告なしで読め、日本語のサンプルと同じ構造を持つ', (lang) => {
+  it.each(APP_LANGUAGES)('%s: 全サンプルが警告なしで読め、3種類の項目とペア指定を含む', (lang) => {
     expect(samplesFor(lang).map((s) => s.id)).toEqual(['sample1', 'sample2', 'sample-group'])
     for (const s of samplesFor(lang)) {
       const { problem } = loadSample(lang, s.id)
-      const ja = loadSample('ja', s.id).problem
       expect(problem.warnings).toEqual([])
-      expect(problem.students.length).toBe(ja.students.length)
-      expect(problem.numClasses).toBe(ja.numClasses)
-      expect(problem.columns.map((c) => [c.kind, c.levels.length, c.weight])).toEqual(ja.columns.map((c) => [c.kind, c.levels.length, c.weight]))
-      expect(problem.wantedGroups).toEqual(ja.wantedGroups)
-      expect(problem.unwantedGroups).toEqual(ja.unwantedGroups)
+      expect(new Set(problem.columns.map((c) => c.kind))).toEqual(new Set(['flag', 'category', 'numeric']))
+      expect(problem.unwantedGroups.length).toBeGreaterThan(0)
       expect(new Set(problem.students.map((x) => x.name)).size).toBe(problem.students.length)
       if (lang !== 'ja') expect(JSON.stringify(problem)).not.toMatch(/[ぁ-んァ-ヶ一-龥○]/)
     }
