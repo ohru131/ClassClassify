@@ -73,13 +73,17 @@ export function parseWorkbook(data: ArrayBuffer): Problem {
   const noToIndex = new Map<number, number>()
   for (let r = 2; r < roster.length; r++) {
     const row = roster[r]
-    const no = toNumber(row[c0])
-    if (no === null) continue
+    const rawNo = toNumber(row[c0])
+    if (rawNo === null) {
+      if (cellStr(row[c1]) !== '') warnings.push(`生徒名簿 ${r + 1}行目: 「${cellStr(row[c1])}」の NO が空欄のため読み込みませんでした`)
+      continue
+    }
+    const no = Math.trunc(rawNo)
     const values: Record<string, string> = {}
     for (const { col, name } of attrCols) values[name] = normalizeMark(cellStr(row[col]))
     if (noToIndex.has(no)) warnings.push(`出席番号 ${no} が重複しています`)
-    noToIndex.set(Math.trunc(no), students.length)
-    students.push({ no: Math.trunc(no), name: cellStr(row[c1]), values })
+    noToIndex.set(no, students.length)
+    students.push({ no, name: cellStr(row[c1]), values })
   }
   if (students.length === 0) throw new Error('生徒データがありません（3行目以降に NO と名前を入力してください）')
 

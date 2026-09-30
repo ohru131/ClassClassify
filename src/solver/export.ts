@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx'
 import type { Problem } from './types'
 import type { Report } from './evaluate'
-import { rosterRows } from './roster'
+import { rosterRows, toCell } from './roster'
 
 export type Cell = string | number | null
 export interface SheetData {
@@ -29,7 +29,7 @@ export function buildResultSheets(p: Problem, classOf: number[], k: number, repo
   return [
     {
       name: '組分け',
-      rows: [['NO', '名前', '組', ...cols], ...p.students.map((s, i) => [s.no, s.name, className(classOf[i]), ...cols.map((c) => s.values[c])])],
+      rows: [['NO', '名前', '組', ...cols], ...p.students.map((s, i) => [s.no, s.name, className(classOf[i]), ...cols.map((c) => toCell(s.values[c]))])],
     },
     { name: 'クラス別名簿', rows: side },
     { name: '集計', rows: summary },
@@ -48,7 +48,7 @@ export function exportWorkbook(p: Problem, classOf: number[], k: number, report:
   for (let c = 0; c < k; c++) {
     add(className(c), [
       ['NO', '名前', ...cols],
-      ...p.students.filter((_, i) => classOf[i] === c).map((s) => [s.no, s.name, ...cols.map((col) => s.values[col])]),
+      ...p.students.filter((_, i) => classOf[i] === c).map((s) => [s.no, s.name, ...cols.map((col) => toCell(s.values[col]))]),
     ])
   }
   add(summary.name, summary.rows)

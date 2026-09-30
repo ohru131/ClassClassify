@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
-import { AlertCircle, Cpu, Loader2, Lock, Play, Square, Zap } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { AlertCircle, Cpu, Loader2, X, Lock, Play, Square, Zap } from 'lucide-react'
 import { parseWorkbook } from './solver/parse'
 import { compile } from './solver/compile'
 import { evaluate } from './solver/evaluate'
@@ -39,6 +39,10 @@ export default function App() {
   const [savedUrl, setSavedUrl] = useState<string | null>(null)
   const [editorTab, setEditorTab] = useState<EditorTab | null>(null)
   const cancelRef = useRef<() => void>(() => {})
+  const problemRef = useRef<Problem | null>(null)
+  useEffect(() => {
+    problemRef.current = problem
+  }, [problem])
   const resultRef = useRef<HTMLDivElement>(null)
 
   const onLoad = (data: ArrayBuffer, name: string, source: GoogleFile | null = null) => {
@@ -75,10 +79,10 @@ export default function App() {
 
   const createTemplate = async () => {
     setTemplateBusy(true)
+    // 自動でタブは開かない（Google 認証ポップアップと競合するため）。ボタンが「作成したひな形を開く」に変わる
     try {
       const file = await createTemplateSpreadsheet()
       setTemplateUrl(file.url)
-      window.open(file.url, '_blank', 'noopener')
     } catch (e) {
       showError(e)
     } finally {
@@ -127,8 +131,15 @@ export default function App() {
     setError(null)
     const job = runParallel(compiled, timeSec * 1000, (f) => setProgress(f))
     cancelRef.current = job.cancel
+    const start = problem
     try {
       const res = await job.promise
+      const now = problemRef.current
+      // 実行中に生徒やペア指定が変わった場合、結果の index が合わないので破棄
+      if (!now || now.students !== start.students || now.wantedGroups !== start.wantedGroups || now.unwantedGroups !== start.unwantedGroups) {
+        setError('実行中に名簿が変更されたため、結果を破棄しました。もう一度実行してください。')
+        return
+      }
       setSavedUrl(null)
       setSolution({ classOf: res.classOf, original: res.classOf, k: numClasses, iterations: res.iterations, workers: res.workers })
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
@@ -140,7 +151,7 @@ export default function App() {
   }
 
   const report = useMemo(
-    () => (problem && solution ? evaluate(problem, solution.classOf, solution.k) : null),
+    () => (problem && solution && solution.classOf.length === problem.students.length ? evaluate(problem, solution.classOf, solution.k) : null),
     [problem, solution],
   )
 
@@ -210,7 +221,12 @@ export default function App() {
 
         {problem && problem.warnings.length > 0 && (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
-            <div className="mb-1 font-semibold">読み込み時の注意</div>
+            <div className="mb-1 flex items-center justify-between font-semibold">
+              読み込み時の注意
+              <button type="button" onClick={() => setProblem({ ...problem, warnings: [] })} className="rounded p-0.5 hover:bg-amber-100" aria-label="閉じる">
+                <X className="size-4" />
+              </button>
+            </div>
             <ul className="list-inside list-disc space-y-0.5">
               {problem.warnings.map((w, i) => (
                 <li key={i}>{w}</li>
