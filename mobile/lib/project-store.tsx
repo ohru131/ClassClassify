@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
+import { useI18n } from './language-provider'
 import { CancelledError, runSliced } from './runner'
 import { compile, evaluate, type ColumnSpec, type Problem, type Report } from './solver'
 import { isStoredProject, type StoredProject } from './stored-project'
@@ -47,6 +48,7 @@ const STORAGE_KEY = 'mosaic.project.v1'
 const ProjectContext = createContext<ProjectContextValue | null>(null)
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
+  const { t } = useI18n()
   const [hydrated, setHydrated] = useState(false)
   const [problem, setProblem] = useState<Problem | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
@@ -156,7 +158,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     const start = problemRef.current
     if (!start || runningRef.current) return false
     if (start.students.length < numClasses) {
-      setError(`生徒数（${start.students.length}名）がクラス数（${numClasses}）より少ないため編成できません。`)
+      setError(t('tooFew', { n: start.students.length, k: numClasses }))
       return false
     }
     runningRef.current = true
@@ -171,7 +173,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       const now = problemRef.current
       // 実行中に生徒やペア指定が変わった場合は index が合わないので破棄（Web 版と同じ）
       if (!now || now.students !== start.students || now.wantedGroups !== start.wantedGroups || now.unwantedGroups !== start.unwantedGroups) {
-        setError('実行中に名簿が変更されたため、結果を破棄しました。もう一度実行してください。')
+        setError(t('discarded'))
         return false
       }
       setSolution({ classOf: res.classOf, original: res.classOf, k: numClasses, iterations: res.iterations, starts: res.starts })
@@ -184,7 +186,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       runningRef.current = false
       setRunning(false)
     }
-  }, [numClasses, timeSec])
+  }, [numClasses, timeSec, t])
 
   const cancel = useCallback(() => cancelRef.current(), [])
 

@@ -2,16 +2,20 @@ import { useMemo, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 
 import { roster, UNWANTED_COLOR, wantedColor, type Problem } from '@/lib/solver'
+import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { C } from './theme'
 import { Btn, Card, Notice, styles } from './ui'
 
 type Kind = 'wanted' | 'unwanted'
-const TITLE: Record<Kind, string> = { wanted: '同じ組にする', unwanted: '別の組にする' }
-const nameOf = (p: Problem, i: number) => p.students[i].name || `NO ${p.students[i].no}`
+const TITLE_KEY = { wanted: 'wantedTitle', unwanted: 'unwantedTitle' } as const
+const nameOf = (p: Problem, i: number, no: string) => p.students[i].name || `${no} ${p.students[i].no}`
 
 /** 「同じ組」「別の組」の指定。作成・編集はチェックリストで生徒を選ぶ（長押し・ドラッグ不要） */
 export function GroupEditor({ problem, kind, onChange }: { problem: Problem; kind: Kind; onChange: (f: (p: Problem) => Problem) => void }) {
+  const { t, file } = useI18n()
+  const who = (i: number) => nameOf(problem, i, file.no)
+  const prefix = file.tagPrefix[kind]
   const groups = kind === 'wanted' ? problem.wantedGroups : problem.unwantedGroups
   // editing: null=一覧、-1=新規、0以上=そのグループを編集
   const [editing, setEditing] = useState<number | null>(null)
@@ -22,7 +26,7 @@ export function GroupEditor({ problem, kind, onChange }: { problem: Problem; kin
       <MemberPicker
         key={`${kind}${editing}`}
         problem={problem}
-        title={editing < 0 ? `${TITLE[kind]}指定を追加` : `${kind === 'wanted' ? '同' : '別'}${editing + 1} を編集`}
+        title={editing < 0 ? t('addConditionTitle', { kind: t(TITLE_KEY[kind]) }) : t('editConditionTitle', { label: `${prefix}${editing + 1}` })}
         initial={editing >= 0 ? (groups[editing] ?? []) : []}
         onCancel={() => setEditing(null)}
         onSave={(members) => {
@@ -37,32 +41,32 @@ export function GroupEditor({ problem, kind, onChange }: { problem: Problem; kin
       {conflicts.length ? (
         <Notice tone="error">
           <Text style={{ color: C.danger, fontSize: 13 }}>
-            矛盾する指定があります: {conflicts.map(([a, b]) => `${nameOf(problem, a)} と ${nameOf(problem, b)}`).join('、')} は「同じ組」でつながっているのに「別の組」にも指定されています。
+            {t('conflict', { pairs: conflicts.map(([a, b]) => t('conflictPair', { a: who(a), b: who(b) })).join(file.listSep) })}
           </Text>
         </Notice>
       ) : null}
       <Card style={{ gap: 10 }}>
         <View style={[styles.row, { justifyContent: 'space-between', flexWrap: 'wrap' }]}>
           <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }}>
-            {TITLE[kind]} <Text style={{ fontSize: 13, color: C.muted, fontWeight: '600' }}>{groups.length} 件</Text>
+            {t(TITLE_KEY[kind])} <Text style={{ fontSize: 13, color: C.muted, fontWeight: '600' }}>{t('conditionsCount', { n: groups.length })}</Text>
           </Text>
-          <Btn variant="soft" icon="add" label="指定を追加" onPress={() => setEditing(-1)} />
+          <Btn variant="soft" icon="add" label={t('addCondition')} onPress={() => setEditing(-1)} />
         </View>
         <Text style={{ fontSize: 12, color: C.sub }}>
-          {kind === 'wanted' ? '選んだ生徒全員を同じ組に置きます（3人以上も可）。' : '選んだ生徒どうしを互いに別の組にします。'}
+          {t(kind === 'wanted' ? 'wantedHelp' : 'unwantedHelp')}
         </Text>
-        {groups.length === 0 ? <Text style={{ color: C.muted }}>指定はありません。</Text> : null}
+        {groups.length === 0 ? <Text style={{ color: C.muted }}>{t('noConditions')}</Text> : null}
         {groups.map((g, gi) => {
           const color = kind === 'wanted' ? wantedColor(gi) : UNWANTED_COLOR
           return (
             <View key={gi} style={[styles.row, { backgroundColor: color.bg, borderRadius: 12, padding: 10 }]}>
               <Text style={{ fontWeight: '800', color: color.fg, width: 40 }}>
-                {kind === 'wanted' ? '同' : '別'}
+                {prefix}
                 {gi + 1}
               </Text>
-              <Text style={{ flex: 1, color: C.text, fontSize: 14 }}>{g.map((i) => nameOf(problem, i)).join('・')}</Text>
-              <Btn small icon="create-outline" accessibilityLabel="編集" onPress={() => setEditing(gi)} />
-              <Btn small variant="danger" icon="trash-outline" accessibilityLabel="削除" onPress={() => onChange((p) => roster.removeGroup(p, kind, gi))} />
+              <Text style={{ flex: 1, color: C.text, fontSize: 14 }}>{g.map(who).join(file.joinSep)}</Text>
+              <Btn small icon="create-outline" accessibilityLabel={t('edit')} onPress={() => setEditing(gi)} />
+              <Btn small variant="danger" icon="trash-outline" accessibilityLabel={t('delete')} onPress={() => onChange((p) => roster.removeGroup(p, kind, gi))} />
             </View>
           )
         })}
@@ -75,6 +79,7 @@ function MemberPicker({ problem, title, initial, onSave, onCancel }: { problem: 
   const [picked, setPicked] = useState<number[]>(initial)
   const [query, setQuery] = useState('')
   const { isWide } = useLayout()
+  const { t, file } = useI18n()
   const q = query.trim()
   const rows = problem.students.map((_, i) => i).filter((i) => !q || problem.students[i].name.includes(q) || String(problem.students[i].no) === q)
   const toggle = (i: number) => setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]))
@@ -82,14 +87,14 @@ function MemberPicker({ problem, title, initial, onSave, onCancel }: { problem: 
     <Card style={{ gap: 10 }}>
       <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }}>{title}</Text>
       <Text style={{ fontSize: 13, color: C.sub }}>
-        選択中: {picked.length ? picked.map((i) => nameOf(problem, i)).join('・') : 'なし'}（2人以上）
+        {t('selectedNames', { names: picked.length ? picked.map((i) => nameOf(problem, i, file.no)).join(file.joinSep) : t('selectedNone') })}
       </Text>
       <View style={[styles.row, { flexWrap: 'wrap' }]}>
-        <Btn variant="primary" icon="checkmark" label="保存" disabled={picked.length < 2 && initial.length === 0} onPress={() => onSave(picked)} />
-        <Btn label="キャンセル" onPress={onCancel} />
-        {initial.length > 0 && picked.length < 2 ? <Text style={{ fontSize: 12, color: C.warn }}>2人未満で保存するとこの指定は削除されます</Text> : null}
+        <Btn variant="primary" icon="checkmark" label={t('save')} disabled={picked.length < 2 && initial.length === 0} onPress={() => onSave(picked)} />
+        <Btn label={t('cancel')} onPress={onCancel} />
+        {initial.length > 0 && picked.length < 2 ? <Text style={{ fontSize: 12, color: C.warn }}>{t('willDelete')}</Text> : null}
       </View>
-      <TextInput style={styles.input} value={query} onChangeText={setQuery} placeholder="名前・NO で絞り込み" accessibilityLabel="生徒の絞り込み" />
+      <TextInput style={styles.input} value={query} onChangeText={setQuery} placeholder={t('filterNames')} accessibilityLabel={t('filterNames')} />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
         {rows.map((i) => {
           const on = picked.includes(i)
@@ -119,7 +124,7 @@ function MemberPicker({ problem, title, initial, onSave, onCancel }: { problem: 
               <Text style={{ fontSize: 16, color: on ? C.primary : C.muted }}>{on ? '☑' : '☐'}</Text>
               <Text style={{ fontSize: 12, color: C.muted, width: 26 }}>{s.no}</Text>
               <Text style={{ flex: 1, fontSize: 14, color: C.text }} numberOfLines={1}>
-                {s.name || '（名前なし）'}
+                {s.name || t('noName')}
               </Text>
             </Pressable>
           )

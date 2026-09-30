@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Mosaic 반 편성"
+  },
+  "android": {
+    "app_name": "Mosaic 반 편성"
+  }
+}

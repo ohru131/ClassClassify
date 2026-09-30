@@ -2,6 +2,7 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useM
 import { Platform } from 'react-native'
 import Purchases, { type CustomerInfo, LOG_LEVEL, type PurchasesPackage } from 'react-native-purchases'
 
+import { useI18n } from './language-provider'
 import { isWebProPreview } from './pro-preview'
 import { resolvePurchaseMessageKey } from './purchase-message'
 import { selectOneTimePackageFromOfferings } from './purchase-offering'
@@ -10,21 +11,17 @@ import { selectOneTimePackageFromOfferings } from './purchase-offering'
 // 設計は既存アプリ UnitCalc の lib/revenuecat-provider.tsx と同じ（不変条件は mobile/README.md）。
 export const PRO_ENTITLEMENT_IDENTIFIER = 'pro'
 
-const COPY = {
-  purchaseStoreOnly: '購入は iOS / Android のアプリ版でご利用いただけます。',
-  revenueCatKeyMissing: 'RevenueCat の公開 SDK キーが設定されていません。',
-  customerInfoFetchFailed: '購入情報を取得できませんでした。時間をおいてもう一度お試しください。',
-  purchaseSucceeded: 'ご購入ありがとうございます。Pro が有効になりました（買い切りのため、今後の請求はありません）。',
-  purchaseNotApplied:
-    'お支払いは完了しましたが、Pro をまだ有効にできていません。「購入を復元」を押してください。それでも有効にならない場合はサポートへご連絡ください（二重に請求されることはありません）。',
-  purchaseFailed: '購入を完了できませんでした。もう一度お試しください。',
-  productLoadFailed: 'ストアから Pro の商品を読み込めませんでした。通信状況を確認して、もう一度お試しください。',
-  proRestored: 'Pro の購入を復元しました。',
-  noRestorablePurchase: '復元できる Pro の購入が見つかりませんでした。',
-  restoreFailed: '購入を復元できませんでした。もう一度お試しください。',
-} as const
-
-type PurchaseMessageKey = keyof typeof COPY
+type PurchaseMessageKey =
+  | 'purchaseStoreOnly'
+  | 'revenueCatKeyMissing'
+  | 'customerInfoFetchFailed'
+  | 'purchaseSucceeded'
+  | 'purchaseNotApplied'
+  | 'purchaseFailed'
+  | 'productLoadFailed'
+  | 'proRestored'
+  | 'noRestorablePurchase'
+  | 'restoreFailed'
 
 type ProContextValue = {
   isPro: boolean
@@ -57,6 +54,8 @@ function isUserCancelledError(error: unknown): boolean {
 }
 
 export function RevenueCatProvider({ children }: { children: ReactNode }) {
+  // 文言は表示の直前に選択中の言語で引く（state にはキーだけを持つ）
+  const { t } = useI18n()
   const [isEntitled, setIsPro] = useState(false)
   const [webPreview] = useState(() => isWebProPreview(Platform.OS, typeof window !== 'undefined' ? window.location?.search : undefined))
   const isPro = isEntitled || webPreview
@@ -75,7 +74,7 @@ export function RevenueCatProvider({ children }: { children: ReactNode }) {
   const blockedReasonKey: PurchaseMessageKey | null = !isNativePurchaseAvailable ? 'purchaseStoreOnly' : !platformKey ? 'revenueCatKeyMissing' : null
   const isReady = blockedReasonKey !== null ? true : isNativeReady
   const messageKey = resolvePurchaseMessageKey(purchaseMessageKey, blockedReasonKey, isPro)
-  const purchaseMessage = messageKey ? COPY[messageKey] : null
+  const purchaseMessage = messageKey ? t(messageKey) : null
   // 価格はストアのローカライズ済み文字列をそのまま出す
   const priceLabel = oneTimePackage ? oneTimePackage.product.priceString : null
 

@@ -2,55 +2,67 @@ import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Text, View } from 'react-native'
 
+import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
-import { blankProblem, loadSample, SAMPLES } from '@/lib/samples'
-import { parseWorkbook } from '@/lib/solver'
-import { pickXlsx } from '@/lib/xlsx-files'
+import { blankProblem, loadSample, samplesFor } from '@/lib/samples'
+import { parseWorkbook, rosterWorkbook } from '@/lib/solver'
+import { pickXlsx, shareXlsx } from '@/lib/xlsx-files'
 import { C } from './theme'
 import { Btn, Card, styles, Title } from './ui'
 
-/** 名簿の読み込み（Excel・サンプル・新規作成） */
+/** 名簿の読み込み（Excel・サンプル・新規作成）と、ひな形の入手（無料） */
 export function LoadPanel({ onDone }: { onDone?: () => void }) {
   const { loadProblem, setError } = useProject()
+  const { lang, t, parseMessages, fileLang } = useI18n()
   const { isWide } = useLayout()
   const router = useRouter()
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState<null | 'pick' | 'template'>(null)
+  const fail = (e: unknown) => setError(e instanceof Error ? e.message : String(e))
 
   const pick = async () => {
-    setBusy(true)
+    setBusy('pick')
     try {
       const f = await pickXlsx()
       if (!f) return
-      loadProblem(parseWorkbook(f.data), f.name)
+      loadProblem(parseWorkbook(f.data, parseMessages), f.name)
       onDone?.()
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
+      fail(e)
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
+  const template = () => {
+    setBusy('template')
+    // ひな形はその言語のシート名・見出しで作る（どの言語のファイルも読み込める）
+    shareXlsx(rosterWorkbook(blankProblem(lang, 5), 2, fileLang), `${t('fileTemplate')}.xlsx`, t('sharingUnavailable'))
+      .catch(fail)
+      .finally(() => setBusy(null))
+  }
+
+  const grow = isWide ? undefined : { flexGrow: 1 }
   return (
     <Card>
-      <Title sub="ひな形の Excel（Web 版と同じ形式）に生徒の特性を記入して選ぶか、サンプル・新規作成から始めます。名簿はこの端末の中だけに保存されます。">
-        名簿を読み込む
-      </Title>
+      <Title sub={t('loadDesc')}>{t('loadTitle')}</Title>
       <View style={[styles.wrap, { marginTop: 4 }]}>
-        <Btn variant="primary" icon="document-attach" label="Excel ファイルを選ぶ（.xlsx）" busy={busy} onPress={pick} style={isWide ? undefined : { flexGrow: 1 }} />
+        <Btn variant="primary" icon="document-attach" label={t('pickFile')} busy={busy === 'pick'} onPress={pick} style={grow} />
         <Btn
           icon="create-outline"
-          label="新しい名簿を作る"
+          label={t('newRoster')}
           onPress={() => {
-            loadProblem(blankProblem(), '新しい名簿')
+            loadProblem(blankProblem(lang), t('newRosterName'))
             onDone?.()
           }}
-          style={isWide ? undefined : { flexGrow: 1 }}
+          style={grow}
         />
+        <Btn icon="download-outline" label={t('getTemplate')} busy={busy === 'template'} onPress={template} style={grow} />
       </View>
-      <Text style={[styles.label, { marginTop: 16 }]}>サンプルで試す</Text>
+      <Text style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>{t('templateHint')}</Text>
+      <Text style={[styles.label, { marginTop: 16 }]}>{t('trySamples')}</Text>
       <View style={styles.wrap}>
-        {SAMPLES.map((s) => (
+        {samplesFor(lang).map((s) => (
           <Btn
             key={s.id}
             small
@@ -59,18 +71,18 @@ export function LoadPanel({ onDone }: { onDone?: () => void }) {
             label={s.label}
             onPress={() => {
               try {
-                const { problem, name } = loadSample(s.id)
-                loadProblem(problem, name)
+                const { problem, label } = loadSample(lang, s.id)
+                loadProblem(problem, t('samplePrefix', { label }))
                 onDone?.()
               } catch (e) {
-                setError(e instanceof Error ? e.message : String(e))
+                fail(e)
               }
             }}
           />
         ))}
       </View>
       <Text style={{ fontSize: 12, color: C.muted, marginTop: 14 }} onPress={() => router.push('/privacy')} accessibilityRole="link">
-        データの扱い（プライバシーポリシー）›
+        {t('privacyLink')}
       </Text>
     </Card>
   )

@@ -4,6 +4,7 @@ import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { C } from '@/components/theme'
+import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 
@@ -11,6 +12,7 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets()
   const { isWide } = useLayout()
   const { report } = useProject()
+  const { t } = useI18n()
   return (
     <View style={{ flex: 1, paddingTop: insets.top, backgroundColor: C.bg }}>
       <Tabs
@@ -24,17 +26,17 @@ export default function TabsLayout() {
           tabBarLabelStyle: { fontSize: 12, fontWeight: '700' },
         }}
       >
-        <Tabs.Screen name="index" options={{ title: '名簿', tabBarIcon: ({ color, size }) => <Ionicons name="people" color={color} size={size} /> }} />
-        <Tabs.Screen name="run" options={{ title: '設定・実行', tabBarIcon: ({ color, size }) => <Ionicons name="options" color={color} size={size} /> }} />
+        <Tabs.Screen name="index" options={{ title: t('tabRoster'), tabBarIcon: ({ color, size }) => <Ionicons name="people" color={color} size={size} /> }} />
+        <Tabs.Screen name="run" options={{ title: t('tabRun'), tabBarIcon: ({ color, size }) => <Ionicons name="options" color={color} size={size} /> }} />
         <Tabs.Screen
           name="results"
           options={{
-            title: '結果',
+            title: t('tabResults'),
             tabBarIcon: ({ color, size }) => <Ionicons name="grid" color={color} size={size} />,
             tabBarBadge: report && report.violations.length ? report.violations.length : undefined,
           }}
         />
-        <Tabs.Screen name="pro" options={{ title: 'Pro・設定', tabBarIcon: ({ color, size }) => <Ionicons name="star" color={color} size={size} /> }} />
+        <Tabs.Screen name="pro" options={{ title: t('tabPro'), tabBarIcon: ({ color, size }) => <Ionicons name="star" color={color} size={size} /> }} />
       </Tabs>
     </View>
   )

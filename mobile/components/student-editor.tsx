@@ -2,11 +2,12 @@ import { useRef, useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 
 import { confirmAction } from '@/lib/confirm'
+import { useI18n } from '@/lib/language-provider'
 import { roster, type ColumnSpec, type Problem } from '@/lib/solver'
 import { C } from './theme'
 import { Btn, Chip, styles } from './ui'
 
-const KIND_LABEL: Record<ColumnSpec['kind'], string> = { flag: '該当', category: 'カテゴリ', numeric: '数値' }
+const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', numeric: 'kindNumeric' } as const
 
 /**
  * 生徒1人の編集。テキストは入力中は手元に持ち、確定（Enter・フォーカスが外れたとき）で名簿へ反映する
@@ -14,6 +15,7 @@ const KIND_LABEL: Record<ColumnSpec['kind'], string> = { flag: '該当', categor
  * 呼び出し側で key に生徒の index を渡し、別の生徒に切り替えたら作り直すこと。
  */
 export function StudentEditor({ problem, index, onChange, onClose }: { problem: Problem; index: number; onChange: (f: (p: Problem) => Problem) => void; onClose?: () => void }) {
+  const { t, file, lang } = useI18n()
   const s = problem.students[index]
   const [no, setNo] = useState(String(s.no))
   const [name, setName] = useState(s.name)
@@ -23,8 +25,8 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
 
   const commitNo = () => {
     const v = Number(no)
-    if (!Number.isInteger(v) || v <= 0) return setNoError('1以上の整数を入力してください')
-    if (roster.isNoTaken(problem, v, index)) return setNoError(`NO ${v} は他の生徒が使っています`)
+    if (!Number.isInteger(v) || v <= 0) return setNoError(t('noInvalid'))
+    if (roster.isNoTaken(problem, v, index)) return setNoError(t('noTaken', { no: v }))
     setNoError(null)
     if (v !== s.no) onChange((p) => roster.updateStudent(p, index, { no: v }))
   }
@@ -36,12 +38,12 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
   return (
     <View style={{ gap: 14 }}>
       <View style={[styles.row, { justifyContent: 'space-between' }]}>
-        <Text style={{ fontSize: 18, fontWeight: '800', color: C.text }}>生徒の編集</Text>
-        {onClose ? <Btn small icon="close" accessibilityLabel="閉じる" onPress={onClose} /> : null}
+        <Text style={{ fontSize: 18, fontWeight: '800', color: C.text }}>{t('editStudent')}</Text>
+        {onClose ? <Btn small icon="close" accessibilityLabel={t('close')} onPress={onClose} /> : null}
       </View>
       <View style={styles.row}>
         <View style={{ width: 96 }}>
-          <Text style={styles.label}>NO</Text>
+          <Text style={styles.label}>{t('colNo')}</Text>
           <TextInput
             style={[styles.input, noError ? { borderColor: C.danger } : null]}
             value={no}
@@ -53,11 +55,11 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
             }}
             keyboardType="number-pad"
             returnKeyType="next"
-            accessibilityLabel="出席番号"
+            accessibilityLabel={t('colNo')}
           />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.label}>名前</Text>
+          <Text style={styles.label}>{t('colName')}</Text>
           <TextInput
             ref={nameRef}
             style={styles.input}
@@ -66,27 +68,27 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
             onBlur={commitName}
             onSubmitEditing={commitName}
             returnKeyType="done"
-            placeholder="氏名"
-            accessibilityLabel="名前"
+            placeholder={t('namePlaceholder')}
+            accessibilityLabel={t('colName')}
           />
         </View>
       </View>
       {noError ? <Text style={{ color: C.danger, fontSize: 12 }}>{noError}</Text> : null}
 
       {problem.columns.map((c) => (
-        <ValueField key={c.name} column={c} value={s.values[c.name] ?? ''} onCommit={(v) => setValue(c.name, v)} />
+        <ValueField key={c.name} column={c} value={s.values[c.name] ?? ''} onCommit={(v) => setValue(c.name, v)} flagMark={lang === 'ja' ? '○' : '✓'} />
       ))}
-      {problem.columns.length === 0 ? <Text style={{ color: C.muted }}>項目がありません。「項目」タブから追加できます。</Text> : null}
+      {problem.columns.length === 0 ? <Text style={{ color: C.muted }}>{t('noColumns')}</Text> : null}
 
       {groups.wanted[index].length + groups.unwanted[index].length > 0 ? (
         <View>
-          <Text style={styles.label}>ペア指定</Text>
+          <Text style={styles.label}>{t('pairingsLabel')}</Text>
           <View style={styles.wrap}>
             {groups.wanted[index].map((g) => (
-              <Chip key={`w${g}`} label={`同${g + 1}: ${problem.wantedGroups[g].map((i) => problem.students[i].name || problem.students[i].no).join('・')}`} bg="#E0F2FE" fg="#0369A1" />
+              <Chip key={`w${g}`} label={`${file.tagPrefix.wanted}${g + 1}: ${problem.wantedGroups[g].map((i) => problem.students[i].name || problem.students[i].no).join(file.joinSep)}`} bg="#E0F2FE" fg="#0369A1" />
             ))}
             {groups.unwanted[index].map((g) => (
-              <Chip key={`u${g}`} label={`別${g + 1}: ${problem.unwantedGroups[g].map((i) => problem.students[i].name || problem.students[i].no).join('・')}`} bg="#FFE4E6" fg="#BE123C" />
+              <Chip key={`u${g}`} label={`${file.tagPrefix.unwanted}${g + 1}: ${problem.unwantedGroups[g].map((i) => problem.students[i].name || problem.students[i].no).join(file.joinSep)}`} bg="#FFE4E6" fg="#BE123C" />
             ))}
           </View>
         </View>
@@ -95,9 +97,9 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
       <Btn
         variant="danger"
         icon="trash-outline"
-        label="この生徒を削除"
+        label={t('deleteStudent')}
         onPress={async () => {
-          if (await confirmAction('生徒を削除', `${s.no} ${s.name || '（名前なし）'} を名簿から削除します。ペア指定からも外れます。`, '削除')) {
+          if (await confirmAction(t('deleteStudentTitle'), t('deleteStudentBody', { who: `${s.no} ${s.name || t('noName')}` }), t('delete'), t('cancel'))) {
             onClose?.()
             onChange((p) => roster.removeStudents(p, [index]))
           }
@@ -107,7 +109,8 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
   )
 }
 
-function ValueField({ column, value, onCommit }: { column: ColumnSpec; value: string; onCommit: (v: string) => void }) {
+function ValueField({ column, value, onCommit, flagMark }: { column: ColumnSpec; value: string; onCommit: (v: string) => void; flagMark: string }) {
+  const { t } = useI18n()
   // カテゴリは選択肢のチップで選べるので、入力欄には選択肢に無い値だけを出す
   const initial = column.kind === 'category' && column.levels.includes(value) ? '' : value
   const [text, setText] = useState(initial)
@@ -126,12 +129,12 @@ function ValueField({ column, value, onCommit }: { column: ColumnSpec; value: st
   return (
     <View>
       <Text style={styles.label}>
-        {column.name} <Text style={{ color: C.muted, fontWeight: '600' }}>（{KIND_LABEL[column.kind]}）</Text>
+        {column.name} <Text style={{ color: C.muted, fontWeight: '600' }}>({t(KIND_KEY[column.kind])})</Text>
       </Text>
       {column.kind === 'flag' ? (
         <View style={styles.wrap}>
-          <Chip label={column.levels[0] ?? '○'} selected={value !== ''} onPress={() => onCommit(value !== '' ? '' : (column.levels[0] ?? '○'))} />
-          <Chip label="空欄" selected={value === ''} onPress={() => onCommit('')} />
+          <Chip label={column.levels[0] ?? flagMark} selected={value !== ''} onPress={() => onCommit(value !== '' ? '' : (column.levels[0] ?? flagMark))} />
+          <Chip label={t('blank')} selected={value === ''} onPress={() => onCommit('')} />
         </View>
       ) : column.kind === 'category' ? (
         <View style={{ gap: 8 }}>
@@ -139,7 +142,7 @@ function ValueField({ column, value, onCommit }: { column: ColumnSpec; value: st
             {column.levels.map((l) => (
               <Chip key={l} label={l} selected={value === l} onPress={() => onCommit(l)} />
             ))}
-            <Chip label="空欄" selected={value === ''} onPress={() => onCommit('')} />
+            <Chip label={t('blank')} selected={value === ''} onPress={() => onCommit('')} />
           </View>
           <TextInput
             style={styles.input}
@@ -147,8 +150,8 @@ function ValueField({ column, value, onCommit }: { column: ColumnSpec; value: st
             onChangeText={setText}
             onBlur={() => commit(text)}
             onSubmitEditing={() => commit(text)}
-            placeholder="新しい値を入力して確定"
-            accessibilityLabel={`${column.name}の値`}
+            placeholder={t('newValuePlaceholder')}
+            accessibilityLabel={t('valueA11y', { col: column.name })}
           />
         </View>
       ) : (
@@ -159,8 +162,8 @@ function ValueField({ column, value, onCommit }: { column: ColumnSpec; value: st
           onBlur={() => commit(text)}
           onSubmitEditing={() => commit(text)}
           keyboardType="decimal-pad"
-          placeholder="数値"
-          accessibilityLabel={`${column.name}の値`}
+          placeholder={t('numberPlaceholder')}
+          accessibilityLabel={t('valueA11y', { col: column.name })}
         />
       )}
     </View>

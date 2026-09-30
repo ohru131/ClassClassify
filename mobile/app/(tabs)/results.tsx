@@ -4,9 +4,10 @@ import { Pressable, ScrollView, Switch, Text, View } from 'react-native'
 
 import { C, classColor } from '@/components/theme'
 import { Btn, Card, Chip, Notice, Screen, Segmented, Stat, styles } from '@/components/ui'
+import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
-import { pairStatus, resultWorkbook, rowColor, type ColumnReport, type PairTag, type Problem, type Report } from '@/lib/solver'
+import { pairStatus, resultWorkbook, rowColor, violationText, type ColumnReport, type PairTag, type Problem, type Report } from '@/lib/solver'
 import { canSharePdf } from '@/lib/print'
 import { buildResultPrintHtml } from '@/lib/print-html'
 import { useProExport } from '@/lib/use-pro-export'
@@ -19,16 +20,18 @@ export default function ResultsScreen() {
   const { exportXlsx, print, exportPdf, busy, isPro } = useProExport()
   const router = useRouter()
   const { isWide } = useLayout()
+  const i18n = useI18n()
+  const { t, className, fileLang, num } = i18n
   const [tab, setTab] = useState<Tab>('classes')
   const [selected, setSelected] = useState<number | null>(null)
 
   if (!problem || !solution || !report)
     return (
       <Screen>
-        <Text style={{ fontSize: 24, fontWeight: '900', color: C.text }}>結果</Text>
+        <Text style={{ fontSize: 24, fontWeight: '900', color: C.text }}>{t('resultsTitle')}</Text>
         <Card style={{ gap: 10 }}>
-          <Text style={{ color: C.sub }}>まだ編成していません。「設定・実行」タブで実行すると、ここに結果が表示されます。</Text>
-          <Btn variant="primary" icon="play" label="設定・実行へ" onPress={() => router.navigate(problem ? '/run' : '/')} />
+          <Text style={{ color: C.sub }}>{t('notYet')}</Text>
+          <Btn variant="primary" icon="play" label={t('toRunBtn')} onPress={() => router.navigate(problem ? '/run' : '/')} />
         </Card>
       </Screen>
     )
@@ -37,57 +40,62 @@ export default function ResultsScreen() {
   const perfect = report.totalExcess === 0
   const sizeGap = Math.max(...report.sizes) - Math.min(...report.sizes)
   const sel = selected !== null && selected < problem.students.length ? selected : null
-  const printHtmlFor = () => buildResultPrintHtml({ problem, classOf: solution.classOf, k, report, createdAt: new Date() })
+  const printHtmlFor = () => buildResultPrintHtml({ problem, classOf: solution.classOf, k, report, createdAt: new Date(), i18n })
 
   return (
     <View style={{ flex: 1 }}>
       <Screen>
-        <Text style={{ fontSize: 24, fontWeight: '900', color: C.text }}>結果</Text>
+        <Text style={{ fontSize: 24, fontWeight: '900', color: C.text }}>{t('resultsTitle')}</Text>
         {error ? (
           <Notice tone="error" onClose={() => setError(null)}>
             {error}
           </Notice>
         ) : null}
         <View style={styles.wrap}>
-          <Stat label="クラス" value={k} sub={`${problem.students.length} 名を編成`} />
-          <Stat label="人数差" value={sizeGap} sub={`${Math.min(...report.sizes)}〜${Math.max(...report.sizes)} 名`} tone={sizeGap <= 1 ? 'good' : 'bad'} />
-          <Stat label="バランス" value={perfect ? '完全' : report.totalExcess} sub={perfect ? '全項目が理想の範囲内' : '理想範囲からのずれ（人）'} tone={perfect ? 'good' : 'default'} />
+          <Stat label={t('statClasses')} value={k} sub={t('statClassesSub', { n: problem.students.length })} />
+          <Stat label={t('statGap')} value={sizeGap} sub={t('statGapSub', { min: Math.min(...report.sizes), max: Math.max(...report.sizes) })} tone={sizeGap <= 1 ? 'good' : 'bad'} />
           <Stat
-            label="条件違反"
+            label={t('statBalance')}
+            value={perfect ? t('perfect') : num(report.totalExcess, report.totalExcess % 1 ? 1 : 0)}
+            sub={perfect ? t('balancePerfectSub') : t('balanceSub')}
+            tone={perfect ? 'good' : 'default'}
+          />
+          <Stat
+            label={t('statViolations')}
             value={report.violations.length}
-            sub={report.violations.length ? 'ペア条件を満たせていません' : 'ペア条件をすべて満たしています'}
+            sub={report.violations.length ? t('violationsSub') : t('violationsOk')}
             tone={report.violations.length ? 'bad' : 'good'}
           />
         </View>
         <View style={[styles.row, { flexWrap: 'wrap' }]}>
-          {edited ? <Btn small icon="arrow-undo-outline" label="手動変更を戻す" onPress={resetMoves} /> : null}
+          {edited ? <Btn small icon="arrow-undo-outline" label={t('undoMoves')} onPress={resetMoves} /> : null}
           <Btn
             small
             variant="primary"
             icon={isPro ? 'share-outline' : 'lock-closed-outline'}
-            label="結果を Excel で共有"
+            label={t('shareXlsx')}
             busy={busy === 'xlsx'}
-            onPress={() => exportXlsx(() => resultWorkbook(problem, solution.classOf, k, report), 'クラス編成結果')}
+            onPress={() => exportXlsx(() => resultWorkbook(problem, solution.classOf, k, report, fileLang), t('fileResults'))}
           />
           <Btn
             small
             icon={isPro ? 'print-outline' : 'lock-closed-outline'}
-            label={canSharePdf ? '印刷' : '印刷・PDF'}
+            label={canSharePdf ? t('print') : t('printPdf')}
             busy={busy === 'print'}
             onPress={() => print(printHtmlFor)}
           />
           {canSharePdf ? (
-            <Btn small icon={isPro ? 'document-outline' : 'lock-closed-outline'} label="PDF で共有" busy={busy === 'pdf'} onPress={() => exportPdf(printHtmlFor, 'クラス編成結果')} />
+            <Btn small icon={isPro ? 'document-outline' : 'lock-closed-outline'} label={t('sharePdf')} busy={busy === 'pdf'} onPress={() => exportPdf(printHtmlFor, t('fileResults'))} />
           ) : null}
-          {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>Excel・印刷・PDF は Pro（買い切り）の機能です</Text> : null}
+          {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>{t('proFeaturesNote')}</Text> : null}
         </View>
         <Segmented
           value={tab}
           onChange={setTab}
           options={[
-            { value: 'classes', label: 'クラス一覧' },
-            { value: 'balance', label: 'バランス分析' },
-            { value: 'checks', label: `条件チェック${report.violations.length ? ` (${report.violations.length})` : ''}` },
+            { value: 'classes', label: t('tabClasses') },
+            { value: 'balance', label: t('tabBalance') },
+            { value: 'checks', label: report.violations.length ? t('tabChecksN', { n: report.violations.length }) : t('tabChecks') },
           ]}
         />
         {tab === 'classes' && <ClassBoard problem={problem} classOf={solution.classOf} k={k} report={report} selected={sel} setSelected={setSelected} />}
@@ -96,10 +104,10 @@ export default function ResultsScreen() {
             {report.columns.map((c) => (
               <BalanceCard key={c.column} col={c} k={k} wide={isWide} />
             ))}
-            {report.columns.length === 0 ? <Text style={{ color: C.muted }}>均等にする項目がありません。</Text> : null}
+            {report.columns.length === 0 ? <Text style={{ color: C.muted }}>{t('noBalanceItems')}</Text> : null}
           </View>
         )}
-        {tab === 'checks' && <Checks problem={problem} report={report} />}
+        {tab === 'checks' && <Checks problem={problem} report={report} classOf={solution.classOf} />}
         {/* 移動パネルの下に隠れないための余白 */}
         {sel !== null ? <View style={{ height: 120 }} /> : null}
       </Screen>
@@ -108,9 +116,9 @@ export default function ResultsScreen() {
         <View style={moveBar} accessibilityLiveRegion="polite">
           <View style={[styles.row, { justifyContent: 'space-between' }]}>
             <Text style={{ fontWeight: '800', color: C.text, flexShrink: 1 }} numberOfLines={1}>
-              {problem.students[sel].no}:{problem.students[sel].name} を移動 →
+              {t('moveTitle', { who: `${problem.students[sel].no}:${problem.students[sel].name}` })}
             </Text>
-            <Btn small icon="close" accessibilityLabel="閉じる" onPress={() => setSelected(null)} />
+            <Btn small icon="close" accessibilityLabel={t('close')} onPress={() => setSelected(null)} />
           </View>
           <View style={[styles.wrap, { marginTop: 8 }]}>
             {Array.from({ length: k }, (_, c) => {
@@ -120,9 +128,9 @@ export default function ResultsScreen() {
                 <Btn
                   key={c}
                   small
-                  label={`${c + 1}組`}
+                  label={className(c)}
                   disabled={here}
-                  accessibilityLabel={`${c + 1}組へ移動`}
+                  accessibilityLabel={t('moveTo', { cls: className(c) })}
                   style={{ backgroundColor: color.soft, borderColor: color.dot }}
                   onPress={() => {
                     moveStudent(sel, c)
@@ -174,10 +182,11 @@ function ClassBoard({
   setSelected: (s: number | null) => void
 }) {
   const { isWide, classColumns } = useLayout()
+  const { t, className, file } = useI18n()
   const [current, setCurrent] = useState(0)
   const [colorize, setColorize] = useState(true)
   const [focus, setFocus] = useState<Focus>(null)
-  const pairs = useMemo(() => pairStatus(problem, classOf), [problem, classOf])
+  const pairs = useMemo(() => pairStatus(problem, classOf, file.tagPrefix), [problem, classOf, file])
   const flagged = useMemo(() => new Set(report.violations.flatMap((v) => v.students)), [report])
   const flagTags = useMemo(() => {
     const flagCols = problem.columns.filter((c) => c.enabled && c.kind === 'flag')
@@ -199,9 +208,9 @@ function ClassBoard({
         <View style={[styles.row, { justifyContent: 'space-between', padding: 14, paddingBottom: 6 }]}>
           <View style={styles.row}>
             <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color.dot }} />
-            <Text style={{ fontSize: 18, fontWeight: '900', color: C.text }}>{c + 1}組</Text>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: C.text }}>{className(c)}</Text>
           </View>
-          <Text style={{ fontSize: 12, fontWeight: '800', color: C.sub, backgroundColor: '#F1F5F9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>{members.length} 名</Text>
+          <Text style={{ fontSize: 12, fontWeight: '800', color: C.sub, backgroundColor: '#F1F5F9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 }}>{t('studentsN', { n: members.length })}</Text>
         </View>
         <View style={{ paddingHorizontal: 8, paddingBottom: 10 }}>
           {members.map((i) => {
@@ -214,7 +223,7 @@ function ClassBoard({
               <Pressable
                 key={i}
                 accessibilityRole="button"
-                accessibilityLabel={`${s.no} ${s.name}、${c + 1}組。タップして別の組へ移動`}
+                accessibilityLabel={t('studentA11y', { no: s.no, name: s.name, cls: className(c) })}
                 accessibilityState={{ selected: isSel }}
                 onPress={() => setSelected(isSel ? null : i)}
                 style={(st: { pressed: boolean; hovered?: boolean; focused?: boolean }) => [
@@ -228,7 +237,7 @@ function ClassBoard({
               >
                 <Text style={{ width: 28, fontSize: 12, color: C.muted, fontVariant: ['tabular-nums'] }}>{s.no}</Text>
                 <Text style={{ flexShrink: 1, fontSize: 14, fontWeight: '600', color: flagged.has(i) ? C.danger : C.text }} numberOfLines={1}>
-                  {s.name || '（名前なし）'}
+                  {s.name || t('noName')}
                 </Text>
                 <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 3 }}>
                   {pt.map((t) => (
@@ -254,20 +263,20 @@ function ClassBoard({
   return (
     <View style={{ gap: 12 }}>
       <Text style={{ fontSize: 12, color: C.sub }}>
-        {isWide ? '生徒をクリック（タップ）すると別の組へ移動できます。' : '上の組を選んで切り替え。生徒をタップすると別の組へ移動できます。'}集計は即座に再計算されます。
+        {isWide ? t('boardHintWide') : t('boardHintNarrow')}
       </Text>
       {pairs.groups.length > 0 ? (
         <Card style={{ gap: 8, padding: 12 }}>
           <View style={[styles.row, { flexWrap: 'wrap', justifyContent: 'space-between' }]}>
             <Text style={{ fontWeight: '800', color: C.text }}>
-              ペア指定{' '}
+              {t('pairingsHeader')}{' '}
               <Text style={{ color: pairs.groups.every((g) => g.ok) ? C.good : C.danger, fontSize: 12 }}>
-                {pairs.groups.filter((g) => g.ok).length} / {pairs.groups.length} 件を満たしています
+                {t('pairingsMet', { ok: pairs.groups.filter((g) => g.ok).length, n: pairs.groups.length })}
               </Text>
             </Text>
             <View style={styles.row}>
-              <Text style={{ fontSize: 12, color: C.sub }}>同じ組を色分け</Text>
-              <Switch value={colorize} onValueChange={setColorize} accessibilityLabel="同じ組を色分け" />
+              <Text style={{ fontSize: 12, color: C.sub }}>{t('colorize')}</Text>
+              <Switch value={colorize} onValueChange={setColorize} accessibilityLabel={t('colorize')} />
             </View>
           </View>
           <View style={styles.wrap}>
@@ -295,10 +304,10 @@ function ClassBoard({
                 >
                   <Text style={{ fontWeight: '900', color: g.color.fg, fontSize: 12 }}>{g.label}</Text>
                   <Text style={{ color: C.sub, fontSize: 12, flexShrink: 1 }} numberOfLines={1}>
-                    {g.members.map((i) => problem.students[i].name).join('・')}
+                    {g.members.map((i) => problem.students[i].name).join(file.joinSep)}
                   </Text>
                   <Text style={{ color: g.color.fg, fontSize: 12, fontWeight: '700' }}>
-                    → {classes.map((c) => `${c}組`).join('/')} {g.ok ? '✓' : '✗'}
+                    → {classes.map((c) => className(c - 1)).join('/')} {g.ok ? '✓' : '✗'}
                   </Text>
                 </Pressable>
               )
@@ -319,7 +328,7 @@ function ClassBoard({
         <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
             {Array.from({ length: k }, (_, c) => (
-              <Chip key={c} label={`${c + 1}組 ${report.sizes[c]}名`} selected={cur === c} onPress={() => setCurrent(c)} />
+              <Chip key={c} label={t('classChip', { cls: className(c), n: report.sizes[c] })} selected={cur === c} onPress={() => setCurrent(c)} />
             ))}
           </ScrollView>
           {card(cur)}
@@ -330,9 +339,10 @@ function ClassBoard({
 }
 
 function PairBadge({ tag }: { tag: PairTag }) {
+  const { t } = useI18n()
   return (
     <Text
-      accessibilityLabel={`${tag.kind === 'wanted' ? '同じ組' : '別の組'}指定 ${tag.label}${tag.ok ? '' : '、満たせていません'}`}
+      accessibilityLabel={`${t(tag.kind === 'wanted' ? 'wantedBadgeA11y' : 'unwantedBadgeA11y', { label: tag.label })}${tag.ok ? '' : t('notMetA11y')}`}
       style={{
         fontSize: 10,
         fontWeight: '900',
@@ -352,6 +362,7 @@ function PairBadge({ tag }: { tag: PairTag }) {
 }
 
 function BalanceCard({ col, k, wide }: { col: ColumnReport; k: number; wide: boolean }) {
+  const { t, className, num } = useI18n()
   const numeric = col.kind === 'numeric'
   const max = Math.max(1, ...col.rows.flat())
   return (
@@ -359,7 +370,7 @@ function BalanceCard({ col, k, wide }: { col: ColumnReport; k: number; wide: boo
       <View style={[styles.row, { justifyContent: 'space-between' }]}>
         <Text style={{ fontWeight: '800', color: C.text, fontSize: 15 }}>{col.column}</Text>
         <View style={styles.row}>
-          <Text style={{ fontSize: 12, color: C.muted }}>重み {col.weight}</Text>
+          <Text style={{ fontSize: 12, color: C.muted }}>{t('weightN', { w: num(col.weight, col.weight % 1 ? 1 : 0) })}</Text>
           <Text
             style={{
               fontSize: 12,
@@ -372,7 +383,7 @@ function BalanceCard({ col, k, wide }: { col: ColumnReport; k: number; wide: boo
               backgroundColor: numeric ? '#F1F5F9' : col.excess === 0 ? C.goodSoft : C.warnSoft,
             }}
           >
-            {numeric ? '平均値' : col.excess === 0 ? '均等' : `ずれ ${col.excess}`}
+            {numeric ? t('average') : col.excess === 0 ? t('even') : t('offBy', { n: num(col.excess, col.excess % 1 ? 1 : 0) })}
           </Text>
         </View>
       </View>
@@ -381,23 +392,23 @@ function BalanceCard({ col, k, wide }: { col: ColumnReport; k: number; wide: boo
           <View style={{ flexDirection: 'row' }}>
             <Text style={{ width: 76 }} />
             {Array.from({ length: k }, (_, c) => (
-              <Text key={c} style={{ width: 52, textAlign: 'center', fontSize: 12, fontWeight: '800', color: C.muted }}>
-                {c + 1}組
+              <Text key={c} style={{ width: 64, textAlign: 'center', fontSize: 11, fontWeight: '800', color: C.muted }} numberOfLines={1}>
+                {className(c)}
               </Text>
             ))}
-            <Text style={{ width: 52, textAlign: 'center', fontSize: 12, color: C.muted }}>理想</Text>
+            <Text style={{ width: 64, textAlign: 'center', fontSize: 11, color: C.muted }}>{t('target')}</Text>
           </View>
           {col.levels.map((level, l) => (
             <View key={level} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
               <Text style={{ width: 76, fontSize: 12, fontWeight: '700', color: C.sub }} numberOfLines={1}>
-                {level}
+                {numeric ? t('average') : level}
               </Text>
               {col.rows[l].map((v, c) => {
                 const ideal = col.ideal[l]
                 const ok = numeric || (v >= Math.floor(ideal) && v <= Math.ceil(ideal))
                 const alpha = numeric ? 0.15 : 0.12 + 0.5 * (v / max)
                 return (
-                  <View key={c} style={{ width: 52, paddingHorizontal: 2 }}>
+                  <View key={c} style={{ width: 64, paddingHorizontal: 2 }}>
                     <Text
                       style={{
                         textAlign: 'center',
@@ -412,12 +423,12 @@ function BalanceCard({ col, k, wide }: { col: ColumnReport; k: number; wide: boo
                         borderColor: '#FBBF24',
                       }}
                     >
-                      {numeric ? v.toFixed(2) : v}
+                      {numeric ? num(v, 2) : v}
                     </Text>
                   </View>
                 )
               })}
-              <Text style={{ width: 52, textAlign: 'center', fontSize: 12, color: C.muted }}>{col.ideal[l].toFixed(numeric ? 2 : 1)}</Text>
+              <Text style={{ width: 64, textAlign: 'center', fontSize: 12, color: C.muted }}>{num(col.ideal[l], numeric ? 2 : 1)}</Text>
             </View>
           ))}
         </View>
@@ -426,15 +437,16 @@ function BalanceCard({ col, k, wide }: { col: ColumnReport; k: number; wide: boo
   )
 }
 
-function Checks({ problem, report }: { problem: Problem; report: Report }) {
+function Checks({ problem, report, classOf }: { problem: Problem; report: Report; classOf: number[] }) {
+  const { t, fileLang } = useI18n()
   const total = problem.wantedGroups.length + problem.unwantedGroups.length
   if (report.violations.length === 0)
     return (
       <Notice tone="good">
         <View>
-          <Text style={{ fontWeight: '800', color: C.good }}>すべての条件を満たしています</Text>
+          <Text style={{ fontWeight: '800', color: C.good }}>{t('allMet')}</Text>
           <Text style={{ color: C.sub, fontSize: 13, marginTop: 2 }}>
-            {total ? `同じ組 ${problem.wantedGroups.length} 件・別の組 ${problem.unwantedGroups.length} 件の指定をすべて反映しました。` : 'ペアの指定はありません。'}
+            {total ? t('allMetBody', { w: problem.wantedGroups.length, u: problem.unwantedGroups.length }) : t('noPairsBody')}
           </Text>
         </View>
       </Notice>
@@ -443,7 +455,7 @@ function Checks({ problem, report }: { problem: Problem; report: Report }) {
     <Card style={{ gap: 8 }}>
       {report.violations.map((v, i) => (
         <Text key={i} style={{ color: C.text, fontSize: 14 }}>
-          ⚠ {v.message}
+          ⚠ {violationText(fileLang, v, problem, classOf)}
         </Text>
       ))}
     </Card>

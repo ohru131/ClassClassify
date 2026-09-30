@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import type { WorkBook } from 'xlsx-js-style'
 
+import { useI18n } from './language-provider'
 import { printHtml, sharePdf } from './print'
 import { useProject } from './project-store'
 import { usePro } from './revenuecat-provider'
@@ -17,30 +18,30 @@ const today = () => {
  * Excel・印刷・PDF（Pro 限定）。無料版でもボタンは見せ、押すと Pro の画面へ案内する。
  * 中身（ブック・HTML）は押したときに作る。Web の印刷は window.open をクリックと同じ流れで
  * 呼ばないとポップアップとして止められるので、await を挟まずに呼び出す。
+ * ファイル名とシート名は選択中の言語で出す。
  */
 export function useProExport() {
   const { isPro } = usePro()
   const { setError } = useProject()
+  const { t } = useI18n()
   const router = useRouter()
   const [busy, setBusy] = useState<null | 'xlsx' | 'print' | 'pdf'>(null)
+  const messages = { sharingUnavailable: t('sharingUnavailable'), popupBlocked: t('popupBlocked') }
 
-  const run = useCallback(
-    (kind: 'xlsx' | 'print' | 'pdf', task: () => Promise<void>) => {
-      if (!isPro) {
-        router.navigate('/pro')
-        return
-      }
-      setBusy(kind)
-      task()
-        .catch((e) => setError(e instanceof Error ? e.message : String(e)))
-        .finally(() => setBusy(null))
-    },
-    [isPro, router, setError],
-  )
+  const run = (kind: 'xlsx' | 'print' | 'pdf', task: () => Promise<void>) => {
+    if (!isPro) {
+      router.navigate('/pro')
+      return
+    }
+    setBusy(kind)
+    task()
+      .catch((e) => setError(e instanceof Error ? e.message : String(e)))
+      .finally(() => setBusy(null))
+  }
 
-  const exportXlsx = useCallback((build: () => WorkBook, baseName: string) => run('xlsx', () => shareXlsx(build(), `${baseName}_${today()}.xlsx`)), [run])
-  const print = useCallback((build: () => string) => run('print', () => printHtml(build())), [run])
-  const exportPdf = useCallback((build: () => string, baseName: string) => run('pdf', () => sharePdf(build(), `${baseName}_${today()}.pdf`)), [run])
+  const exportXlsx = (build: () => WorkBook, baseName: string) => run('xlsx', () => shareXlsx(build(), `${baseName}_${today()}.xlsx`, messages.sharingUnavailable))
+  const print = (build: () => string) => run('print', () => printHtml(build(), messages))
+  const exportPdf = (build: () => string, baseName: string) => run('pdf', () => sharePdf(build(), `${baseName}_${today()}.pdf`, messages))
 
   return { exportXlsx, print, exportPdf, busy, isPro }
 }

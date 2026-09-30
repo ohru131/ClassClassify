@@ -4,7 +4,8 @@ import type { ExpoConfig } from 'expo/config'
 const APP_ID = 'com.ohru131.mosaic'
 
 const config: ExpoConfig = {
-  name: 'Mosaic クラス編成',
+  // 端末の言語に合わせてホーム画面の名前を変える（locales/*.json）。既定は短い製品名
+  name: 'Mosaic',
   slug: 'mosaic-class-classify',
   version: '1.0.0',
   // 学校のタブレット・Chromebook では横向き・分割画面で使うので、向きを固定しない。
@@ -27,6 +28,14 @@ const config: ExpoConfig = {
     // ファイル選択、書き出しはアプリのキャッシュ＋共有シートで、どちらも権限が要らない）。
     blockedPermissions: ['android.permission.READ_EXTERNAL_STORAGE', 'android.permission.WRITE_EXTERNAL_STORAGE'],
   },
+  locales: {
+    ja: './locales/ja.json',
+    en: './locales/en.json',
+    ko: './locales/ko.json',
+    es: './locales/es.json',
+    de: './locales/de.json',
+    'pt-BR': './locales/pt-BR.json',
+  },
   web: {
     bundler: 'metro',
     output: 'single',
@@ -38,6 +47,7 @@ const config: ExpoConfig = {
     // release ビルドから開発メニュー用の SYSTEM_ALERT_WINDOW を外す
     './plugins/withoutReleaseOverlayPermission',
     'expo-router',
+    'expo-localization',
     'expo-sharing',
     'expo-document-picker',
     ['expo-build-properties', { android: { minSdkVersion: 24 } }],

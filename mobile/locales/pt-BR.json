@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Mosaic Turmas"
+  },
+  "android": {
+    "app_name": "Mosaic Turmas"
+  }
+}

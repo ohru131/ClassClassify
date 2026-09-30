@@ -10,7 +10,7 @@
     "ios": "expo run:ios",
     "check": "tsc --noEmit",
     "test": "vitest run",
-    "samples:generate": "node scripts/generate-samples.mjs",
+    "samples:generate": "tsx scripts/generate-samples.ts",
     "export:web": "expo export --platform web"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
     "expo-document-picker": "~57.0.1",
     "expo-file-system": "~57.0.5",
     "expo-linking": "~57.0.7",
+    "expo-localization": "~57.0.1",
     "expo-print": "~57.0.2",
     "expo-router": "~57.0.15",
     "expo-sharing": "^57.0.14",
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@types/node": "^22.19.3",
     "@types/react": "~19.2.18",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vitest": "^2.1.9"
   }

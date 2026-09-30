@@ -26,8 +26,8 @@ export async function pickXlsx(): Promise<{ data: ArrayBuffer; name: string } | 
 export const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|\s]+/g, '_')
 
 /** ブックを .xlsx としてキャッシュに書き、OS の共有シートを開く（Excel・Google ドライブ・メール等へ） */
-export async function shareXlsx(wb: WorkBook, fileName: string): Promise<void> {
-  if (!(await Sharing.isAvailableAsync())) throw new Error('この端末ではファイルの共有を利用できません。')
+export async function shareXlsx(wb: WorkBook, fileName: string, unavailableMessage: string): Promise<void> {
+  if (!(await Sharing.isAvailableAsync())) throw new Error(unavailableMessage)
   const uri = `${FileSystem.cacheDirectory}${safeFileName(fileName)}`
   await FileSystem.writeAsStringAsync(uri, writeXlsx(wb, 'base64'), { encoding: FileSystem.EncodingType.Base64 })
   await Sharing.shareAsync(uri, { mimeType: XLSX_MIME, UTI: 'org.openxmlformats.spreadsheetml.sheet', dialogTitle: fileName })

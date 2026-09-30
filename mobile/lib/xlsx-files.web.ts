@@ -16,7 +16,7 @@ export async function pickXlsx(): Promise<{ data: ArrayBuffer; name: string } | 
 export const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|\s]+/g, '_')
 
 /** Web（動作確認用）はダウンロードする */
-export async function shareXlsx(wb: WorkBook, fileName: string): Promise<void> {
+export async function shareXlsx(wb: WorkBook, fileName: string, _unavailableMessage?: string): Promise<void> {
   const blob = new Blob([writeXlsx(wb, 'array')], { type: XLSX_MIME })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)

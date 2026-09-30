@@ -48,6 +48,17 @@ mobile/
 - React Native の `Blob` は ArrayBuffer から作れないので、Excel は `writeXlsx(wb, 'base64')` で
   キャッシュに書いてから `expo-sharing` で共有する。
 
+## 多言語対応（ja / en / ko / es / de / pt-BR）
+
+- **`lib/i18n.ts` の `APP_LANGUAGES` が唯一の情報源**（型・端末ロケールの判定・言語名＝endonym・Intl のロケール）。既定は端末の言語（`expo-localization`）で、未対応の言語は英語。ポルトガル語はブラジル以外も pt-BR。「Pro・設定」で言語を選ぶと端末に保存する。
+- UI 文言は `lib/copy/en.ts`（`EN_COPY` のキー集合が正）と各言語のファイル。`Record<CopyKey, string>` なので**キーが欠けると型エラー**になり、`test/i18n.test.ts` が空文字と埋め込み（`{n}` など）の食い違い、日本語の混入を検出する。プライバシーポリシーは `lib/copy/privacy.ts`。
+- **訳語は `docs/i18n-glossary.md` に揃える**（先に用語集を直してから各所を直す）。スペイン語は中南米の語彙（grupo・estudiantes・tú）を基本にしている。
+- Excel の語彙（シート名・見出し・設定の項目名・結果の見出し）は共有ソルバーの `src/solver/labels.ts`。**読み込みは全言語のシート名・見出しを受け付け**（日本語を最優先に探すので Web 版の挙動は変わらない）、書き出しは選択中の言語で出す。ひな形も選択中の言語で生成して共有できる（無料）。
+- 日付・数値は `Intl`（`lib/locale-format.ts`）。印刷用 HTML の `lang` 属性もロケールに合わせる。
+- ホーム画面のアプリ名は `locales/*.json`（`app.config.ts` の `locales`）で言語ごとに出し分ける。
+- サンプル名簿は言語ごとに、その国らしい氏名と配慮のある項目名で生成している（`npm run samples:generate` ＝ `scripts/generate-samples.ts`。日本語のサンプルの構造・項目の分布・ペア指定をそのまま使う。リポジトリ直下で `npm install` 済みであること）。各言語のサンプルが違反0に届くことをテストで確認している。
+- ストア掲載文は `docs/store-listing.md`（Play の en-US / en-AU / en-GB / ko-KR / es-419 / es-ES / de-DE / pt-BR / ja-JP）。
+
 ## セットアップ
 
 ```bash
@@ -145,9 +156,11 @@ npx expo start --dev-client
 
 確認済み（この環境）:
 
-- `npm test`（vitest 41件）: ランナーが3つのサンプルで条件違反0・人数差1以内・全項目が理想範囲内に到達すること、中止、UI へ返した時間を探索時間に数えないこと、保存データの検証、課金の判定、Excel（base64 経路）の往復、印刷用 HTML（エスケープ・A4 縦・各組・凡例・改ページ）、Web 限定の Pro プレビュー。
+- `npm test`（vitest 92件）: ランナーが3つのサンプルで条件違反0・人数差1以内・全項目が理想範囲内に到達すること、中止、UI へ返した時間を探索時間に数えないこと、保存データの検証、課金の判定、Excel（base64 経路）の往復、印刷用 HTML（エスケープ・A4 縦・各組・凡例・改ページ・各言語）、Web 限定の Pro プレビュー、多言語（端末の言語の判定・全言語の文言・各言語のサンプルが違反0・言語別の Excel の往復・読み込みエラーの言語）。
 - `npx tsc --noEmit`、`npx expo export --platform web`。
 - Web 書き出しを Playwright で 390×844・1280×800・800×1280 で操作: サンプル読み込み → 生徒編集 → 実行（進捗バーが進む）→ 結果（人数差0・バランス完全・違反0）→ 手動移動で即時再計算 → 無料時に Excel・印刷ボタンが Pro 画面へ案内する。`?pro=preview` で印刷用ウィンドウ（A4 の HTML）が開く。名前の Enter 確定・項目の追加・同じ組の作成・再読み込み後の復元・ウィンドウ幅を狭めたときのレイアウト切り替え。
+
+- 6言語 × 390×844・1280×800 で サンプル → 実行 → 結果 → バランス → Pro 画面、印刷用ウィンドウを Playwright で撮影し、ボタン・タブの文字のはみ出しが無いことを確認（独・西の長い語はセグメントを2行まで折り返す）。
 
 **実機では未検証**（ネイティブのビルドはこの環境で行っていない）:
 
@@ -158,3 +171,5 @@ npx expo start --dev-client
 - `expo-print` の印刷画面・PDF の見た目（Android の WebView / iOS の WKWebView で組版がブラウザと違うことがある。日本語フォント、改ページ、背景色の印刷）。
 - Chromebook（タッチなし機を含む）・Android タブレットでの表示、フリーフォーム窓のリサイズ、物理キーボードでの Tab 移動・Enter 確定、戻るキー。
 - iOS 版（`supportsTablet` 含む）は一度もビルドしていない。
+- Hermes の `Intl`（日付・数値の書式）と、ホーム画面のアプリ名の言語別表示（`locales`）。
+- 翻訳はネイティブスピーカーの確認を受けていない（`docs/i18n-glossary.md` 第4節に確認してほしい箇所をまとめた）。

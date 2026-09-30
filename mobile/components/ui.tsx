@@ -2,6 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import type { ComponentProps, ReactNode } from 'react'
 import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native'
 
+import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { C } from './theme'
 
@@ -108,7 +109,8 @@ export function Segmented<T extends string | number>({ value, onChange, options 
             onPress={() => onChange(o.value)}
             style={(st: InteractionState) => [styles.segItem, active ? styles.segActive : (st.hovered || st.pressed) && { backgroundColor: '#E2E8F0' }, focusRing(st)]}
           >
-            <Text style={[styles.segText, active && { color: C.text }]} numberOfLines={1}>
+            {/* 長い言語（独・西）でも省略せず2行まで折り返す */}
+            <Text style={[styles.segText, active && { color: C.text }]} numberOfLines={2}>
               {o.label}
             </Text>
           </Pressable>
@@ -119,13 +121,14 @@ export function Segmented<T extends string | number>({ value, onChange, options 
 }
 
 export function Stepper({ value, onChange, min, max, step = 1, format, label }: { value: number; onChange: (v: number) => void; min: number; max: number; step?: number; format?: (v: number) => string; label: string }) {
+  const { t } = useI18n()
   return (
     <View style={styles.row}>
-      <Btn icon="remove" small accessibilityLabel={`${label}を減らす`} disabled={value <= min} onPress={() => onChange(Math.max(min, Math.round((value - step) * 100) / 100))} />
+      <Btn icon="remove" small accessibilityLabel={t('decrease', { label })} disabled={value <= min} onPress={() => onChange(Math.max(min, Math.round((value - step) * 100) / 100))} />
       <Text style={styles.stepValue} accessibilityLabel={`${label} ${value}`}>
         {format ? format(value) : value}
       </Text>
-      <Btn icon="add" small accessibilityLabel={`${label}を増やす`} disabled={value >= max} onPress={() => onChange(Math.min(max, Math.round((value + step) * 100) / 100))} />
+      <Btn icon="add" small accessibilityLabel={t('increase', { label })} disabled={value >= max} onPress={() => onChange(Math.min(max, Math.round((value + step) * 100) / 100))} />
     </View>
   )
 }
@@ -157,11 +160,12 @@ export function Stat({ label, value, sub, tone = 'default' }: { label: string; v
 }
 
 export function Notice({ tone, children, onClose }: { tone: 'error' | 'warn' | 'good' | 'info'; children: ReactNode; onClose?: () => void }) {
+  const { t } = useI18n()
   const palette = { error: [C.dangerSoft, C.danger], warn: [C.warnSoft, C.warn], good: [C.goodSoft, C.good], info: [C.primarySoft, C.primaryText] }[tone]
   return (
     <View style={[styles.notice, { backgroundColor: palette[0] }]} accessibilityLiveRegion="polite">
       <View style={{ flex: 1 }}>{typeof children === 'string' ? <Text style={{ color: palette[1], fontSize: 14 }}>{children}</Text> : children}</View>
-      {onClose ? <Btn icon="close" small variant="ghost" accessibilityLabel="閉じる" onPress={onClose} style={{ backgroundColor: 'transparent', borderWidth: 0 }} /> : null}
+      {onClose ? <Btn icon="close" small variant="ghost" accessibilityLabel={t('close')} onPress={onClose} style={{ backgroundColor: 'transparent', borderWidth: 0 }} /> : null}
     </View>
   )
 }
@@ -197,9 +201,9 @@ export const styles = StyleSheet.create({
   chip: { paddingHorizontal: 12, minHeight: 34, justifyContent: 'center', borderRadius: 999, borderWidth: 1, borderColor: C.border },
   chipText: { fontSize: 13, fontWeight: '700' },
   seg: { flexDirection: 'row', backgroundColor: '#EEF0F5', borderRadius: 12, padding: 3, gap: 2 },
-  segItem: { flex: 1, minHeight: 38, paddingHorizontal: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
+  segItem: { flex: 1, minHeight: 38, paddingHorizontal: 6, paddingVertical: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   segActive: { backgroundColor: '#fff', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 1 },
-  segText: { fontSize: 13, fontWeight: '700', color: C.sub },
+  segText: { fontSize: 13, fontWeight: '700', color: C.sub, textAlign: 'center' },
   stepValue: { minWidth: 44, textAlign: 'center', fontSize: 22, fontWeight: '800', color: C.text, fontVariant: ['tabular-nums'] },
   card: { backgroundColor: C.card, borderRadius: 18, borderWidth: 1, borderColor: C.border, padding: 16 },
   title: { fontSize: 20, fontWeight: '800', color: C.text },

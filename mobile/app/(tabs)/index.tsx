@@ -8,6 +8,7 @@ import { LoadPanel } from '@/components/load-panel'
 import { StudentList } from '@/components/student-list'
 import { C } from '@/components/theme'
 import { Btn, Card, Notice, Screen, Segmented, styles } from '@/components/ui'
+import { useI18n } from '@/lib/language-provider'
 import { useProject } from '@/lib/project-store'
 import { rosterWorkbook } from '@/lib/solver'
 import { useProExport } from '@/lib/use-pro-export'
@@ -17,6 +18,7 @@ type Tab = 'students' | 'columns' | 'wanted' | 'unwanted'
 export default function RosterScreen() {
   const { hydrated, problem, fileName, numClasses, modifyProblem, dismissWarnings, error, setError } = useProject()
   const { exportXlsx, busy, isPro } = useProExport()
+  const { t, fileLang } = useI18n()
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('students')
   const [showLoad, setShowLoad] = useState(false)
@@ -31,8 +33,8 @@ export default function RosterScreen() {
   return (
     <Screen>
       <View>
-        <Text style={{ fontSize: 13, fontWeight: '800', color: C.primary }}>Mosaic · クラス編成</Text>
-        <Text style={{ fontSize: 24, fontWeight: '900', color: C.text, marginTop: 2 }}>名簿</Text>
+        <Text style={{ fontSize: 13, fontWeight: '800', color: C.primary }}>{t('appEyebrow')}</Text>
+        <Text style={{ fontSize: 24, fontWeight: '900', color: C.text, marginTop: 2 }}>{t('rosterTitle')}</Text>
       </View>
       {error ? (
         <Notice tone="error" onClose={() => setError(null)}>
@@ -48,7 +50,7 @@ export default function RosterScreen() {
               setTab('students')
             }}
           />
-          {problem ? <Btn label="キャンセル（今の名簿に戻る）" onPress={() => setShowLoad(false)} /> : null}
+          {problem ? <Btn label={t('backToRoster')} onPress={() => setShowLoad(false)} /> : null}
         </>
       ) : (
         <>
@@ -56,34 +58,35 @@ export default function RosterScreen() {
             <View style={[styles.row, { flexWrap: 'wrap', justifyContent: 'space-between' }]}>
               <View style={{ flexShrink: 1 }}>
                 <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }} numberOfLines={1}>
-                  {fileName ?? '名簿'}
+                  {fileName ?? t('rosterTitle')}
                 </Text>
                 <Text style={{ fontSize: 13, color: C.sub }}>
-                  {problem.students.length} 名 · 項目 {problem.columns.length} · 同じ組 {problem.wantedGroups.length} 件 · 別の組 {problem.unwantedGroups.length} 件
+                  {t('rosterSummary', { n: problem.students.length, cols: problem.columns.length, w: problem.wantedGroups.length, u: problem.unwantedGroups.length })}
                 </Text>
               </View>
-              <View style={[styles.row, { flexWrap: 'wrap' }]}>
-                <Btn small icon="folder-open-outline" label="別の名簿" onPress={() => setShowLoad(true)} />
+              {/* 長い言語でもカードからはみ出さないよう、行の幅に収めて折り返す */}
+              <View style={[styles.row, { flexWrap: 'wrap', flexShrink: 1 }]}>
+                <Btn small icon="folder-open-outline" label={t('otherRoster')} onPress={() => setShowLoad(true)} />
                 <Btn
                   small
                   icon={isPro ? 'share-outline' : 'lock-closed-outline'}
-                  label="名簿を Excel で保存"
+                  label={t('saveRosterXlsx')}
                   busy={busy === 'xlsx'}
-                  onPress={() => exportXlsx(() => rosterWorkbook(problem, numClasses), '名簿')}
+                  onPress={() => exportXlsx(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster'))}
                 />
-                <Btn small variant="primary" icon="arrow-forward" label="設定・実行へ" onPress={() => router.navigate('/run')} />
+                <Btn small variant="primary" icon="arrow-forward" label={t('toRun')} onPress={() => router.navigate('/run')} />
               </View>
             </View>
-            {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>Excel での保存・共有は Pro（買い切り）の機能です。</Text> : null}
+            {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>{t('proFeaturesNote')}</Text> : null}
           </Card>
 
           {problem.warnings.length ? (
             <Notice tone="warn" onClose={dismissWarnings}>
               <View>
-                <Text style={{ color: C.warn, fontWeight: '800', marginBottom: 2 }}>読み込み時の注意</Text>
+                <Text style={{ color: C.warn, fontWeight: '800', marginBottom: 2 }}>{t('loadWarnings')}</Text>
                 {problem.warnings.map((w, i) => (
                   <Text key={i} style={{ color: C.warn, fontSize: 13 }}>
-                    ・{w}
+                    • {w}
                   </Text>
                 ))}
               </View>
@@ -94,10 +97,10 @@ export default function RosterScreen() {
             value={tab}
             onChange={setTab}
             options={[
-              { value: 'students', label: `生徒 ${problem.students.length}` },
-              { value: 'columns', label: '項目・重み' },
-              { value: 'wanted', label: `同じ組 ${problem.wantedGroups.length}` },
-              { value: 'unwanted', label: `別の組 ${problem.unwantedGroups.length}` },
+              { value: 'students', label: t('tabStudents', { n: problem.students.length }) },
+              { value: 'columns', label: t('tabColumns') },
+              { value: 'wanted', label: t('tabWanted', { n: problem.wantedGroups.length }) },
+              { value: 'unwanted', label: t('tabUnwanted', { n: problem.unwantedGroups.length }) },
             ]}
           />
           {tab === 'students' && <StudentList problem={problem} onChange={modifyProblem} />}

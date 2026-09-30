@@ -3,6 +3,7 @@ import { Text, View } from 'react-native'
 
 import { C } from '@/components/theme'
 import { Btn, Card, Notice, Screen, Segmented, Stepper, styles } from '@/components/ui'
+import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { defaultStarts } from '@/lib/runner'
@@ -11,14 +12,15 @@ export default function RunScreen() {
   const { problem, numClasses, setNumClasses, setMaxPerClass, timeSec, setTimeSec, run, cancel, running, progress, solution, error, setError } = useProject()
   const router = useRouter()
   const { isWide } = useLayout()
+  const { t, num } = useI18n()
 
   if (!problem)
     return (
       <Screen>
         <Title />
         <Card style={{ gap: 10 }}>
-          <Text style={{ color: C.sub }}>まず「名簿」タブで名簿を読み込んでください。</Text>
-          <Btn variant="primary" icon="people" label="名簿を読み込む" onPress={() => router.navigate('/')} />
+          <Text style={{ color: C.sub }}>{t('loadFirst')}</Text>
+          <Btn variant="primary" icon="people" label={t('loadRosterBtn')} onPress={() => router.navigate('/')} />
         </Card>
       </Screen>
     )
@@ -43,52 +45,52 @@ export default function RunScreen() {
       ) : null}
       <View style={{ flexDirection: isWide ? 'row' : 'column', gap: 14 }}>
         <Card style={[{ gap: 6 }, isWide && { flex: 1 }]}>
-          <Text style={styles.label}>クラス（グループ）数</Text>
-          <Stepper label="クラス数" value={numClasses} min={2} max={Math.max(2, n)} onChange={setNumClasses} />
-          <Text style={{ fontSize: 12, color: C.muted }}>1組あたり {lo === hi ? lo : `${lo}〜${hi}`} 名（{n} 名）</Text>
+          <Text style={styles.label}>{t('classCount')}</Text>
+          <Stepper label={t('classCountA11y')} value={numClasses} min={2} max={Math.max(2, n)} onChange={setNumClasses} />
+          <Text style={{ fontSize: 12, color: C.muted }}>{t('perClass', { range: lo === hi ? lo : `${lo}–${hi}`, n })}</Text>
         </Card>
         <Card style={[{ gap: 6 }, isWide && { flex: 1 }]}>
-          <Text style={styles.label}>1クラスの最大人数</Text>
-          <Stepper label="最大人数" value={hi} min={1} max={Math.max(1, Math.ceil(n / 2))} onChange={setMaxPerClass} />
-          <Text style={{ fontSize: 12, color: C.muted }}>変えるとクラス数を自動で決めます</Text>
+          <Text style={styles.label}>{t('maxPerClass')}</Text>
+          <Stepper label={t('maxPerClass')} value={hi} min={1} max={Math.max(1, Math.ceil(n / 2))} onChange={setMaxPerClass} />
+          <Text style={{ fontSize: 12, color: C.muted }}>{t('maxHint')}</Text>
         </Card>
         <Card style={[{ gap: 6 }, isWide && { flex: 1.3 }]}>
-          <Text style={styles.label}>探索時間</Text>
+          <Text style={styles.label}>{t('searchTime')}</Text>
           <Segmented
             value={timeSec}
             onChange={setTimeSec}
             options={[
-              { value: 3, label: '高速 3秒' },
-              { value: 10, label: '標準 10秒' },
-              { value: 30, label: '徹底 30秒' },
+              { value: 3, label: t('quick') },
+              { value: 10, label: t('standard') },
+              { value: 30, label: t('thorough') },
             ]}
           />
           <Text style={{ fontSize: 12, color: C.muted }}>
-            {timeSec} 秒{starts > 1 ? ` · ${starts} 回探索して最良の案を採用` : ''}
+            {starts > 1 ? t('timeInfoStarts', { s: timeSec, n: starts }) : t('timeInfo', { s: timeSec })}
           </Text>
         </Card>
       </View>
 
       <Card style={{ gap: 8 }}>
         <View style={[styles.row, { justifyContent: 'space-between' }]}>
-          <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }}>均等にする項目</Text>
-          <Btn small icon="create-outline" label="項目・重みを編集" onPress={() => router.navigate('/')} />
+          <Text style={{ fontSize: 16, fontWeight: '800', color: C.text, flexShrink: 1 }}>{t('balancedItems')}</Text>
+          <Btn small icon="create-outline" label={t('editAttributes')} onPress={() => router.navigate('/')} />
         </View>
         {enabled.length === 0 ? (
-          <Text style={{ color: C.warn }}>有効な項目がありません（人数だけを揃えます）。</Text>
+          <Text style={{ color: C.warn }}>{t('noEnabled')}</Text>
         ) : (
           <View style={styles.wrap}>
             {enabled.map((c) => (
               <View key={c.name} style={{ backgroundColor: C.primarySoft, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6 }}>
                 <Text style={{ color: C.primaryText, fontWeight: '700', fontSize: 13 }}>
-                  {c.name} ×{c.weight}
+                  {c.name} ×{num(c.weight, c.weight % 1 ? 1 : 0)}
                 </Text>
               </View>
             ))}
           </View>
         )}
         <Text style={{ fontSize: 13, color: C.sub }}>
-          同じ組にする {problem.wantedGroups.length} 件 · 別の組にする {problem.unwantedGroups.length} 件
+          {t('pairsSummary', { w: problem.wantedGroups.length, u: problem.unwantedGroups.length })}
         </Text>
       </Card>
 
@@ -99,16 +101,16 @@ export default function RunScreen() {
               <View style={{ height: '100%', width: `${Math.max(3, progress * 100)}%`, backgroundColor: C.primary, borderRadius: 6 }} />
             </View>
             <View style={[styles.row, { justifyContent: 'space-between' }]}>
-              <Text style={{ color: C.sub }}>最適な組み合わせを探索中… {Math.round(progress * 100)}%</Text>
-              <Btn small icon="stop" label="中止" onPress={cancel} />
+              <Text style={{ color: C.sub, flexShrink: 1 }}>{t('searching', { p: Math.round(progress * 100) })}</Text>
+              <Btn small icon="stop" label={t('stop')} onPress={cancel} />
             </View>
           </>
         ) : (
           <>
-            <Btn variant="primary" icon="play" label={solution ? 'もう一度編成する' : 'クラス編成を実行'} onPress={start} />
+            <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} onPress={start} />
             {solution ? (
               <Text style={{ fontSize: 12, color: C.muted }}>
-                前回: {solution.k} クラス · {solution.starts} 回 · {(solution.iterations / 1e6).toFixed(2)}M 回の探索
+                {t('lastRun', { k: solution.k, starts: solution.starts, m: num(solution.iterations / 1e6, 2) })}
               </Text>
             ) : null}
           </>
@@ -119,5 +121,6 @@ export default function RunScreen() {
 }
 
 function Title() {
-  return <Text style={{ fontSize: 24, fontWeight: '900', color: C.text }}>設定・実行</Text>
+  const { t } = useI18n()
+  return <Text style={{ fontSize: 24, fontWeight: '900', color: C.text }}>{t('runTitle')}</Text>
 }

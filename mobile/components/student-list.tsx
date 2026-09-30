@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { roster, type Problem } from '@/lib/solver'
 import { StudentEditor } from './student-editor'
@@ -19,6 +20,7 @@ const matches = (p: Problem, i: number, q: string) => {
 /** 生徒一覧。狭い画面はカードの列＋編集はモーダル、広い画面は表（横スクロール）＋右に編集欄 */
 export function StudentList({ problem, onChange }: Props) {
   const { isWide } = useLayout()
+  const { t } = useI18n()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<number | null>(null)
   const q = query.trim()
@@ -36,11 +38,11 @@ export function StudentList({ problem, onChange }: Props) {
         style={[styles.input, { flex: 1, minWidth: 180 }]}
         value={query}
         onChangeText={setQuery}
-        placeholder="名前・NO・値で絞り込み"
-        accessibilityLabel="生徒の絞り込み"
+        placeholder={t('filterPlaceholder')}
+        accessibilityLabel={t('filterPlaceholder')}
         returnKeyType="search"
       />
-      <Btn variant="soft" icon="person-add-outline" label="生徒を追加" onPress={add} />
+      <Btn variant="soft" icon="person-add-outline" label={t('addStudent')} onPress={add} />
     </View>
   )
 
@@ -53,11 +55,11 @@ export function StudentList({ problem, onChange }: Props) {
         <Card style={{ flex: 3, gap: 12, minWidth: 0 }}>
           {header}
           <Text style={{ fontSize: 12, color: C.muted }}>
-            {visible.length} / {problem.students.length} 名 · 行をクリック（タップ）すると右側で編集できます
+            {t('countWide', { shown: visible.length, total: problem.students.length })}
           </Text>
           <RosterTable problem={problem} rows={visible} selected={sel} onSelect={setSelected} />
         </Card>
-        <Card style={{ flex: 2, minWidth: 300 }}>{editor ?? <Text style={{ color: C.muted }}>一覧から生徒を選ぶと、ここで編集できます。</Text>}</Card>
+        <Card style={{ flex: 2, minWidth: 300 }}>{editor ?? <Text style={{ color: C.muted }}>{t('selectToEdit')}</Text>}</Card>
       </View>
     )
   }
@@ -66,7 +68,7 @@ export function StudentList({ problem, onChange }: Props) {
     <Card style={{ gap: 10 }}>
       {header}
       <Text style={{ fontSize: 12, color: C.muted }}>
-        {visible.length} / {problem.students.length} 名 · タップして編集
+        {t('countNarrow', { shown: visible.length, total: problem.students.length })}
       </Text>
       {visible.map((i) => (
         <StudentRow key={i} problem={problem} index={i} onPress={() => setSelected(i)} />
@@ -83,12 +85,13 @@ export function StudentList({ problem, onChange }: Props) {
 }
 
 function StudentRow({ problem, index, onPress }: { problem: Problem; index: number; onPress: () => void }) {
+  const { t } = useI18n()
   const s = problem.students[index]
   const tags = problem.columns.filter((c) => s.values[c.name]).map((c) => (c.kind === 'flag' ? c.name : `${c.name}:${s.values[c.name]}`))
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${s.no} ${s.name} を編集`}
+      accessibilityLabel={t('editStudentA11y', { no: s.no, name: s.name })}
       onPress={onPress}
       style={(st: { pressed: boolean; hovered?: boolean }) => [
         { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 8, borderRadius: 12, borderBottomWidth: 1, borderColor: '#F1F5F9' },
@@ -97,7 +100,7 @@ function StudentRow({ problem, index, onPress }: { problem: Problem; index: numb
     >
       <Text style={{ width: 34, fontSize: 13, color: C.muted, fontVariant: ['tabular-nums'] }}>{s.no}</Text>
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 15, fontWeight: '700', color: s.name ? C.text : C.muted }}>{s.name || '（名前なし）'}</Text>
+        <Text style={{ fontSize: 15, fontWeight: '700', color: s.name ? C.text : C.muted }}>{s.name || t('noName')}</Text>
         {tags.length ? (
           <Text style={{ fontSize: 12, color: C.sub, marginTop: 2 }} numberOfLines={1}>
             {tags.join(' · ')}
@@ -111,14 +114,15 @@ function StudentRow({ problem, index, onPress }: { problem: Problem; index: numb
 
 /** 広い画面向けの表。列が多い名簿は横にスクロールする */
 function RosterTable({ problem, rows, selected, onSelect }: { problem: Problem; rows: number[]; selected: number | null; onSelect: (i: number) => void }) {
+  const { t } = useI18n()
   const cols = problem.columns
   const cell = (w: number) => ({ width: w, paddingHorizontal: 8, paddingVertical: 8 })
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator>
       <View>
         <View style={{ flexDirection: 'row', backgroundColor: '#F8FAFC', borderRadius: 8 }}>
-          <Text style={[cell(56), th]}>NO</Text>
-          <Text style={[cell(130), th]}>名前</Text>
+          <Text style={[cell(56), th]}>{t('colNo')}</Text>
+          <Text style={[cell(130), th]}>{t('colName')}</Text>
           {cols.map((c) => (
             <Text key={c.name} style={[cell(96), th]} numberOfLines={1}>
               {c.name}
@@ -131,7 +135,7 @@ function RosterTable({ problem, rows, selected, onSelect }: { problem: Problem; 
             <Pressable
               key={i}
               accessibilityRole="button"
-              accessibilityLabel={`${s.no} ${s.name} を編集`}
+              accessibilityLabel={t('editStudentA11y', { no: s.no, name: s.name })}
               accessibilityState={{ selected: selected === i }}
               onPress={() => onSelect(i)}
               style={(st: { pressed: boolean; hovered?: boolean; focused?: boolean }) => [
@@ -141,7 +145,7 @@ function RosterTable({ problem, rows, selected, onSelect }: { problem: Problem; 
             >
               <Text style={[cell(56), td, { color: C.muted }]}>{s.no}</Text>
               <Text style={[cell(130), td, { fontWeight: '700' }]} numberOfLines={1}>
-                {s.name || '（名前なし）'}
+                {s.name || t('noName')}
               </Text>
               {cols.map((c) => (
                 <Text key={c.name} style={[cell(96), td]} numberOfLines={1}>
