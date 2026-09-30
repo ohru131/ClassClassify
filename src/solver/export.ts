@@ -151,7 +151,24 @@ function toWorksheet(sheet: SheetData) {
   return ws
 }
 
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+/**
+ * ブックを .xlsx のバイト列にする。React Native の Blob は ArrayBuffer から作れないため、
+ * スマホ版は 'base64' で受け取ってファイルに書き出す。
+ */
+export function writeXlsx(wb: XLSX.WorkBook, type: 'base64'): string
+export function writeXlsx(wb: XLSX.WorkBook, type: 'array'): ArrayBuffer
+export function writeXlsx(wb: XLSX.WorkBook, type: 'array' | 'base64'): ArrayBuffer | string {
+  return XLSX.write(wb, { bookType: 'xlsx', type })
+}
+
 export function exportWorkbook(p: Problem, classOf: number[], k: number, report: Report): Blob {
+  return new Blob([writeXlsx(resultWorkbook(p, classOf, k, report), 'array')], { type: XLSX_MIME })
+}
+
+/** 結果のブック（組分け・クラス別名簿・各組・ペア指定・集計・組み合わせ失敗・生徒名簿） */
+export function resultWorkbook(p: Problem, classOf: number[], k: number, report: Report): XLSX.WorkBook {
   const wb = XLSX.utils.book_new()
   const add = (sheet: SheetData) => XLSX.utils.book_append_sheet(wb, toWorksheet(sheet), sheet.name)
   const [assign, side, pairs, summary, failed] = buildResultSheets(p, classOf, k, report)
@@ -164,13 +181,15 @@ export function exportWorkbook(p: Problem, classOf: number[], k: number, report:
   add(summary)
   add(failed)
   add({ name: '生徒名簿', rows: rosterRows(p) })
-
-  const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-  return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  return wb
 }
 
 /** 現在の名簿を、ひな形と同じ形式の Excel（再読み込み可能）にする */
 export function exportRoster(p: Problem, numClasses: number): Blob {
+  return new Blob([writeXlsx(rosterWorkbook(p, numClasses), 'array')], { type: XLSX_MIME })
+}
+
+export function rosterWorkbook(p: Problem, numClasses: number): XLSX.WorkBook {
   const wb = XLSX.utils.book_new()
   const add = (name: string, rows: unknown[][]) => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), name)
   const n = p.students.length
@@ -183,6 +202,5 @@ export function exportRoster(p: Problem, numClasses: number): Blob {
   const nos = (groups: number[][]) => groups.map((g) => g.map((i) => p.students[i].no))
   add('同じ組ペア', nos(p.wantedGroups))
   add('別の組ペア', nos(p.unwantedGroups))
-  const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-  return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  return wb
 }
