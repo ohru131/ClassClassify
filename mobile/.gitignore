@@ -28,3 +28,6 @@ play-service-account*.json
 device-screen*.png
 metro.log
 gradle-*.log
+# ローカルのネイティブモジュール（modules/）のビルド生成物
+modules/*/android/build/
+modules/*/android/.cxx/
