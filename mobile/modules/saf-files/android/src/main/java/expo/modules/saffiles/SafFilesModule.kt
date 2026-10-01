@@ -33,12 +33,13 @@ class SafFilesModule : Module() {
     // 戻り値は { name, base64 }。キャンセルなら null
     AsyncFunction("openDocumentAsync") { mimeTypes: List<String>, promise: Promise ->
       if (!begin(promise)) return@AsyncFunction
+      // CATEGORY_OPENABLE は付けない。付けると仮想ファイル（Google スプレッドシート）が選択肢から外れ、
+      // read() の xlsx への変換までたどり着けない（Android のドキュメントの指定どおり）
       val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-        addCategory(Intent.CATEGORY_OPENABLE)
         type = "*/*"
         putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes.toTypedArray())
       }
-      appContext.throwingActivity.startActivityForResult(intent, OPEN_CODE)
+      launch(intent, OPEN_CODE)
     }
 
     // 戻り値は保存したファイル名。キャンセルなら null
@@ -50,7 +51,7 @@ class SafFilesModule : Module() {
         type = mimeType
         putExtra(Intent.EXTRA_TITLE, fileName)
       }
-      appContext.throwingActivity.startActivityForResult(intent, CREATE_CODE)
+      launch(intent, CREATE_CODE)
     }
 
     OnActivityResult { _, (requestCode, resultCode, intent) ->
@@ -83,6 +84,19 @@ class SafFilesModule : Module() {
     }
     pendingPromise = promise
     return true
+  }
+
+  // ダイアログを起動できなかったとき（Activity が無い等）は、待ち状態を解いてから失敗を返す。
+  // 解かないと、以後の呼び出しがすべて ERR_SAF_BUSY で弾かれる
+  private fun launch(intent: Intent, requestCode: Int) {
+    try {
+      appContext.throwingActivity.startActivityForResult(intent, requestCode)
+    } catch (e: Exception) {
+      val promise = pendingPromise
+      pendingPromise = null
+      pendingBytes = null
+      promise?.reject(CodedException("ERR_SAF_FILES", e.message ?: "could not open the file dialog", e))
+    }
   }
 
   private fun displayName(uri: Uri): String? =
