@@ -7,6 +7,32 @@ export type PrivacySection = { title: string; body: string[] }
 const RC = 'https://www.revenuecat.com/privacy'
 const GH = 'https://github.com/ohru131/ClassClassify'
 
+/** 最終更新日（本文を変えたら更新する）。Web で公開しているページ（privacy/index.html）にも出す */
+export const PRIVACY_UPDATED = '2026-10-01'
+
+/**
+ * 公開ページ（https://ohru131.github.io/ClassClassify/privacy/）の冒頭に出す「このポリシーの対象」。
+ * アプリ内の画面では出さない（アプリの中にいる時点で対象は自明なため）。
+ */
+export const PRIVACY_SCOPE: Record<AppLanguage, string> = {
+  ja: 'このプライバシーポリシーは、クラス編成アプリ「Mosaic」のスマホ・タブレット版（Android / iOS）に適用されます。アプリ内の「Pro・設定」タブから開ける画面と同じ内容です。',
+  en: 'This privacy policy applies to the Mosaic class placement app for phones and tablets (Android / iOS). It is the same text as the screen you can open from the Pro tab in the app.',
+  ko: '이 개인정보 처리방침은 반 편성 앱 "Mosaic"의 스마트폰·태블릿 버전(Android / iOS)에 적용됩니다. 앱의 "Pro·설정" 탭에서 열 수 있는 화면과 같은 내용입니다.',
+  es: 'Esta política de privacidad se aplica a la app Mosaic para armar grupos y cursos en teléfonos y tabletas (Android / iOS). Es el mismo texto que la pantalla que se abre desde la pestaña Pro de la app.',
+  de: 'Diese Datenschutzerklärung gilt für die App „Mosaic“ zur Klasseneinteilung auf Smartphones und Tablets (Android / iOS). Sie entspricht dem Bildschirm, den Sie in der App im Tab Pro öffnen können.',
+  'pt-BR': 'Esta política de privacidade se aplica ao app Mosaic de enturmação para celulares e tablets (Android / iOS). É o mesmo texto da tela que se abre pela aba Pro do app.',
+}
+
+/** 公開ページの見出しまわり（「最終更新日」の言い方） */
+export const PRIVACY_UPDATED_LABEL: Record<AppLanguage, string> = {
+  ja: '最終更新日',
+  en: 'Last updated',
+  ko: '최종 수정일',
+  es: 'Última actualización',
+  de: 'Zuletzt aktualisiert',
+  'pt-BR': 'Última atualização',
+}
+
 export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
   ja: [
     {

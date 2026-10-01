@@ -4,7 +4,7 @@ import { WEB_COPY, type WebCopyKey } from './index'
 
 // Web 版の言語まわりの純関数（React・DOM に依存しない。テストから使う）
 
-export const LANGUAGE_STORAGE_KEY = 'mosaic.lang'
+export { LANGUAGE_STORAGE_KEY } from '../i18n/storage-key'
 
 /** 既定の言語: URL の ?lang= → 保存済み → ブラウザの言語（navigator.languages）→ 英語 */
 export function resolveInitialLanguage(search: string, stored: string | null, browser: readonly string[]): AppLanguage {
