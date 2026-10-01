@@ -1,3 +1,4 @@
+import { PRIVACY_TITLE } from './privacy'
 import type { CopyKey } from './en'
 
 // Anrede „Sie“. Begriffe: docs/i18n-glossary.md（Klasseneinteilung, zusammen, trennen）
@@ -14,7 +15,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   tabRun: 'Einteilen',
   tabResults: 'Ergebnis',
   tabPro: 'Pro',
-  privacyTitle: 'Datenschutzerklärung',
+  privacyTitle: PRIVACY_TITLE['de'],
 
   loadTitle: 'Schülerliste laden',
   loadDesc: 'Füllen Sie die Excel-Vorlage aus (gleiches Format wie die Webversion) und wählen Sie die Datei – oder beginnen Sie mit einem Beispiel oder einer leeren Liste. Die Liste bleibt auf diesem Gerät.',

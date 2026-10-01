@@ -1,5 +1,7 @@
 // 英語のキー集合が正。他の言語はこのキーを全部持たないと型エラーになる（lib/copy/index.ts）。
 // 訳語は docs/i18n-glossary.md に揃える。{name} は format() で埋める。
+import { PRIVACY_TITLE } from './privacy'
+
 export const EN_COPY = {
   appEyebrow: 'Mosaic · Class placement',
   close: 'Close',
@@ -13,7 +15,7 @@ export const EN_COPY = {
   tabRun: 'Setup & run',
   tabResults: 'Results',
   tabPro: 'Pro',
-  privacyTitle: 'Privacy policy',
+  privacyTitle: PRIVACY_TITLE['en'],
 
   loadTitle: 'Load a roster',
   loadDesc: 'Fill in the Excel template (same format as the web version) and pick the file, or start from a sample or a blank roster. Your roster is saved only on this device.',

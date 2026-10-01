@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 // 公開用プライバシーポリシー（privacy/index.html → dist/privacy/index.html）。
 // Play Console に登録する URL は https://ohru131.github.io/ClassClassify/privacy/ 。
-// 本文はスマホ版の mobile/lib/copy/privacy.ts から、ビルド時に静的な HTML として埋め込む。
+// 本文は src/i18n/privacy.ts（スマホ版と共通）から、ビルド時に静的な HTML として埋め込む。
 // 設定ファイルから静的に import すると設定のバンドルにスマホ版の文言まで巻き込むので、
 // Vite のモジュールランナー（runnerImport）で必要になったときだけ読む。
 const privacyPage = (): Plugin => ({

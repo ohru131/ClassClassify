@@ -30,7 +30,7 @@
 Google Play への提出一式:
 
 - [docs/play-console/submission-checklist.md](docs/play-console/submission-checklist.md) — Play Console の全項目を触る順に（データセーフティ・レーティング・審査員向けの手順・国別価格は同じフォルダ）
-- プライバシーポリシー: **https://ohru131.github.io/ClassClassify/privacy/**（`privacy/index.html`。本文はスマホ版の `mobile/lib/copy/privacy.ts` からビルド時に6言語ぶん埋め込む。`?lang=ko` などで切り替え）
+- プライバシーポリシー: **https://ohru131.github.io/ClassClassify/privacy/**（`privacy/index.html`。本文はスマホ版と共通の `src/i18n/privacy.ts` からビルド時に6言語ぶん埋め込む。`?lang=ko` などで切り替え）
 - ストア用の画像: [submission-assets/README.md](submission-assets/README.md)（アイコン・フィーチャーグラフィック・スマホ／タブレット／Chromebook のスクリーンショット）
 
 ## 使い方

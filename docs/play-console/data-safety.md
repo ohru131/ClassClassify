@@ -22,7 +22,7 @@ Play の定義上、サードパーティ SDK（ここでは RevenueCat）が送
 | 書き出した Excel・PDF は OS の共有シートで利用者が送り先を選ぶ（アプリが送るのではない） | `mobile/lib/xlsx-files.ts`、`mobile/lib/print.ts`、`mobile/lib/app-files.ts` |
 | 「この端末の名簿と結果を消去」で保存データと書き出しのキャッシュを消せる | `mobile/lib/project-store.tsx` の `clearProject`、`mobile/app/(tabs)/pro.tsx` |
 | アカウント・ログインは無い | アプリ全体（認証の画面・SDK が無い） |
-| プライバシーポリシーの本文 | `mobile/lib/copy/privacy.ts`（公開ページ `https://ohru131.github.io/ClassClassify/privacy/` も同じ文言から作る） |
+| プライバシーポリシーの本文 | `src/i18n/privacy.ts`（公開ページ `https://ohru131.github.io/ClassClassify/privacy/` も同じ文言から作る） |
 
 ## フォームの回答
 
@@ -63,7 +63,7 @@ Play の定義上、サードパーティ SDK（ここでは RevenueCat）が送
 
 | 申告 | 回答 |
 |---|---|
-| 広告 | **広告は含まれていない**（`mobile/lib/copy/privacy.ts`「広告は表示しません」） |
+| 広告 | **広告は含まれていない**（`src/i18n/privacy.ts`「広告は表示しません」） |
 | 広告 ID（Advertising ID）の使用 | **いいえ**。リリース AAB のマニフェストに `com.google.android.gms.permission.AD_ID` が入っていないことを確認する |
 | プライバシーポリシー | `https://ohru131.github.io/ClassClassify/privacy/`（6言語・`?lang=ja` などで切り替え） |
 
@@ -77,4 +77,4 @@ Play の定義上、サードパーティ SDK（ここでは RevenueCat）が送
    （`android/` は prebuild の生成物なのでコミットしない）。**この環境ではネイティブのビルドをしていないので未確認。**
 2. RevenueCat の Google Play データセーフティの案内を開き、SDK のバージョン（`react-native-purchases` ^10.7）で
    収集項目（購入履歴・ID）が増えていないか確かめる。
-3. プライバシーポリシー（`mobile/lib/copy/privacy.ts`）とこの表の食い違いが無いか読み比べる。どちらかを変えたら両方直す。
+3. プライバシーポリシー（`src/i18n/privacy.ts`）とこの表の食い違いが無いか読み比べる。どちらかを変えたら両方直す。

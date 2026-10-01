@@ -46,7 +46,7 @@
 ダッシュボードの「アプリのセットアップ」に出る順。**広告の申告をレーティングより先に**済ませる。
 
 - [ ] **プライバシー ポリシー**: `https://ohru131.github.io/ClassClassify/privacy/`
-  - Web 版と一緒に GitHub Pages へ出る（`privacy/index.html`、本文は `mobile/lib/copy/privacy.ts` からビルド時に埋め込む。6言語・`?lang=ja` などで切り替え）。
+  - Web 版と一緒に GitHub Pages へ出る（`privacy/index.html`、本文は `src/i18n/privacy.ts` からビルド時に埋め込む。6言語・`?lang=ja` などで切り替え）。
   - **main にマージしてデプロイが通ったあと**、ブラウザで開けることを確かめてから登録する（`.github/workflows/deploy.yml` が `dist/privacy/index.html` の存在を検査する）。
 - [ ] **アプリへのアクセス**: 「すべての機能を特別なアクセス権なしで利用できる」（ログイン無し）→ [`reviewer-instructions.md`](reviewer-instructions.md)
 - [ ] **広告**: **「いいえ、広告は含まれていません」**（広告 SDK を入れていない）

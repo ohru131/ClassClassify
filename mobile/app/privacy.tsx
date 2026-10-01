@@ -5,7 +5,7 @@ import { PRIVACY } from '@/lib/copy/privacy'
 import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 
-// 本文は lib/copy/privacy.ts（6言語）。実態と食い違わないこと
+// 本文は src/i18n/privacy.ts（6言語・Web の公開ページと共通。lib/copy/privacy.ts から再 export）。実態と食い違わないこと
 export default function PrivacyScreen() {
   const { contentMaxWidth } = useLayout()
   const { lang, t } = useI18n()

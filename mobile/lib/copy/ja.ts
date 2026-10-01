@@ -1,3 +1,4 @@
+import { PRIVACY_TITLE } from './privacy'
 import type { CopyKey } from './en'
 
 export const JA_COPY: Record<CopyKey, string> = {
@@ -13,7 +14,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   tabRun: '設定・実行',
   tabResults: '結果',
   tabPro: 'Pro・設定',
-  privacyTitle: 'プライバシーポリシー',
+  privacyTitle: PRIVACY_TITLE['ja'],
 
   loadTitle: '名簿を読み込む',
   loadDesc: 'ひな形の Excel（Web 版と同じ形式）に生徒の特性を記入して選ぶか、サンプル・新規作成から始めます。名簿はこの端末の中だけに保存されます。',

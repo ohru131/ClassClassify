@@ -1,9 +1,8 @@
-import { COPY } from '../../mobile/lib/copy'
-import { PRIVACY, PRIVACY_SCOPE, PRIVACY_UPDATED, PRIVACY_UPDATED_LABEL } from '../../mobile/lib/copy/privacy'
+import { PRIVACY, PRIVACY_SCOPE, PRIVACY_TITLE, PRIVACY_UPDATED, PRIVACY_UPDATED_LABEL } from '../i18n/privacy'
 import { APP_LANGUAGES, LANGUAGE_META, type AppLanguage } from '../i18n/languages'
 
 // 公開用プライバシーポリシー（https://ohru131.github.io/ClassClassify/privacy/）の本文を組み立てる純関数。
-// **本文の情報源はスマホ版の mobile/lib/copy/privacy.ts だけ**で、ここに文章を書かない
+// **本文の情報源は src/i18n/privacy.ts だけ（スマホ版と共通）**で、ここに文章を書かない
 // （アプリ内の画面とストアに登録する URL の中身が食い違うと、審査でもデータセーフティでも説明が付かない）。
 // ビルド時に vite.config.ts のプラグインが privacy/index.html の <!--PRIVACY_CONTENT--> へ埋め込むので、
 // JavaScript を読まないクローラーにも6言語ぶんの本文がそのまま見える。
@@ -18,7 +17,7 @@ export function linkify(text: string): string {
     .join('')
 }
 
-export const privacyTitle = (lang: AppLanguage) => COPY[lang].privacyTitle
+export const privacyTitle = (lang: AppLanguage) => PRIVACY_TITLE[lang]
 
 function renderSection(lang: AppLanguage): string {
   const sections = PRIVACY[lang]
