@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
-import { useMemo, useState } from 'react'
-import { Pressable, ScrollView, Switch, Text, View } from 'react-native'
+import { type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, ScrollView, Switch, Text, View } from 'react-native'
 
 import { C, classColor } from '@/components/theme'
 import { Btn, Card, Chip, Notice, Screen, Segmented, Stat, styles } from '@/components/ui'
@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { pairStatus, resultWorkbook, rowColor, violationText, type ColumnReport, type PairTag, type Problem, type Report } from '@/lib/solver'
+import { clampPage, offsetForPage, pageFromOffset, pageLayout, stepPage } from '@/lib/class-pager'
 import { canSharePdf } from '@/lib/print'
 import { buildResultPrintHtml } from '@/lib/print-html'
 import { useProExport } from '@/lib/use-pro-export'
@@ -325,15 +326,117 @@ function ClassBoard({
           </View>
         ))
       ) : (
-        <>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
-            {Array.from({ length: k }, (_, c) => (
-              <Chip key={c} label={t('classChip', { cls: className(c), n: report.sizes[c] })} selected={cur === c} onPress={() => setCurrent(c)} />
-            ))}
-          </ScrollView>
-          {card(cur)}
-        </>
+        <ClassPager k={k} current={cur} onChange={setCurrent} sizes={report.sizes} renderPage={card} extraData={[classOf, selected, colorize, focus, pairs]} />
       )}
+    </View>
+  )
+}
+
+/**
+ * スマホ幅の結果画面: クラスを1ページずつ横に並べ、左右のスワイプ・上のタブ・前後の矢印で切り替える。
+ * ネイティブモジュールは足さず、横向きの FlatList（pagingEnabled）だけで組む（Web 書き出しでも同じ）。
+ * 縦のスクロールは画面全体の ScrollView が受け持ち、ページの中では縦に入れ子にしない
+ * （向きの違うスクロールは OS が方向で振り分けるので、生徒の一覧を縦に送る指と左右のスワイプが干渉しない）。
+ * 今どのページかは onScroll の位置から求める（react-native-web は onMomentumScrollEnd を出さないため）。
+ */
+function ClassPager({
+  k,
+  current,
+  onChange,
+  sizes,
+  renderPage,
+  extraData,
+}: {
+  k: number
+  current: number
+  onChange: (c: number) => void
+  sizes: number[]
+  renderPage: (c: number) => ReactElement
+  extraData: unknown
+}) {
+  const { t, className } = useI18n()
+  const listRef = useRef<FlatList<number>>(null)
+  const tabsRef = useRef<ScrollView>(null)
+  const [width, setWidth] = useState(0)
+  // スクロールで決まったページ。タブ・矢印で動かすときはスクロールが終わるまでこの値を追わない
+  const settling = useRef<number | null>(null)
+  const pages = useMemo(() => Array.from({ length: k }, (_, c) => c), [k])
+  const cur = clampPage(current, k)
+  // タブ（クラスのチップ）の位置。クラスが多くてタブが画面からはみ出すとき、今のクラスのタブを見える位置へ送る
+  const chipX = useRef<number[]>([])
+  useEffect(() => {
+    const x = chipX.current[cur]
+    if (x !== undefined) tabsRef.current?.scrollTo({ x: Math.max(0, x - 24), animated: true })
+  }, [cur])
+
+  const goTo = useCallback(
+    (c: number, animated = true) => {
+      const target = clampPage(c, k)
+      settling.current = animated ? target : null
+      onChange(target)
+      if (width > 0) listRef.current?.scrollToOffset({ offset: offsetForPage(target, width), animated })
+    },
+    [k, width, onChange],
+  )
+
+  // ページ幅が変わった（回転・ウィンドウのリサイズ）・クラス数が変わったときは、今のクラスの位置へ戻す
+  useEffect(() => {
+    if (width > 0) listRef.current?.scrollToOffset({ offset: offsetForPage(cur, width), animated: false })
+    // cur はここでは追わない（スワイプのたびに位置を戻すと指の動きと喧嘩する）
+  }, [width, k]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const page = pageFromOffset(e.nativeEvent.contentOffset.x, width, k)
+    if (settling.current !== null) {
+      if (page === settling.current) settling.current = null
+      return
+    }
+    if (page !== cur) onChange(page)
+  }
+
+  const prev = stepPage(cur, -1, k)
+  const next = stepPage(cur, 1, k)
+  return (
+    <View style={{ gap: 8 }} onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}>
+      <ScrollView ref={tabsRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
+        {pages.map((c) => (
+          <View key={c} onLayout={(e) => (chipX.current[c] = e.nativeEvent.layout.x)}>
+            <Chip label={t('classChip', { cls: className(c), n: sizes[c] ?? 0 })} selected={cur === c} onPress={() => goTo(c)} />
+          </View>
+        ))}
+      </ScrollView>
+      <View style={[styles.row, { justifyContent: 'space-between' }]}>
+        <Btn small icon="chevron-back" accessibilityLabel={t('prevClass')} disabled={prev === null} onPress={() => prev !== null && goTo(prev)} />
+        <View style={[styles.row, { gap: 5 }]} accessibilityLabel={t('classPositionA11y', { cls: className(cur), i: cur + 1, n: k })} accessibilityLiveRegion="polite">
+          {k <= 12
+            ? pages.map((c) => <View key={c} style={{ width: c === cur ? 16 : 6, height: 6, borderRadius: 3, backgroundColor: c === cur ? classColor(c).dot : C.border }} />)
+            : null}
+          <Text style={{ fontSize: 12, fontWeight: '800', color: C.sub, marginLeft: 4, fontVariant: ['tabular-nums'] }}>
+            {cur + 1} / {k}
+          </Text>
+        </View>
+        <Btn small icon="chevron-forward" accessibilityLabel={t('nextClass')} disabled={next === null} onPress={() => next !== null && goTo(next)} />
+      </View>
+      {width > 0 ? (
+        <FlatList
+          ref={listRef}
+          data={pages}
+          extraData={extraData}
+          keyExtractor={(c) => String(c)}
+          horizontal
+          pagingEnabled
+          nestedScrollEnabled
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={cur}
+          getItemLayout={(_, index) => pageLayout(width, index)}
+          onScroll={onScroll}
+          onMomentumScrollEnd={onScroll}
+          scrollEventThrottle={16}
+          // 高さはいちばん長いクラスに揃う（人数差はふつう1人以内なので、短いクラスの下の余白はわずか）
+          style={{ width }}
+          renderItem={({ item }) => <View style={{ width }}>{renderPage(item)}</View>}
+        />
+      ) : null}
     </View>
   )
 }
