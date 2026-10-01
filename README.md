@@ -27,6 +27,12 @@
 名簿データは端末内だけに保存し、外部へ送るのは購入確認（RevenueCat）の匿名 ID とレシートだけ。セットアップ・ビルド・課金の設定は [mobile/README.md](mobile/README.md)。
 日本語・英語・韓国語・スペイン語・ドイツ語・ポルトガル語（ブラジル）に対応（用語集は [docs/i18n-glossary.md](docs/i18n-glossary.md)、ストア掲載文は [docs/store-listing.md](docs/store-listing.md)）。Web 版はこれまでどおり無料のまま。
 
+Google Play への提出一式:
+
+- [docs/play-console/submission-checklist.md](docs/play-console/submission-checklist.md) — Play Console の全項目を触る順に（データセーフティ・レーティング・審査員向けの手順・国別価格は同じフォルダ）
+- プライバシーポリシー: **https://ohru131.github.io/ClassClassify/privacy/**（`privacy/index.html`。本文はスマホ版の `mobile/lib/copy/privacy.ts` からビルド時に6言語ぶん埋め込む。`?lang=ko` などで切り替え）
+- ストア用の画像: [submission-assets/README.md](submission-assets/README.md)（アイコン・フィーチャーグラフィック・スマホ／タブレット／Chromebook のスクリーンショット）
+
 ## 使い方
 
 1. 画面の「Excel ひな形」から取得、または「スプレッドシートでひな形を作成」で Google ドライブに作成し、名簿を記入
@@ -75,6 +81,17 @@ npm run build   # dist/ に静的ファイルを出力
 ```
 
 `main` への push で GitHub Actions がビルドし、GitHub Pages へデプロイする（Settings → Pages → Source: GitHub Actions）。
+Web 版（`index.html`）とプライバシーポリシー（`privacy/index.html` → `/privacy/`）の2ページを出す。
+
+ストア提出用のスクリプト（Playwright・sharp はアプリの依存に入れていない。`scripts/lib/deps.mjs` を参照）:
+
+```bash
+(cd mobile && npx expo export --platform web)       # スクリーンショットの元になる Web 書き出し
+npx tsx scripts/capture-submission-assets.mjs        # 6言語 × スマホ／7・10インチ／Chromebook のスクリーンショット
+node scripts/generate-feature-graphic.mjs            # フィーチャーグラフィック（6言語）とストアアイコン
+node scripts/check-submission-assets.mjs             # Play の規格（大きさ・アルファ・枚数）を検査
+node scripts/push-play-pricing.mjs                   # Pro の国別価格（既定はドライラン。--commit で反映）
+```
 
 ローカルで Google 連携を試すには `.env.local` に `VITE_GOOGLE_CLIENT_ID` / `VITE_GOOGLE_API_KEY` / `VITE_GOOGLE_APP_ID` を書く。
 
