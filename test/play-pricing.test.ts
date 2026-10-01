@@ -42,7 +42,7 @@ describe('Pro の国別価格（pricing.csv）', () => {
     expect(() => parseArgs(['--package', ''])).toThrow(/--package に値がない/)
     expect(() => parseArgs(['--sku', '-x'])).toThrow(/--sku に値がない/)
     // 指定しなければ既定値（指定なしと値なしを区別する）
-    expect(parseArgs([])).toMatchObject({ mode: 'dry-run', package: 'com.ohru131.mosaic', sku: 'mosaic_pro', key: null, enableNewRegions: false })
+    expect(parseArgs([])).toMatchObject({ mode: 'dry-run', package: 'com.ohru131.fairclass', sku: 'fairclass_pro', key: null, enableNewRegions: false })
     expect(parseArgs(['--commit', '--key', 'sa.json', '--sku', 'pro2'])).toMatchObject({ mode: 'commit', key: 'sa.json', sku: 'pro2' })
   })
 

@@ -3,7 +3,7 @@
 import { PRIVACY_TITLE } from './privacy'
 
 export const EN_COPY = {
-  appEyebrow: 'Mosaic · Class placement',
+  appEyebrow: 'FairClass · Class placement',
   close: 'Close',
   cancel: 'Cancel',
   delete: 'Delete',
@@ -141,6 +141,7 @@ export const EN_COPY = {
   violationsOk: 'All pairings are met',
   undoMoves: 'Undo manual changes',
   shareXlsx: 'Share results as Excel',
+  saveToFile: 'Save to Drive or device',
   print: 'Print',
   printPdf: 'Print / PDF',
   sharePdf: 'Share as PDF',
@@ -175,7 +176,7 @@ export const EN_COPY = {
   noPairsBody: 'No pairings were set.',
 
   proTitle: 'Pro & settings',
-  proName: 'Mosaic Pro',
+  proName: 'FairClass Pro',
   active: '✓ Active',
   proIntro: 'Loading, editing, building and adjusting classes is free, with no ads. Get Pro when you need to export or print.',
   feat1Title: 'Export results to Excel and Google Drive',
@@ -197,7 +198,7 @@ export const EN_COPY = {
   clearData: 'Erase roster and results on this device',
   clearTitle: 'Erase roster and results',
   clearBody: 'This deletes the roster and results saved on this device. It cannot be undone.',
-  footer: 'Mosaic · class placement optimizer (free web version: https://ohru131.github.io/ClassClassify/)',
+  footer: 'FairClass · class placement optimizer (free web version: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'Purchases are available in the iOS or Android app.',
   revenueCatKeyMissing: 'The RevenueCat public SDK key is not configured.',
@@ -222,7 +223,7 @@ export const EN_COPY = {
   popupBlocked: 'The pop-up was blocked. Please allow pop-ups for this site.',
   fileResults: 'class-placement',
   fileRoster: 'roster',
-  fileTemplate: 'mosaic-template',
+  fileTemplate: 'fairclass-template',
 
   printTitle: 'Class placement results',
   printCreated: 'Created: {date}',

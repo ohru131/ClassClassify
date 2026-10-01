@@ -18,7 +18,7 @@ type Focus = { kind: 'wanted' | 'unwanted'; group: number } | null
 
 export default function ResultsScreen() {
   const { problem, solution, report, edited, moveStudent, resetMoves, error, setError } = useProject()
-  const { exportXlsx, print, exportPdf, busy, isPro } = useProExport()
+  const { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, busy, isPro } = useProExport()
   const router = useRouter()
   const { isWide } = useLayout()
   const i18n = useI18n()
@@ -78,6 +78,15 @@ export default function ResultsScreen() {
             busy={busy === 'xlsx'}
             onPress={() => exportXlsx(() => resultWorkbook(problem, solution.classOf, k, report, fileLang), t('fileResults'))}
           />
+          {canSaveToFile ? (
+            <Btn
+              small
+              icon={isPro ? 'save-outline' : 'lock-closed-outline'}
+              label={t('saveToFile')}
+              busy={busy === 'save'}
+              onPress={() => saveToFile(() => resultWorkbook(problem, solution.classOf, k, report, fileLang), t('fileResults'))}
+            />
+          ) : null}
           <Btn
             small
             icon={isPro ? 'print-outline' : 'lock-closed-outline'}

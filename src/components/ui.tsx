@@ -33,7 +33,7 @@ export function Logo() {
         </g>
       </svg>
       <div className="leading-tight">
-        <div className="text-lg font-extrabold tracking-tight text-slate-900">Mosaic</div>
+        <div className="text-lg font-extrabold tracking-tight text-slate-900">FairClass</div>
         <div className="text-[11px] font-medium tracking-wide text-slate-500">{t('tagline')}</div>
       </div>
     </div>

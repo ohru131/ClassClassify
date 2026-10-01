@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 // 設定ファイルから静的に import すると設定のバンドルにスマホ版の文言まで巻き込むので、
 // Vite のモジュールランナー（runnerImport）で必要になったときだけ読む。
 const privacyPage = (): Plugin => ({
-  name: 'mosaic-privacy-page',
+  name: 'fairclass-privacy-page',
   transformIndexHtml: {
     order: 'pre',
     handler: async (html, ctx) => {

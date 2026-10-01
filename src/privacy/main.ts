@@ -23,7 +23,7 @@ function show(lang: AppLanguage) {
   })
   document.documentElement.lang = LANGUAGE_META[lang].intl
   const h1 = document.querySelector<HTMLElement>(`[data-lang="${lang}"] h1`)
-  if (h1?.textContent) document.title = `${h1.textContent} — Mosaic`
+  if (h1?.textContent) document.title = `${h1.textContent} — FairClass`
 }
 
 const stored = readStored()

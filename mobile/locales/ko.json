@@ -1,8 +1,8 @@
 {
   "ios": {
-    "CFBundleDisplayName": "Mosaic 반 편성"
+    "CFBundleDisplayName": "FairClass 반 편성"
   },
   "android": {
-    "app_name": "Mosaic 반 편성"
+    "app_name": "FairClass 반 편성"
   }
 }

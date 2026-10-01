@@ -7,6 +7,7 @@ import { makeI18n, type I18n, type LanguageChoice } from './i18n-core'
 
 export type { I18n, LanguageChoice }
 
+// 旧名 Mosaic のままにしてある（変えると保存済みの言語設定を読めなくなる）
 const STORAGE_KEY = 'mosaic.language.v1'
 const Ctx = createContext<I18n | null>(null)
 

@@ -1,8 +1,8 @@
 {
   "ios": {
-    "CFBundleDisplayName": "Mosaic Class Placement"
+    "CFBundleDisplayName": "FairClass"
   },
   "android": {
-    "app_name": "Mosaic Class Placement"
+    "app_name": "FairClass"
   }
 }

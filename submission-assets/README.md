@@ -1,6 +1,6 @@
 # ストア提出用の画像（Google Play）
 
-Mosaic スマホ・タブレット版（`mobile/`）を Google Play に掲載するための画像一式。
+FairClass スマホ・タブレット版（`mobile/`）を Google Play に掲載するための画像一式。
 **すべてスクリプトで作り直せる**（手で加工した画像は無い）。作り方は下の「作り直す」。
 
 ```
@@ -97,6 +97,11 @@ submission-assets/
 #   Chromium は CHROMIUM_PATH → /opt/pw-browsers/chromium → Windows の Chrome / Edge の順に探す（playwright install はしない）
 npm i --no-save playwright-core sharp
 
+# 一括（Web 書き出し → 撮影 → フィーチャーグラフィック → 検査）。アプリ名や文言を変えたらこれ1本でよい
+node scripts/rebuild-store-images.mjs              # 全部（20分ほど）
+node scripts/rebuild-store-images.mjs --lang ja --form phone --only 01-roster
+
+# 個別に動かすとき
 (cd mobile && npx expo export --platform web)     # mobile/dist を作る
 npx tsx scripts/capture-submission-assets.mjs      # 全部（6言語 × 4サイズ × 8枚、10分ほど）
 npx tsx scripts/capture-submission-assets.mjs --lang ko --form phone,tablet10 --only 04-results
@@ -108,3 +113,5 @@ node scripts/check-submission-assets.mjs           # 大きさ・アルファ・
   文言を変えてもスクリプトの直しは要らない（ボタンが見つからなければタイムアウトで止まる）。
 - フィーチャーグラフィックの見出しは `scripts/generate-feature-graphic.mjs` の `LOCALES`。`docs/store-listing.md` の短い説明と同じ主張に揃える。
 - 画面を変えたら撮り直し、`check-submission-assets.mjs` を通してからコミットする。
+- **撮影元は作業ツリーの `mobile/` そのもの。** 未コミットの画面の変更があると写り込むので、コミット済みの画面だけを撮るときは
+  `git worktree add <短いパス> HEAD` で取り出したフォルダで `npm ci`（直下と `mobile/`）してから撮り、`submission-assets/` だけを戻す。

@@ -31,7 +31,7 @@ describe('公開用プライバシーポリシー', () => {
     expect(linkify('GitHub（https://github.com/ohru131/ClassClassify）の')).toContain('href="https://github.com/ohru131/ClassClassify"')
   })
 
-  const outDir = mkdtempSync(join(tmpdir(), 'mosaic-dist-'))
+  const outDir = mkdtempSync(join(tmpdir(), 'fairclass-dist-'))
   afterAll(() => rmSync(outDir, { recursive: true, force: true }))
 
   it('vite build の出力に privacy/index.html が入る', async () => {

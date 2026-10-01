@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { CancelledError, defaultStarts, runSliced } from '../lib/runner'
+import { CancelledError, defaultStarts, nextSliceMs, runSliced } from '../lib/runner'
 import { compile, evaluate, parseWorkbook } from '../lib/solver'
 
 const load = (f: string) => {
@@ -65,6 +65,32 @@ describe('runSliced', () => {
     // 計算 300ms ＋ 待ち（5ms × 回数）ぶんの実時間がかかる
     expect(Date.now() - t0).toBeGreaterThanOrEqual(300 + yields * 4)
     expect(res.iterations).toBeGreaterThan(0)
+  })
+
+  it('UI に返す時間が長くても、計算時間を伸ばして実時間を探索時間の近くに収める', async () => {
+    const p = load('sample-group.xlsx')
+    const { compiled } = compile(p)
+    let yields = 0
+    const t0 = Date.now()
+    await runSliced(compiled, {
+      timeMs: 600,
+      starts: 1,
+      sliceMs: 5,
+      yieldToUi: async () => {
+        yields++
+        // 実機の debug ビルドの再描画に相当する重さ
+        await new Promise((r) => setTimeout(r, 30))
+      },
+    }).promise
+    // 計算を伸ばさないと 600ms ÷ 5ms = 120回 × 30ms ≈ 3.6秒の待ちが加わる
+    expect(yields).toBeLessThan(30)
+    expect(Date.now() - t0).toBeLessThan(600 * 2)
+  })
+
+  it('計算時間は UI に返した時間の4倍（計算8割）を目安に、下限と上限の間に収める', () => {
+    expect(nextSliceMs(0, 24, 200)).toBe(24)
+    expect(nextSliceMs(10, 24, 200)).toBeCloseTo(40)
+    expect(nextSliceMs(1000, 24, 200)).toBe(200)
   })
 
   it('探索時間からスタート回数を決める', () => {

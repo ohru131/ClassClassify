@@ -47,6 +47,7 @@ type ProjectContextValue = {
   setError: (e: string | null) => void
 }
 
+// 旧名 Mosaic のままにしてある（変えると保存済みの名簿・結果を読めなくなる）
 const STORAGE_KEY = 'mosaic.project.v1'
 const ProjectContext = createContext<ProjectContextValue | null>(null)
 
@@ -186,7 +187,8 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     try {
       // compile も try の中で（例外で実行中のまま固まらないように）
       const { compiled } = compile(start, numClasses)
-      const job = runSliced(compiled, { timeMs: timeSec * 1000, onProgress: (f) => setProgress(f) })
+      // 1% 刻みに丸める（同じ値なら React が再描画を省くので、計算中の UI の負担が減る）
+      const job = runSliced(compiled, { timeMs: timeSec * 1000, onProgress: (f) => setProgress(Math.round(f * 100) / 100) })
       cancelRef.current = job.cancel
       const res = await job.promise
       const now = problemRef.current

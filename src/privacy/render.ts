@@ -28,7 +28,7 @@ function renderSection(lang: AppLanguage): string {
   return (
     `<article class="policy" id="${lang}" lang="${LANGUAGE_META[lang].intl}" data-lang="${lang}">` +
     `<h1>${escapeHtml(privacyTitle(lang))}</h1>` +
-    `<p class="meta">Mosaic · ${escapeHtml(PRIVACY_UPDATED_LABEL[lang])}: <time datetime="${PRIVACY_UPDATED}">${PRIVACY_UPDATED}</time></p>` +
+    `<p class="meta">FairClass · ${escapeHtml(PRIVACY_UPDATED_LABEL[lang])}: <time datetime="${PRIVACY_UPDATED}">${PRIVACY_UPDATED}</time></p>` +
     `<p class="scope">${escapeHtml(PRIVACY_SCOPE[lang])}</p>` +
     sections +
     `</article>`

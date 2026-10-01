@@ -9,7 +9,7 @@ type Row = (string | number)[]
 // 「使い方」シート（言語別）。シート名は src/solver/labels.ts の語彙に合わせる
 const GUIDE: Record<AppLanguage, Row[]> = {
   ja: [
-    ['Mosaic 名簿ひな形の使い方'],
+    ['FairClass 名簿ひな形の使い方'],
     [''],
     ['シート', '書き方'],
     ['設定', 'B列に値を入力。「クラス数」は必須、「1クラスの最大人数」は任意（生徒人数は参考）'],
@@ -24,11 +24,11 @@ const GUIDE: Record<AppLanguage, Row[]> = {
     ['', '7種類以上の数値（点数など）→ クラス平均を均等化'],
     [''],
     ['記入例', '「生徒名簿」などには記入例（架空の生徒80名）が入っている。自分の名簿に書き換えて使う'],
-    ['読み込み', 'Mosaic の「Google スプレッドシート」からこのファイルを選ぶ'],
+    ['読み込み', 'FairClass の「Google スプレッドシート」からこのファイルを選ぶ'],
     ['このシート', '「使い方」シートは読み込み時に無視されるので、残しても消してもよい'],
   ],
   en: [
-    ['How to use the Mosaic roster template'],
+    ['How to use the FairClass roster template'],
     [''],
     ['Sheet', 'What to enter'],
     ['Settings', 'Enter values in column B. "Number of classes" is required, "Maximum class size" is optional (number of students is for reference)'],
@@ -43,11 +43,11 @@ const GUIDE: Record<AppLanguage, Row[]> = {
     ['', '7 or more numbers (e.g. scores) → class averages are balanced'],
     [''],
     ['Example', 'The sheets contain an example (80 fictional students). Replace it with your own roster'],
-    ['Loading', 'Choose this file with "Google Sheets" in Mosaic'],
+    ['Loading', 'Choose this file with "Google Sheets" in FairClass'],
     ['This sheet', 'The "How to use" sheet is ignored when loading, so you can keep or delete it'],
   ],
   ko: [
-    ['Mosaic 명단 양식 사용법'],
+    ['FairClass 명단 양식 사용법'],
     [''],
     ['시트', '입력 방법'],
     ['설정', 'B열에 값을 입력합니다. "반 수"는 필수, "반별 최대 인원"은 선택(학생 수는 참고용)'],
@@ -62,11 +62,11 @@ const GUIDE: Record<AppLanguage, Row[]> = {
     ['', '7종류 이상의 숫자(점수 등) → 반 평균을 고르게'],
     [''],
     ['예시', '시트에는 예시(가상의 학생 80명)가 들어 있습니다. 실제 명단으로 바꿔 쓰세요'],
-    ['불러오기', 'Mosaic의 "Google 스프레드시트"에서 이 파일을 선택합니다'],
+    ['불러오기', 'FairClass의 "Google 스프레드시트"에서 이 파일을 선택합니다'],
     ['이 시트', '"사용법" 시트는 불러올 때 무시되므로 남겨 두어도, 지워도 됩니다'],
   ],
   es: [
-    ['Cómo usar la plantilla de lista de Mosaic'],
+    ['Cómo usar la plantilla de lista de FairClass'],
     [''],
     ['Hoja', 'Qué escribir'],
     ['Configuración', 'Escribe los valores en la columna B. “Número de grupos” es obligatorio, “Máximo por grupo” es opcional (el número de estudiantes es de referencia)'],
@@ -81,11 +81,11 @@ const GUIDE: Record<AppLanguage, Row[]> = {
     ['', '7 o más números (notas, etc.) → se equilibran los promedios de los grupos'],
     [''],
     ['Ejemplo', 'Las hojas traen un ejemplo (80 estudiantes ficticios). Reemplázalo con tu lista'],
-    ['Cargar', 'Elige este archivo con “Google Sheets” en Mosaic'],
+    ['Cargar', 'Elige este archivo con “Google Sheets” en FairClass'],
     ['Esta hoja', 'La hoja “Cómo usar” se ignora al cargar; puedes dejarla o borrarla'],
   ],
   de: [
-    ['So verwenden Sie die Mosaic-Vorlage'],
+    ['So verwenden Sie die FairClass-Vorlage'],
     [''],
     ['Blatt', 'Was eintragen'],
     ['Einstellungen', 'Werte in Spalte B eintragen. „Anzahl Klassen“ ist Pflicht, „Höchstzahl pro Klasse“ optional (Anzahl Schüler dient zur Orientierung)'],
@@ -100,11 +100,11 @@ const GUIDE: Record<AppLanguage, Row[]> = {
     ['', '7 oder mehr Zahlen (Noten usw.) → die Klassendurchschnitte werden ausgeglichen'],
     [''],
     ['Beispiel', 'Die Blätter enthalten ein Beispiel (80 fiktive Schüler). Ersetzen Sie es durch Ihre Liste'],
-    ['Laden', 'Wählen Sie diese Datei in Mosaic über „Google Tabellen“'],
+    ['Laden', 'Wählen Sie diese Datei in FairClass über „Google Tabellen“'],
     ['Dieses Blatt', 'Das Blatt „Anleitung“ wird beim Laden ignoriert und kann bleiben oder gelöscht werden'],
   ],
   'pt-BR': [
-    ['Como usar o modelo de lista do Mosaic'],
+    ['Como usar o modelo de lista do FairClass'],
     [''],
     ['Aba', 'O que preencher'],
     ['Configurações', 'Preencha os valores na coluna B. “Número de turmas” é obrigatório, “Máximo por turma” é opcional (o número de alunos é só referência)'],
@@ -119,7 +119,7 @@ const GUIDE: Record<AppLanguage, Row[]> = {
     ['', '7 ou mais números (notas etc.) → equilibra as médias das turmas'],
     [''],
     ['Exemplo', 'As abas trazem um exemplo (80 alunos fictícios). Substitua pela sua lista'],
-    ['Carregar', 'Escolha este arquivo em “Planilhas Google” no Mosaic'],
+    ['Carregar', 'Escolha este arquivo em “Planilhas Google” no FairClass'],
     ['Esta aba', 'A aba “Como usar” é ignorada ao carregar; pode deixar ou apagar'],
   ],
 }
@@ -158,7 +158,7 @@ export function buildTemplateSheets(buf: ArrayBuffer, lang: AppLanguage = 'ja'):
 }
 
 /** 記入例つきのひな形スプレッドシートを利用者の Drive に作成する */
-export async function createTemplateSpreadsheet(lang: AppLanguage = 'ja', title = 'Mosaic 名簿ひな形'): Promise<GoogleFile> {
+export async function createTemplateSpreadsheet(lang: AppLanguage = 'ja', title = 'FairClass 名簿ひな形'): Promise<GoogleFile> {
   // その言語のサンプル（日本語も samples/ja/。旧 ./sample1.xlsx は以前のリンク用に残してある）
   const buf = await (await fetch(sampleUrl(lang, 'sample1'))).arrayBuffer()
   return createSpreadsheet(title, buildTemplateSheets(buf, lang))

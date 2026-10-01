@@ -1,4 +1,4 @@
-# Mosaic クラス編成（スマホ・タブレット版）
+# FairClass クラス編成（スマホ・タブレット版）
 
 Web 版（リポジトリ直下）と同じソルバー（`../src/solver`）を使う Expo / React Native アプリ。
 Web 版は従来どおり無料。このアプリは**広告なしの無料版＋ Pro（買い切り）**で配布し、収益は買い切り一本にする（広告・サブスクは無い）。
@@ -100,11 +100,31 @@ npx expo start --dev-client
 
 `eas.json` の `appVersionSource: "remote"` は、EAS 側のカウンタが未初期化だと versionCode 1 から始まる。
 既存の Play アプリへ上書きする場合は、先に `eas build:version:set` で合わせる。
-**アプリ ID（`com.ohru131.mosaic`）は公開後に変えないこと。**
+**アプリ ID（`com.ohru131.fairclass`）は公開後に変えないこと。**
+
+## ローカルビルド（gradle）
+
+EAS を使わず手元でビルドする手順（既存アプリ UnitCalc と同じ構成）。要 JDK 17・Android SDK。
+
+```bash
+npx expo prebuild -p android --no-install          # android/ を作り直す（コミットしない）
+cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
+```
+
+- **debug は `com.ohru131.fairclass.debug`（ホーム画面の名前は「FairClass dev」）の別アプリとして入る**（`plugins/withDebugPackageSuffix.js`）。Play 版と署名が違っても上書きにならないので、Play 版の名簿を消さずに試せる。引き換えに debug では課金を試せない（RevenueCat の商品はパッケージ名に紐づく）。
+- 実機の ABI だけビルドすれば速い: `./gradlew.bat installDebug -PreactNativeArchitectures=arm64-v8a`。
+- JS だけの変更なら debug APK の作り直しは要らない（dev-client が Metro から読む）。作り直すのは依存・`app.config.ts`・`plugins/` が変わったときだけ。
+- Metro は `npx expo start --dev-client --port 8082`（この開発機は 8081 を別プロセスが占有している）→ `adb reverse tcp:8081 tcp:8082` と `adb reverse tcp:8082 tcp:8082` → `adb shell am start -a android.intent.action.VIEW -d "'fairclass://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8082'" com.ohru131.fairclass.debug`。
+- `expo start` が `tsconfig.json` を整形し直す（`expo-env.d.ts` が include から消える）ことがある。コミットに混ぜない。
+- **release の署名**: `credentials.json`（`android.keystore` に `keystorePath` / `keystorePassword` / `keyAlias` / `keyPassword`）を置くと、`plugins/withLocalReleaseSigning.js` が prebuild のたびに `android/keystore.properties` を作り、`bundleRelease` を upload key で署名する。無ければ debug 鍵で署名される（Play に弾かれる）。`credentials.json`・`credentials/`・`keystore.properties` は .gitignore 済み。**絶対にコミットしない。**
+- バージョンは `app.config.ts` の `version` と `android.versionCode`（Play で未使用の値）を上げてから prebuild する。
+- release AAB は `cd android && ./gradlew.bat bundleRelease --console=plain`（約15分）→ `android/app/build/outputs/bundle/release/app-release.aab`。`keytool -printcert -jarfile <aab>` の SHA1 が upload key（EAS の Build Credentials・Default）と一致することを確かめる。
+- **`react-native-gesture-handler` / `react-native-reanimated` / `react-native-worklets` は Expo SDK の推奨版を直接の依存に置く**（`npx expo install` で入れる）。直接の依存に無いと expo-router 経由で新しすぎる版が入り、gesture-handler 3.x では release の C++ 中間ファイルのパスが Windows の 260 文字上限を超えて `Filename longer than 260 characters` で落ちる（debug は中間フォルダ名が短いので通ってしまう）。worklets も expo-modules-core の対応範囲外になる。
+- **ネイティブの依存の版を変えたら、`node_modules/*/android/.cxx` と `node_modules/*/android/build` を消してからビルドする。** prebuild は `android/` しか作り直さないので、ライブラリ側に古い CMake のキャッシュが残り、`libworklets.so ... missing and no known rule to make it` のように消えた出力先を参照して落ちる。
 
 ## RevenueCat の設定（買い切りのみ）
 
-1. Play Console で **一回限りの商品（定期購入ではない）** を作る（例: `mosaic_pro`）。iOS も出すなら App Store Connect で「非消費型」。
+1. Play Console で **一回限りの商品（定期購入ではない）** を作る（例: `fairclass_pro`）。iOS も出すなら App Store Connect で「非消費型」。
 2. RevenueCat でプロジェクト・アプリを作り、その商品を登録する。
 3. **Entitlement `pro`** を作り、商品を紐付ける（紐付け忘れると、支払っても Pro にならない。アプリはその場合「復元」とサポートへ案内する）。
 4. **RevenueCat のダッシュボードでその商品を Non-consumable（非消費型）に設定する（必須）。** Google Play の一回限りの商品を
@@ -173,12 +193,16 @@ npx expo start --dev-client
 - スマホ幅の結果画面のページ送り（390×844）: 組のタブのタップ・前後の矢印（端で無効）・タッチの左右ドラッグ・横ホイールで隣の組へ移り、タブとドット・「2 / 4」が追従する。縦のタッチスクロールでは組が変わらない。生徒を別の組へ移しても今の組に留まり、幅を 600 → 390 に変えても同じ組の位置に戻る。
 - 6言語 × 390×844・1280×800 で サンプル → 実行 → 結果 → バランス → Pro 画面、印刷用ウィンドウを Playwright で撮影し、ボタン・タブの文字のはみ出しが無いことを確認（独・西の長い語はセグメントを2行まで折り返す）。
 
-**実機では未検証**（ネイティブのビルドはこの環境で行っていない）:
+実機（moto g52j 5G・Android。debug ビルド＋ Metro と、upload key で署名した release APK）で確認済み:
 
+- 起動 → サンプル（80名・4組）の読み込み → 実行（標準10秒）→ 結果で人数差0・バランス完全・条件違反0。Pro 画面の表示（SDK キー未設定の案内）。
+- **探索時間が実時間に対して大幅に延びていた**のを直した。24ms 計算するたびに UI へ返していたが、UI 側（進捗の再描画）の時間は探索時間に数えないため、「10秒」で実時間が約95秒かかっていた。`lib/runner.ts` が UI に返した時間を測り、計算が実時間の8割を占めるよう1回の計算時間を 24〜200ms で伸ばす。進捗は1%刻みに丸めて、値が変わらない再描画を省く。debug ビルドで約26秒、**release ビルドで約13秒**（10秒で76%・12秒で90%・14秒で結果画面。結果は人数差0・バランス完全・違反0）。
+- 英数字がセリフ体に見えるのは端末のシステムフォント設定（この端末は Roboto Slab）に従っているため。アプリはフォントを指定していない。
+
+**実機では未検証**:
+
+- 240名規模で違反0に届くか（release の実時間は80名で確認済み）。
 - 結果画面の左右スワイプ（Android の横向き `FlatList` の `pagingEnabled` と、画面全体の縦スクロールとの振り分け）。
-
-- Hermes 上のソルバーの速度。V8（Web）より大幅に遅い見込みで、同じ探索時間でも反復回数は少ない。サンプル規模（80名）で違反0に届くか、240名規模で十分かを実機で確認すること。足りなければ `lib/runner.ts` のスタート回数を減らす（1回あたりを長くする）のが最初の調整点。
-- 計算中の UI の滑らかさ（`sliceMs` 24ms ごとに制御を返す）。
 - `expo-document-picker` で .xlsx が選べるか（端末によって MIME が違う。`application/octet-stream` も受け付けている）、共有シートから Excel・Google ドライブ・Gmail へ .xlsx が渡るか。
 - 購入・復元・Pro の反映（本番の RevenueCat 設定が必要）。
 - `expo-print` の印刷画面・PDF の見た目（Android の WebView / iOS の WKWebView で組版がブラウザと違うことがある。日本語フォント、改ページ、背景色の印刷）。

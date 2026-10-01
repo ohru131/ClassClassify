@@ -1,8 +1,8 @@
-# Google Play Console 提出チェックリスト（Mosaic スマホ・タブレット版）
+# Google Play Console 提出チェックリスト（FairClass スマホ・タブレット版）
 
 `mobile/`（Expo SDK 57・Android）を Google Play に初めて出すまでの全項目を、Play Console で実際に触る順に並べた。
 既存アプリ UnitCalc（`ohru131/si-unit-calculator` の `docs/android-submission-checklist.md`）の手順を下敷きにしているが、
-**Mosaic は広告・AdMob・アカウントが無く、扱うデータ（名簿）も違う**ので、答えは全部 Mosaic のコードから取り直してある。
+**FairClass は広告・AdMob・アカウントが無く、扱うデータ（名簿）も違う**ので、答えは全部 FairClass のコードから取り直してある。
 
 関連資料（このフォルダ）:
 
@@ -22,7 +22,7 @@
 
 ## 0. 着手前に決めること
 
-- [ ] **【要決定】アプリ ID（パッケージ名）**: 今は仮に **`com.ohru131.mosaic`**（`mobile/app.config.ts` の `APP_ID`）。
+- [ ] **【要決定】アプリ ID（パッケージ名）**: 今は仮に **`com.ohru131.fairclass`**（`mobile/app.config.ts` の `APP_ID`）。
   **最初の AAB をアップロードした瞬間に永久に固定され、二度と変えられない**（変えると別アプリになり、購入の復元もできない）。
   候補を変えるなら `mobile/app.config.ts`・`scripts/push-play-pricing.mjs` の `DEFAULT_PACKAGE`・RevenueCat のアプリ設定を同時に直す。
 - [ ] **【要決定】デベロッパー名・連絡先メール**（ストアに公開される）。プライバシーポリシーは問い合わせ先を GitHub Issues にしているが、
@@ -35,7 +35,7 @@
 
 | 項目 | 入力 | 理由 |
 |---|---|---|
-| アプリ名 | `Mosaic: Class Placement`（既定言語＝英語の掲載名。各言語の名前は掲載情報で入れる） | `docs/store-listing.md` en-US |
+| アプリ名 | `FairClass: Class Placement`（既定言語＝英語の掲載名。各言語の名前は掲載情報で入れる） | `docs/store-listing.md` en-US |
 | デフォルトの言語 | **英語（米国） – en-US** | 掲載文を用意していない国の利用者には既定言語が出る。日本語を既定にすると、フランス・イタリアなどの利用者に日本語の掲載が出る。アプリ側の既定言語も英語（`src/i18n/languages.ts` の `DEFAULT_LANGUAGE`） |
 | アプリ / ゲーム | **アプリ** | — |
 | 無料 / 有料 | **無料**（アプリ内購入あり） | 読み込み・編集・編成・手直しは無料。**一度「無料」で公開すると有料アプリには変えられない**（逆は可） |
@@ -94,8 +94,8 @@
 ## 5. アプリ内アイテムと課金（「収益化」→「商品」→「一回限りの商品」）
 
 - [ ] お支払いプロファイルを紐付ける（未設定だと商品を作れない）
-- [ ] **一回限りの商品**を作成: 商品 ID **`mosaic_pro`**（**作ったら変えられない・削除しても同じ ID は再利用できない**）
-  - 名前: `Mosaic Pro`（言語ごとの名前・説明も入れる。例: ja「Mosaic Pro（買い切り）」「Excel への書き出しと印刷・PDF」）
+- [ ] **一回限りの商品**を作成: 商品 ID **`fairclass_pro`**（**作ったら変えられない・削除しても同じ ID は再利用できない**）
+  - 名前: `FairClass Pro`（言語ごとの名前・説明も入れる。例: ja「FairClass Pro（買い切り）」「Excel への書き出しと印刷・PDF」）
   - 購入オプション: 「購入（Buy）」1つ。**基準価格 US$5.99** を入れて保存・有効化
   - 国別価格: [`pricing.csv`](pricing.csv) を `node scripts/push-play-pricing.mjs --commit` で反映（[`pricing.md`](pricing.md)）
   - **定期購入（サブスクリプション）は作らない。**
@@ -108,8 +108,8 @@
   - [ ] RevenueCat のプロジェクトに Android アプリ（パッケージ名＝上の App ID）を作る
   - [ ] **Play のサービス アカウントの認証情報**を RevenueCat に登録（購入の検証に要る。権限が反映されるまで最大 36 時間かかることがある【要確認】）
   - [ ] （推奨）リアルタイム デベロッパー通知（Pub/Sub）を RevenueCat の案内どおりに設定（返金の反映が早くなる）
-  - [ ] 商品 `mosaic_pro` を取り込み、**Entitlement `pro`** に紐付ける（紐付け忘れると支払っても Pro にならない）
-  - [ ] **RevenueCat のダッシュボードで商品 `mosaic_pro` の種類を「Non-consumable（非消費型）」に設定する（必須）**。
+  - [ ] 商品 `fairclass_pro` を取り込み、**Entitlement `pro`** に紐付ける（紐付け忘れると支払っても Pro にならない）
+  - [ ] **RevenueCat のダッシュボードで商品 `fairclass_pro` の種類を「Non-consumable（非消費型）」に設定する（必須）**。
     **Lifetime パッケージに入れるだけでは非消費型にならない**（パッケージの種類は offering の中の並べ方で、consume するかどうかとは別の設定）
   - [ ] Offering（current）に **Lifetime パッケージ**として入れる
   - [ ] 内部テストでライセンステスターとして購入 → アプリを入れ直して「購入を復元」で Pro が戻ること、もう一度「購入」しようとすると「購入済み」になることを確かめる（consume されていればどちらも失敗する）
@@ -177,11 +177,11 @@
 
 ## オーナーが手で行う残りの作業（まとめ）
 
-1. **App ID を確定**（`com.ohru131.mosaic` のままでよいか）—— 最初のアップロード前に必ず。
+1. **App ID を確定**（`com.ohru131.fairclass` のままでよいか）—— 最初のアップロード前に必ず。
 2. 公開する連絡先メール・デベロッパー名を決める。
 3. お支払いプロファイル・税務情報・本人確認。
 4. EAS プロジェクトの作成、RevenueCat のプロジェクト・Android アプリ・`pro` entitlement・**商品を非消費型に設定**・Lifetime の offering、SDK キーを EAS へ。
 5. Play Console でアプリ作成 → アプリのコンテンツの各申告（このフォルダの回答を写す）→ ストアの設定・掲載情報（`docs/store-listing.md`・`submission-assets/`）。
-6. `mosaic_pro` を作成し、`pricing.csv` を `scripts/push-play-pricing.mjs` で反映（サービスアカウントの鍵は手元だけに置く）。
+6. `fairclass_pro` を作成し、`pricing.csv` を `scripts/push-play-pricing.mjs` で反映（サービスアカウントの鍵は手元だけに置く）。
 7. 内部テストで実機確認（購入・復元・印刷・Excel 共有・タブレット・Chromebook）→ クローズドテスト（12人 × 14日）→ 本番申請。
 8. 実機で撮ったスクリーンショットと見比べ、Web 書き出しの素材（`submission-assets/`）と違いが大きければ差し替える。

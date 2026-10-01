@@ -3,7 +3,7 @@ import type { CopyKey } from './en'
 
 // 합니다체로 통일. 용어는 docs/i18n-glossary.md（반 편성・같은 반 배정・분리 배정）
 export const KO_COPY: Record<CopyKey, string> = {
-  appEyebrow: 'Mosaic · 반 편성',
+  appEyebrow: 'FairClass · 반 편성',
   close: '닫기',
   cancel: '취소',
   delete: '삭제',
@@ -141,6 +141,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   violationsOk: '배정 조건을 모두 충족합니다',
   undoMoves: '직접 옮긴 것 되돌리기',
   shareXlsx: '결과를 엑셀로 공유',
+  saveToFile: '드라이브·기기에 저장',
   print: '인쇄',
   printPdf: '인쇄 / PDF',
   sharePdf: 'PDF로 공유',
@@ -175,7 +176,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   noPairsBody: '배정 조건이 없습니다.',
 
   proTitle: 'Pro·설정',
-  proName: 'Mosaic Pro',
+  proName: 'FairClass Pro',
   active: '✓ 사용 중',
   proIntro: '명단 불러오기·편집·반 편성·수정은 무료이며 광고도 없습니다. 내보내기와 인쇄가 필요할 때 Pro를 이용하십시오.',
   feat1Title: '결과를 엑셀·Google 드라이브로 내보내기',
@@ -197,7 +198,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   clearData: '이 기기의 명단과 결과 지우기',
   clearTitle: '명단과 결과 지우기',
   clearBody: '이 기기에 저장된 명단과 편성 결과를 삭제합니다. 되돌릴 수 없습니다.',
-  footer: 'Mosaic · 반 편성 최적화 도구(웹 버전 무료: https://ohru131.github.io/ClassClassify/)',
+  footer: 'FairClass · 반 편성 최적화 도구(웹 버전 무료: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: '구매는 iOS / Android 앱에서 이용할 수 있습니다.',
   revenueCatKeyMissing: 'RevenueCat 공개 SDK 키가 설정되지 않았습니다.',

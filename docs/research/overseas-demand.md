@@ -1,7 +1,7 @@
 # 海外需要調査（どの言語版を作るか）
 
 - 調査日: 2026-09-30
-- 対象: Mosaic — クラス編成オプティマイザー（属性の均等化＋同じ組／別の組の制約、端末内処理。モバイル版は画面上で全機能無料・Pro 買い切り約¥980で xlsx 書き出しと印刷/PDF、広告なし。Web版は無料）
+- 対象: FairClass — クラス編成オプティマイザー（属性の均等化＋同じ組／別の組の制約、端末内処理。モバイル版は画面上で全機能無料・Pro 買い切り約¥980で xlsx 書き出しと印刷/PDF、広告なし。Web版は無料）
 - 前提資料: `docs/research/pain-points-and-target.md`、`docs/research/competitors.md`
 
 > **調査方法と限界**: 一次情報は WebSearch の検索結果（タイトルと抜粋）。WebFetch は多くのサイトで egress ブロックされる前提で、抜粋で確認できなかった事項は【要確認】、筆者の推測は【推定】と書く。
@@ -17,7 +17,7 @@
 ### A.1 ブラジル（pt-BR）
 
 - **慣行**: 1学年を複数の turma（例: 5º ano A/B/C）に分ける作業は **enturmação** と呼ばれ、研究対象になるほど一般的。基準は学校が決め、ベロオリゾンテ市立校の校長調査では「年齢の均質性」が最多、次いで「学力の異質性（混ぜる）」、学校によっては「行動の異質性」（規律の良い子と悪い子を混ぜ、問題の多い子が1組に集中しないようにする）。一方で**学力や年齢（留年による遅れ）で固める enturmação はクラス間格差を広げる**という批判的研究も多い。出典: https://www.redalyc.org/pdf/551/55150202.pdf , https://repositorio.ufmg.br/bitstream/1843/46295/1/DISSERTAC%cc%a7A%cc%83O%20TATIANA.pdf , https://observatoriodeeducacao.institutounibanco.org.br/api/assets/observatorio/6c56f0fd-555e-4cd9-abb5-b4ecb594c037
-  - → **「混ぜる（heterogênea）＝公平」という規範が研究・行政側にあり、Mosaic の「均等化」はその規範に合う。** 逆に「学力別に固める」運用の学校には刺さらない。
+  - → **「混ぜる（heterogênea）＝公平」という規範が研究・行政側にあり、FairClass の「均等化」はその規範に合う。** 逆に「学力別に固める」運用の学校には刺さらない。
 - **担い手と時期**: 学校の direção（校長）と **coordenador(a) pedagógico(a)**、実務は secretaria escolar。matrícula（1〜2月）の確定後、**2月の始業直前**に組む【推定：学年暦からの推定。公立の州・市で差あり】。ブラジルの学年は2月始業・12月終業。
 - **規模**: 2024年の Censo Escolar で **学校17.93万校・生徒4,710万人・教員236.8万人**、私立は生徒の **20.2%**。出典: https://www.correiobraziliense.com.br/euestudante/educacao-basica/2025/04/7107754-eja-em-queda-especialistas-alertam-para-evasao-e-fechamento-de-escolas-no-df.html , https://pt.org.br/efeito-lula-cresce-numero-de-matriculas-em-tempo-integral-e-na-educacao-profissional/
   - 1学年1クラスの小規模校（農村部）も多く【推定】、対象校はその一部。ただし都市部の公立・私立は1学年複数 turma が普通【推定】。
@@ -41,7 +41,7 @@
 
 ### A.3 チリ（es-419 / es-CL）
 
-- **慣行**: 同学年の並行クラスは **curso**（「4.º básico A」）。私立・特許補助校では規程として **「Reglamento de fusión, fisión y mezcla de cursos」** を持つ学校があり、ある学校の規程は「mezcla（組の混合）は学年全体への帰属感・社会性・適応力を育て、学校の共生（convivencia）を促す目的で行う」、1組は18〜28人、目標22〜25人と定める。**「混ぜる」ことが制度化されている**のは Mosaic に好材料。出典: https://mackay.cl/wp-content/uploads/2023/09/Reglamento-de-Fusion-Fision-y-Mezcla-y-Cambio-de-Cursos-2024.pdf
+- **慣行**: 同学年の並行クラスは **curso**（「4.º básico A」）。私立・特許補助校では規程として **「Reglamento de fusión, fisión y mezcla de cursos」** を持つ学校があり、ある学校の規程は「mezcla（組の混合）は学年全体への帰属感・社会性・適応力を育て、学校の共生（convivencia）を促す目的で行う」、1組は18〜28人、目標22〜25人と定める。**「混ぜる」ことが制度化されている**のは FairClass に好材料。出典: https://mackay.cl/wp-content/uploads/2023/09/Reglamento-de-Fusion-Fision-y-Mezcla-y-Cambio-de-Cursos-2024.pdf
   - 担い手は校長・**jefe(a) de UTP**（技術教育部門長）・orientador/convivencia escolar の担当【推定】。
 - **時期**: 2026年度は**3月4日始業**（教員は3月2日から）。編成は12月〜2月【推定】。出典: https://www.elmostrador.cl/datos-utiles/2026/02/26/calendario-escolar-2026-revisa-las-fechas-clave-de-inicio-de-clases-y-vacaciones-de-invierno/
 - **規模**: 2025年の生徒 **354万人**、**particular subvencionado（私立の補助校）が53.9%**、自治体立22.3%、SLEP 12.7%。私立補助校は6,000校超（学校全体の約半分）。出典: https://cooperativa.cl/noticias/pais/educacion/colegios/caida-de-la-natalidad-en-chile-se-percibio-en-cantidad-de-escolares/2025-11-04/162732.html
@@ -101,7 +101,7 @@
 - **慣行が最も制度化されている地域。** 公立小学校が「Class Placement Policy」を公開するのが普通で、**毎年、翌年度のクラスを学力・行動・社会性（相性）・性別のバランスで作り直す**。作業は学年末（Term 4、10〜12月）の数か月前から始まり、「友だちを4人挙げさせ、そのうち少なくとも1人と同じ組にする」学校もあれば、友人要望フォームを使わず教員が判断する学校もある。**担任の指名（保護者の希望）は受け付けない**が定型文。出典: https://www.geeastps.vic.edu.au/wp-content/uploads/files/Class-Placement-Policy.pdf , https://connellspt-p.schools.nsw.gov.au/content/dam/doe/sws/schools/c/connellspt-p/2023-documents/ClassPlacementGuidelines.pdf , https://meltonwestps.vic.edu.au/wp-content/uploads/2025/08/Class-Placement-Policy-2025-.pdf
 - NZ も Term 4 に保護者の意見フォームを集め、12月に発表する形。出典: https://northcoteint.school.nz/wp-content/uploads/2023/11/Term-4-Week-8-Principals-Newsletter.pdf , https://snellsbeach.school.nz/?p=33781
 - **規模**: 豪州 2025年 9,673校・生徒416万人（ABS）。出典: https://www.abs.gov.au/statistics/people/education/schools/2025
-- **競合が最も濃い**: Class Creator（豪発・Sentral/Wonde 連携・US$1.60/生徒/年、最低$400）、Class Maker（豪・$199/年〜）、Sentral / School Bytes の Class Builder（学校管理システムの標準機能）。詳しくは `competitors.md` 第3節。**学校単位で既に買われている市場**なので、Mosaic は「予算の無い学校・小規模校・個人の教員」「まず試す」の入口になる。
+- **競合が最も濃い**: Class Creator（豪発・Sentral/Wonde 連携・US$1.60/生徒/年、最低$400）、Class Maker（豪・$199/年〜）、Sentral / School Bytes の Class Builder（学校管理システムの標準機能）。詳しくは `competitors.md` 第3節。**学校単位で既に買われている市場**なので、FairClass は「予算の無い学校・小規模校・個人の教員」「まず試す」の入口になる。
 - **学年暦**: 1月下旬〜2月始業（南半球）→ 編成は**8〜12月**。
 
 ### B.2 米国
@@ -122,11 +122,11 @@
 
 ### B.4 カナダ
 - 春に翌年度の案を作り、**9月の在籍確定後に「September reorganization」でクラスを組み直す**（オンタリオ州。複式学級＝combined grades も一般的）。出典: https://www.hwdsb.on.ca/gatestone/files/2022/09/Gatestone-Reorganization-Sept.-2022.pdf , https://efis.fma.csc.gov.on.ca/faab/Memos/SB2014/SB10E_AODA.pdf
-- → **年に2回（6月と9月）作業がある**のは Mosaic の「再実行が数秒」という強みが生きる場面。ケベックは仏語（fr-CA）。
+- → **年に2回（6月と9月）作業がある**のは FairClass の「再実行が数秒」という強みが生きる場面。ケベックは仏語（fr-CA）。
 
 ### B.5 英語圏のまとめ
 - **需要は世界で最も強く、しかも教員の自腹が最も多い。** 反面、学校単位の SaaS が確立していて、公式利用には学区・学校の承認が要る。
-- Mosaic のポジション: 「**学校が SaaS を契約していない**（小規模校・私立・予算の無い学区・英国の2学級校）」「**契約はあるが、担任が事前に案を試したい**」「**班分け・グループ分けを毎週したい**（ClassDojo の Group Maker はランダム＋除外だけ。`competitors.md` 3.2）」の3つ。
+- FairClass のポジション: 「**学校が SaaS を契約していない**（小規模校・私立・予算の無い学区・英国の2学級校）」「**契約はあるが、担任が事前に案を試したい**」「**班分け・グループ分けを毎週したい**（ClassDojo の Group Maker はランダム＋除外だけ。`competitors.md` 3.2）」の3つ。
 - 南半球（豪NZ）と北半球（米英加）で作業時期が半年ずれるので、**英語版だけで年に2回の需要の山**がある。
 
 ---
@@ -137,7 +137,7 @@
   - 担い手は学年の担任団（現担任が「가편성」＝仮編成を作り、教務部が確定する）【推定：日本と同型。要確認】。
   - 小1の学級編成で「금쪽이」（手のかかる子）の配置が課題として論じられている。出典: https://hangyo.com/mobile/article.html?no=105990
 - **「別の組」制約の法的な必要性がある。** 学校暴力予防法により、学校長は学校暴力を認知したら**加害生徒と被害生徒を遅滞なく分離しなければならない**。加害生徒への措置には **7号「学級交替」** がある。**「加害者と同じ中学に配置された」「分離されずに同じ教室で受験した」ことが報道・訴訟になる**ほど敏感。出典: https://www.heraldk.com/article/2026020413450015864 , https://www.segye.com/newsView/20250205502008 , https://www.jjan.kr/articleAmp/20221121580103
-  - → **Mosaic の「別の組ペア（ハード制約）」は韓国では『学폭 분리』として最も強い訴求点になる**【推定】。一方、学폭の記録は極めて機微な情報なので、**端末内処理が前提条件**になる。
+  - → **FairClass の「別の組ペア（ハード制約）」は韓国では『学폭 분리』として最も強い訴求点になる**【推定】。一方、学폭の記録は極めて機微な情報なので、**端末内処理が前提条件**になる。
 - **規模**: 教員50.6万人（2025、うち小学校は減少中）、中学の1学級平均24.9人。**少子化で1年生は2年で15%減り30万人を割った**＝学級数は減っていくが、都市部は1学年複数学級が標準。出典: https://en.fnnews.com/news/202508191552256510 , https://asianews.network/?p=251079 , https://v.daum.net/v/20250913160142029
 - **競合**: 韓国語の반편성専用ツールは検索で見つからなかった（見つかったのは「1人1役割り当て」の Web ツール程度）。教員コミュニティ（인디스쿨）で Excel マクロが共有されている可能性が高い【要確認】。出典: https://tools.devcomma.com/tools/one-person-one-role
 - **端末・課金**: スマホ普及率は極めて高い。Play ストアでの個人購入に障壁は無い【推定】。教員の自費購入の統計は未取得【要確認】。
@@ -151,7 +151,7 @@
 
 - **ドイツ**: 小学校（Grundschule、4年制）は**入学時に組を作り、原則4年間そのまま**（担任制）【要確認：州・学校で途中の混ぜ替えもあるが少数派】。組分けが発生するのは **入学時（Einschulung）と Klasse 5（中等への進学）**。入学時の基準は学級人数・友人関係・学級の社会構成・男女比・学力・特別支援・通学路（ある小学校の公開規程）。**保護者の友人希望は受け付けるが、他の基準が多いので余地は限られる。** 出典: https://grundschule.spardorf.de/wp-content/uploads/2022/10/GS-Spardorf_Klassenbildung_Allgemeine-Regelungen_Kriterien_11.10.2022.pdf
   - Klasse 5 のギムナジウムでは「同じ組にしたい友だちを3人まで」書かせ、**「連鎖する希望（A→B→C…）や出身小学校の大集団は避ける」**という運用が見られる＝まさに「同じ組ペアの連結成分が大きくなりすぎる」問題。出典: https://gymnasium-ohmoor.hamburg.de/wp-content/uploads/sites/730/2020/12/Ohmooer_FAQ.pdf
-  - → **Mosaic の union-find（同じ組ブロック）とブロックの大きさの警告は、ドイツの Klasse 5 の運用にそのまま合う**【推定】。
+  - → **FairClass の union-find（同じ組ブロック）とブロックの大きさの警告は、ドイツの Klasse 5 の運用にそのまま合う**【推定】。
 - **スイス**: 学校（Schule）ごとに「Klasseneinteilung」の方針を公開し、**段階（Zyklus）の切り替わりで組を混ぜ直す**学校が多い（入学時と中間段階の移行時）。出典: https://www.kirchberg-schulen.ch/schulbetrieb/klasseneinteilung-.html/69/print/pdf , https://www.schule.stallikon.ch/aktuelles/schul-abc/klasseneinteilungen.html/510/print/pdf , https://www.beobachter.ch/bildung/schule/einschulung-mit-dem-freund-zur-schule
 - **オーストリア**: Volksschule 4年・固定【推定】。
 - **競合**: ドイツ語の専用ツールは見つからなかった（検索で出るのは英語 SaaS のドイツ語ページ＝Class Solver の softwareadvice.de 掲載）。出典: https://www.softwareadvice.de/software/248420/class-solver
@@ -165,7 +165,7 @@
 
 - **フランスの小学校は毎年組み直す**（学年ごとに担任が替わるため）。**「生徒の学級への割り振り（répartition des élèves）は校長（directeur）の権限で、教員会議（conseil des maîtres）の意見を聞いて決める」、基準は明示し議事録に残すのが望ましい**とする視学区の通達がある。保護者からの問い合わせには定型の回答を用意するのが普通。出典: https://belfort1.circo90.ac-besancon.fr/wp-content/uploads/sites/2/2016/06/NOTE-DE-SERVICE-N°-9-REPARTITION-des-ELEVES.pdf , https://directeurs-01.blog.ac-lyon.fr/wordpress/wp-content/uploads/2024/10/2024-avril_Cafe-the-dir_Attribution.et_.constitution.des_.classes_Synthese.pdf
 - **中学（collège）の6e の学級編成**は「人数・男女・学力の多様性・行動の特性」で均衡させ、**生徒同士の関係（残す組み合わせ・離す組み合わせ）、自律的な子・発言の多い子と控えめな子の配分**まで考える。出典: https://gphilipe.loire-atlantique.e-lyco.fr/wp-content/uploads/sites/30/2024/06/Note-aux-familles-des-eleves-entrant-au-6eme-au-college-G-Philipe.pdf
-- **ただしフランスの小学校は複式（cours double: CE1-CE2 など）が非常に多く**、編成の悩みの中心は「どの学年を何人ずつどの組に入れるか（structure）」。この部分は **Teetsh の無料ツール**（学年ごとの人数とクラス数、最少・最多人数、学年数の上限から構成案を自動生成）が既にある。**Mosaic は「学年の混在」を扱えない**ので、その前段は対象外。出典: https://outilstice.com/outil-gratuit-pour-creer-une-structure-decole-repartir-les-eleves/
+- **ただしフランスの小学校は複式（cours double: CE1-CE2 など）が非常に多く**、編成の悩みの中心は「どの学年を何人ずつどの組に入れるか（structure）」。この部分は **Teetsh の無料ツール**（学年ごとの人数とクラス数、最少・最多人数、学年数の上限から構成案を自動生成）が既にある。**FairClass は「学年の混在」を扱えない**ので、その前段は対象外。出典: https://outilstice.com/outil-gratuit-pour-creer-une-structure-decole-repartir-les-eleves/
 - **規模**: 初等教育 47,000校・生徒615.5万人（2025年度）。出典: https://www.education.gouv.fr/les-effectifs-dans-le-premier-degre-6155-millions-d-eleves-scolarises-la-rentree-2025-451624
 - 競合: Teetsh（構成）、Keamk（仏発のチーム分け、1〜5のレベル合計を揃える）。出典: https://outilstice.com/en/keamk-creer-des-equipes-par-niveau/
 - **学年暦**: 9月始業 → 小学校の割り振りは **6月**（conseil des maîtres）、6e は **6〜7月**。
@@ -188,7 +188,7 @@
 ## G. イタリア（it）
 
 - **入口の学年（小1・中1＝classe prima）だけ組を作り、以後5年/3年固定。** その代わり**学校ごとに編成基準を明文化**し、委員会（commissione）が作る。基準は「クラス間は均質、クラス内は異質」、**男女・外国籍の子・障害のある子（diversamente abili）・社会経済的に不利な子・DSA/BES（学習障害・特別な教育的ニーズ）を均等に**、出身の園・小学校（plessi di provenienza）の配分。**公表後は変更しない。** 出典: https://nuvola.madisoft.it/file/api/public-file-preview/TOIC85000C/fced2261-427e-43af-b3ff-739ccfed90d6 , https://nuvola.madisoft.it/file/api/public-file-preview/MOIC83300X/4637b0a0-5132-4543-8ced-859e08ceea2a
-- **Mosaic の属性設計（該当者数の均等化）と基準がほぼ1対1で対応する**のが特徴。時期は **6〜7月**（9月始業）。
+- **FairClass の属性設計（該当者数の均等化）と基準がほぼ1対1で対応する**のが特徴。時期は **6〜7月**（9月始業）。
 - **評価**: 需要 中（入口学年のみ、ただし全校が毎年やる）、規模 中、WTP 中、競合 無し【要確認】、ローカライズ 中。
 
 ---
@@ -231,7 +231,7 @@
 ## L. 副次用途: 授業内のグループ分け・チーム分け
 
 - 英語圏・仏語圏では**無料の Web ツールと ClassDojo の Group Maker（ランダム＋除外）**が行き渡っていて、単体では課金につながりにくい（`competitors.md` 3.2）。仏発の Keamk（レベル合計を揃える）、豪 AI Classroom Planner（衝突の定義）など「バランス＋除外」まで持つものもある。出典: https://outilstice.com/en/keamk-creer-des-equipes-par-niveau/ , https://apps.apple.com/us/app/-/id6748561222
-- **Mosaic が勝てるのは「複数属性を同時に均等化」＋「同じ組／別の組のハード制約」＋「名簿を一度入れれば班分けとクラス編成の両方に使い回せる」**点。**クラス編成は年1回なので、班分けの頻繁な利用がアプリを端末に残す理由になる**【推定】。
+- **FairClass が勝てるのは「複数属性を同時に均等化」＋「同じ組／別の組のハード制約」＋「名簿を一度入れれば班分けとクラス編成の両方に使い回せる」**点。**クラス編成は年1回なので、班分けの頻繁な利用がアプリを端末に残す理由になる**【推定】。
 - 各国とも「班分け」の語は別に要る: en `groups / teams`、ko `모둠 편성`（韓国の授業のグループは 모둠）、es `equipos / grupos de trabajo`、pt-BR `grupos de trabalho`、de `Gruppeneinteilung`、fr `groupes / îlots`【推定：一般的な用語。要確認】。
 
 ---
@@ -248,7 +248,7 @@
 | **de**（DE/AT/CH） | 3 | 4 | 5 | 5 | 3 | **35** | 入学時と Klasse 5 だけだが GDPR で端末内処理が最強。WTP 高 |
 | **fr**（FR/BE/CH/CA） | 4 | 4 | 3 | 3 | 3 | **32** | 毎年組み直すが複式が多く、構成の段階は Teetsh（無料）が押さえている |
 | **pt-BR**（BR、+PT） | 3 | 5 | 1 | 5 | 4 | **30** | 最大の母数・Pix・LGPD。WTP が最も低い |
-| **it**（IT） | 3 | 3 | 3 | 5 | 3 | **29** | 入口学年のみだが基準が Mosaic の属性と1対1 |
+| **it**（IT） | 3 | 3 | 3 | 5 | 3 | **29** | 入口学年のみだが基準が FairClass の属性と1対1 |
 | **zh-Hant**（TW/HK） | 2 | 2 | 3 | 4 | 3 | **23** | 台湾は乱数・S 型が法定、香港は学校間で能力別 |
 | **nl / 北欧** | 2 | 2 | 4 | 5 | 3 | **26** | 頻度が低く英語で代替可 |
 | **id**（ID） | 3 | 4 | 1 | 5 | 4 | **28** | rombel 分けの需要はあるが購買力が低い |
@@ -334,7 +334,7 @@
 ## Q. 要約（5行）
 
 1. **クラス替えを毎年・全学年でやり、しかも手作業が痛みとして語られているのは、英語圏（豪NZ・米・加）・韓国・フランス・スペイン**。ドイツ・イタリアは入口学年だけ、台湾・中国は方法が乱数/S 型で規制、東南アジアは能力別が主流。
-2. **英語圏は需要・規模・WTP（教員の自腹 平均$895/年）が最大**だが、学校契約の SaaS（Class Creator 等）が確立している。Mosaic は「無料・登録不要・端末内」で個人と小規模校の入口を取る。
+2. **英語圏は需要・規模・WTP（教員の自腹 平均$895/年）が最大**だが、学校契約の SaaS（Class Creator 等）が確立している。FairClass は「無料・登録不要・端末内」で個人と小規模校の入口を取る。
 3. **韓国は日本と同じ2月に全学年で반편성し、学校暴力の加害・被害の分離が法的義務**で「別の組」制約がそのまま刺さる。競合が見当たらない。
 4. **南米は南半球の2〜3月始業で日本とほぼ同時期に告知できる**。チリ（私立補助校54%・mezcla de cursos の規程・2026年12月の新個人情報法）が最有望、ブラジルは母数最大・Pix で購入可能だが WTP が低い。
 5. **推奨順: `en` → `ko` → `es`（es-419 語彙＋es-ES 掲載）→ `de` → `pt-BR`（課金重視なら `fr`）**。まず `en` と `ko` を2026年11月までに出し、2027年2月の山に間に合わせる。

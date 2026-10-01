@@ -1,4 +1,4 @@
-# 用語集（スマホ版 Mosaic の多言語化）
+# 用語集（スマホ版 FairClass の多言語化）
 
 スマホ版（`mobile/`）の UI・Excel の語彙（`src/solver/labels.ts`）・ストア掲載文（`docs/store-listing.md`）は
 **この表の訳語に揃える**。訳語を変えるときは、先にこの表を直してから各所を直す（訳語のブレを防ぐため）。

@@ -80,7 +80,7 @@ function buildHtml(lang, iconDataUri) {
   .dots i { width: 18px; height: 18px; border-radius: 50%; display: block; }
 </style></head><body><div class="safe">
   <div class="copy">
-    <div class="brand"><img src="${iconDataUri}" alt="">Mosaic</div>
+    <div class="brand"><img src="${iconDataUri}" alt="">FairClass</div>
     <div class="headline">${l.headline}</div>
     <div class="sub">${l.sub}</div>
   </div>
