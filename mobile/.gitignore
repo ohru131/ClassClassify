@@ -17,3 +17,14 @@ expo-env.d.ts
 .env
 .env.local
 credentials.json
+# ローカル署名の資格情報（plugins/withLocalReleaseSigning.js）。公開リポジトリなので絶対にコミットしない
+credentials/
+keystore.properties
+# Google Play のサービスアカウント鍵
+play-service-account*.json
+# リリース一式の集積先（AAB のコピー等）
+/release/
+# 実機デバッグ中のスクリーンショット・Metro のログ
+device-screen*.png
+metro.log
+gradle-*.log

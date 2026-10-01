@@ -20,6 +20,11 @@ const config: ExpoConfig = {
   },
   android: {
     package: APP_ID,
+    // **ローカルの gradle ビルド専用の versionCode。**
+    // plugins/withLocalReleaseSigning.js が release を本番鍵で署名するので、ローカルでも
+    // Play に出せる AAB が作れる。Play は同じ versionCode の AAB を二度受け付けないので、
+    // リリースのたびに Play で未使用の値へ上げる（EAS の autoIncrement とは別系統）。
+    versionCode: 1,
     adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#6366F1' },
     // 追加の権限は宣言しない（通知・カメラ・マイク等は使わない）。
     // ネイティブ依存（課金 = Play Billing）が持つ権限はマニフェストのマージで自動的に入る。
@@ -49,6 +54,10 @@ const config: ExpoConfig = {
     './plugins/withLargeScreenSupport',
     // release ビルドから開発メニュー用の SYSTEM_ALERT_WINDOW を外す
     './plugins/withoutReleaseOverlayPermission',
+    // debug を applicationId + ".debug" の別アプリにして Play 版と共存させる
+    './plugins/withDebugPackageSuffix',
+    // credentials.json があれば release を upload key で署名する（無ければ何もしない）
+    './plugins/withLocalReleaseSigning',
     'expo-router',
     'expo-localization',
     'expo-sharing',
@@ -57,6 +66,12 @@ const config: ExpoConfig = {
   ],
   experiments: {
     typedRoutes: false,
+  },
+  extra: {
+    // EAS のプロジェクト（@ohru131/mosaic-class-classify）。upload key もここに保管している
+    eas: {
+      projectId: 'd7abe157-8b1d-45fe-8f97-802641b8d151',
+    },
   },
 }
 
