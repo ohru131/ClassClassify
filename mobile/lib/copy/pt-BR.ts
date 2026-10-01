@@ -3,7 +3,7 @@ import type { CopyKey } from './en'
 
 // Português do Brasil, tratamento “você”. Termos: docs/i18n-glossary.md（turma, manter juntos, separar）
 export const PT_BR_COPY: Record<CopyKey, string> = {
-  appEyebrow: 'Mosaic · Enturmação',
+  appEyebrow: 'FairClass · Enturmação',
   close: 'Fechar',
   cancel: 'Cancelar',
   delete: 'Excluir',
@@ -175,7 +175,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   noPairsBody: 'Nenhuma condição foi definida.',
 
   proTitle: 'Pro e ajustes',
-  proName: 'Mosaic Pro',
+  proName: 'FairClass Pro',
   active: '✓ Ativo',
   proIntro: 'Carregar, editar, montar e ajustar turmas é grátis e sem anúncios. Adquira o Pro quando precisar exportar ou imprimir.',
   feat1Title: 'Exportar resultados para Excel e Google Drive',
@@ -197,7 +197,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   clearData: 'Apagar a lista e o resultado deste aparelho',
   clearTitle: 'Apagar lista e resultado',
   clearBody: 'A lista e o resultado salvos neste aparelho serão apagados. Não é possível desfazer.',
-  footer: 'Mosaic · otimizador de enturmação (versão web gratuita: https://ohru131.github.io/ClassClassify/)',
+  footer: 'FairClass · otimizador de enturmação (versão web gratuita: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'As compras estão disponíveis no app para iOS ou Android.',
   revenueCatKeyMissing: 'A chave pública do SDK do RevenueCat não está configurada.',
@@ -222,7 +222,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   popupBlocked: 'A janela foi bloqueada. Permita pop-ups nas configurações do navegador.',
   fileResults: 'enturmacao',
   fileRoster: 'lista-de-alunos',
-  fileTemplate: 'modelo-mosaic',
+  fileTemplate: 'modelo-fairclass',
 
   printTitle: 'Enturmação',
   printCreated: 'Criado em: {date}',

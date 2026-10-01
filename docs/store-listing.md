@@ -1,4 +1,4 @@
-# ストア掲載文（Google Play・スマホ版 Mosaic）
+# ストア掲載文（Google Play・スマホ版 FairClass）
 
 - 対象: `mobile/` のアプリ（Android。iOS も同じ文面を流用できる）。訳語は `docs/i18n-glossary.md` に揃えた。
 - **直訳ではなく各国のターゲット向けに書いてある**（根拠: `docs/research/overseas-demand.md` の O 節・A 節）。
@@ -11,15 +11,15 @@
 
 | Play のロケール | アプリ名 | 短い説明 | 詳しい説明 |
 |---|---|---|---|
-| en-US | 23 | 80 | 2243 |
-| en-AU | 23 | 77 | 2036 |
-| en-GB | 22 | 76 | 1961 |
-| ko-KR | 11 | 55 | 1057 |
-| es-419 | 20 | 79 | 2269 |
-| es-ES | 25 | 78 | 2295 |
-| de-DE | 24 | 79 | 2575 |
-| pt-BR | 21 | 76 | 2277 |
-| ja-JP | 12 | 44 | 889 |
+| en-US | 26 | 80 | 2258 |
+| en-AU | 26 | 77 | 2051 |
+| en-GB | 25 | 76 | 1976 |
+| ko-KR | 14 | 55 | 1066 |
+| es-419 | 23 | 79 | 2281 |
+| es-ES | 28 | 78 | 2307 |
+| de-DE | 27 | 79 | 2590 |
+| pt-BR | 24 | 76 | 2289 |
+| ja-JP | 22 | 44 | 898 |
 
 ## en-US（英語・米国）
 
@@ -28,10 +28,10 @@
 - 価格: **US$5.99**（買い切り。`docs/play-console/pricing.md`）
 - ASO キーワード（本文の地の文に入れてある）: `class placement`, `class lists`, `no sign-up`, `Chromebook`, `keep apart`
 
-### アプリ名（23字 / 30）
+### アプリ名（26字 / 30）
 
 ```
-Mosaic: Class Placement
+FairClass: Class Placement
 ```
 
 ### 短い説明（80字 / 80）
@@ -40,16 +40,16 @@ Mosaic: Class Placement
 Balanced class lists in seconds. Free, no sign-up, student data stays on device.
 ```
 
-### 詳しい説明（2243字 / 4000）
+### 詳しい説明（2258字 / 4000）
 
 ```
-Building next year's class lists by hand takes hours: balancing boys and girls, academic levels, students who need extra support, and the friendships and conflicts parents and teachers tell you about. Mosaic does the class placement for you in seconds, and you stay in control of every decision.
+Building next year's class lists by hand takes hours: balancing boys and girls, academic levels, students who need extra support, and the friendships and conflicts parents and teachers tell you about. FairClass does the class placement for you in seconds, and you stay in control of every decision.
 
 HOW IT WORKS
 • Load your roster from an Excel file (.xlsx), start from a sample, or type it in.
 • Add any attributes you care about — gender, reading level, behavior, IEP or 504 support, English learners — and give each one a weight.
 • Mark students to keep together and students to keep apart.
-• Choose the number of classes and tap "Build classes". Mosaic spreads every attribute as evenly as possible, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
+• Choose the number of classes and tap "Build classes". FairClass spreads every attribute as evenly as possible, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
 • Check the balance tables, then move any student to another class with one tap. Totals update instantly.
 
 WHY TEACHERS USE IT
@@ -59,12 +59,12 @@ WHY TEACHERS USE IT
 • Every class gets a balanced mix, not just an even headcount: you can see the target range for each attribute and whether every class is inside it.
 • Great for group work as well: make balanced teams or table groups in the same way.
 
-MOSAIC PRO (ONE-TIME PURCHASE)
+FAIRCLASS PRO (ONE-TIME PURCHASE)
 • Export the results to Excel and Google Drive: placement, class lists, one sheet per class, pairings and a summary.
 • Print or save as PDF for staff meetings: class lists with color-coded pairings and a legend, plus the balance tables, on print-ready pages.
 • Buy once and keep it — Pro is not a subscription.
 
-Mosaic uses the same engine as the free Mosaic web app, and Excel files work in both. The class placement uses simulated annealing, an optimization method that tries a huge number of combinations.
+FairClass uses the same engine as the free FairClass web app, and Excel files work in both. The class placement uses simulated annealing, an optimization method that tries a huge number of combinations.
 
 Privacy: rosters and results are stored only on your device. To verify a Pro purchase, the app store and RevenueCat receive an anonymous ID and the receipt — never student names or roster data.
 ```
@@ -76,10 +76,10 @@ Privacy: rosters and results are stored only on your device. To verify a Pro pur
 - 価格: **A$8.99**（NZ は NZ$9.99。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `class placement`, `Term 4`, `no sign-up`, `Chromebook`, `keep apart`
 
-### アプリ名（23字 / 30）
+### アプリ名（26字 / 30）
 
 ```
-Mosaic: Class Placement
+FairClass: Class Placement
 ```
 
 ### 短い説明（77字 / 80）
@@ -88,16 +88,16 @@ Mosaic: Class Placement
 Next year's classes, balanced in seconds. Free, no sign-up, data stays local.
 ```
 
-### 詳しい説明（2036字 / 4000）
+### 詳しい説明（2051字 / 4000）
 
 ```
-Every Term 4, teachers sit down with sticky notes and spreadsheets to build next year's classes: an even spread of girls and boys, learning levels, behaviour, students with a support plan or EAL/D support, and the friendship requests from families. Mosaic turns that into a few seconds of work and leaves every final decision with you.
+Every Term 4, teachers sit down with sticky notes and spreadsheets to build next year's classes: an even spread of girls and boys, learning levels, behaviour, students with a support plan or EAL/D support, and the friendship requests from families. FairClass turns that into a few seconds of work and leaves every final decision with you.
 
 HOW IT WORKS
 • Load your roster from Excel (.xlsx), start from a sample, or enter it in the app.
 • Add the attributes your class placement policy uses and give each a weight.
 • Record students to keep together (for example, one friend each) and students to keep apart.
-• Set the number of classes and tap "Build classes". Mosaic spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
+• Set the number of classes and tap "Build classes". FairClass spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
 • Review the balance tables and move any student to another class with a single tap. Totals update straight away.
 
 WHY SCHOOLS USE IT
@@ -107,12 +107,12 @@ WHY SCHOOLS USE IT
 • See the target range for every attribute and whether each class is inside it, so you can explain the lists to your leadership team.
 • Also handy for balanced groups and teams within a class.
 
-MOSAIC PRO (ONE-OFF PURCHASE)
+FAIRCLASS PRO (ONE-OFF PURCHASE)
 • Export results to Excel and Google Drive: placement, class lists, a sheet per class, pairings and a summary.
 • Print or save as PDF for staff meetings: class lists with colour-coded pairings and a legend, plus balance tables.
 • Pay once and keep it — no subscription.
 
-Mosaic uses the same engine as the free Mosaic web app, and the Excel files work in both.
+FairClass uses the same engine as the free FairClass web app, and the Excel files work in both.
 
 Privacy: rosters and results are stored only on your device. To verify a Pro purchase, the store and RevenueCat receive an anonymous ID and the receipt — never student names or roster data.
 ```
@@ -124,10 +124,10 @@ Privacy: rosters and results are stored only on your device. To verify a Pro pur
 - 価格: **£4.99**（アイルランドはユーロ圏の €5,99。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `mixing classes`, `class lists`, `no sign-up`, `Chromebook`, `keep apart`
 
-### アプリ名（22字 / 30）
+### アプリ名（25字 / 30）
 
 ```
-Mosaic: Mixing Classes
+FairClass: Mixing Classes
 ```
 
 ### 短い説明（76字 / 80）
@@ -136,16 +136,16 @@ Mosaic: Mixing Classes
 Mix classes fairly in seconds. Free, no sign-up, pupil data stays on device.
 ```
 
-### 詳しい説明（1961字 / 4000）
+### 詳しい説明（1976字 / 4000）
 
 ```
-Mixing classes in a two-form or three-form entry school is one of the hardest jobs of the summer term: balancing girls and boys, attainment, behaviour, pupils with a support plan, EAL, and the friendship groups parents ask about. Mosaic does the number-crunching in seconds and leaves every decision with you.
+Mixing classes in a two-form or three-form entry school is one of the hardest jobs of the summer term: balancing girls and boys, attainment, behaviour, pupils with a support plan, EAL, and the friendship groups parents ask about. FairClass does the number-crunching in seconds and leaves every decision with you.
 
 HOW IT WORKS
 • Load your class list from Excel (.xlsx), start from a sample, or type it in.
 • Add the attributes you care about and give each one a weight.
 • Mark pupils to keep together and pupils to keep apart.
-• Choose the number of classes and tap "Build classes". Mosaic spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
+• Choose the number of classes and tap "Build classes". FairClass spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
 • Check the balance tables and move any pupil to another class with one tap. Totals update instantly.
 
 WHY TEACHERS USE IT
@@ -155,12 +155,12 @@ WHY TEACHERS USE IT
 • Shows the target range for every attribute and whether each class sits inside it — useful when you explain the new classes to parents and governors.
 • Also works for balanced groups and teams within a class.
 
-MOSAIC PRO (ONE-OFF PURCHASE)
+FAIRCLASS PRO (ONE-OFF PURCHASE)
 • Export results to Excel and Google Drive: placement, class lists, a sheet per class, pairings and a summary.
 • Print or save as PDF for staff meetings: colour-coded class lists with a legend and the balance tables on A4.
 • Pay once and keep it — no subscription.
 
-Mosaic uses the same engine as the free Mosaic web app, and the Excel files work in both.
+FairClass uses the same engine as the free FairClass web app, and the Excel files work in both.
 
 Privacy: class lists and results are stored only on your device. To verify a Pro purchase, the store and RevenueCat receive an anonymous ID and the receipt — never pupil names or class list data.
 ```
@@ -172,10 +172,10 @@ Privacy: class lists and results are stored only on your device. To verify a Pro
 - 価格: **₩7,900**（手取りで US$5.99 と揃える。₩6,900 は価格テストの候補。`pricing.md`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `반 편성`, `분리 배정`, `모둠 편성`, `크롬북`
 
-### アプリ名（11字 / 30）
+### アプリ名（14字 / 30）
 
 ```
-Mosaic 반 편성
+FairClass 반 편성
 ```
 
 ### 短い説明（55字 / 80）
@@ -184,10 +184,10 @@ Mosaic 반 편성
 성별·학업·지원 필요 학생을 고르게, 분리 배정도 최대한 반영해 몇 초 만에 반 편성. 가입 없음.
 ```
 
-### 詳しい説明（1057字 / 4000）
+### 詳しい説明（1066字 / 4000）
 
 ```
-매년 2월, 다음 학년 반 편성은 담임 선생님들이 며칠씩 매달리는 일입니다. 남녀 비율, 학업 수준, 학습 지원이 필요한 학생, 같은 반에 두면 안 되는 학생까지 모두 고려해야 하니까요. Mosaic는 이 반 편성을 몇 초 만에 끝내고, 최종 판단은 선생님께 맡깁니다.
+매년 2월, 다음 학년 반 편성은 담임 선생님들이 며칠씩 매달리는 일입니다. 남녀 비율, 학업 수준, 학습 지원이 필요한 학생, 같은 반에 두면 안 되는 학생까지 모두 고려해야 하니까요. FairClass는 이 반 편성을 몇 초 만에 끝내고, 최종 판단은 선생님께 맡깁니다.
 
 사용 방법
 • 엑셀 파일(.xlsx)로 학생 명단을 불러오거나, 예시로 시작하거나, 앱에서 직접 입력합니다.
@@ -204,12 +204,12 @@ Mosaic 반 편성
 • 안드로이드 태블릿과 크롬북에서 가로·세로 모두, 마우스와 키보드로도 쓸 수 있습니다.
 • 수업 중 모둠 편성에도 같은 방식으로 쓸 수 있습니다.
 
-Mosaic Pro(1회 구매)
+FairClass Pro(1회 구매)
 • 결과를 엑셀·Google 드라이브로 내보내기: 반 편성, 반별 명단, 반마다의 시트, 배정 조건, 집계.
 • 회의용 인쇄·PDF: 배정 조건을 색으로 구분한 반별 명단과 범례, 균형 표를 A4로.
 • 한 번 구매로 계속 사용합니다. 구독이 아닙니다.
 
-무료 웹 버전 Mosaic와 같은 엔진을 쓰며, 엑셀 파일은 양쪽에서 그대로 열립니다.
+무료 웹 버전 FairClass와 같은 엔진을 쓰며, 엑셀 파일은 양쪽에서 그대로 열립니다.
 
 개인정보: 명단과 결과는 기기에만 저장됩니다. Pro 구매 확인을 위해 스토어와 RevenueCat이 익명 식별자와 영수증만 받으며, 학생 이름이나 명단 내용은 보내지 않습니다.
 ```
@@ -221,10 +221,10 @@ Mosaic Pro(1회 구매)
 - 価格: **MX$79・CLP 3.990・COP 12.900・PEN 10,90・US$3.99（EC）**、ARS は Play 側の通貨を確認してから（`pricing.csv` の status=confirm）。その他の中南米は自動換算（`pricing.md`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `armar grupos`, `distribución de estudiantes`, `sin registro`, `Chromebook`, `equipos de trabajo`
 
-### アプリ名（20字 / 30）
+### アプリ名（23字 / 30）
 
 ```
-Mosaic: armar grupos
+FairClass: armar grupos
 ```
 
 ### 短い説明（79字 / 80）
@@ -233,16 +233,16 @@ Mosaic: armar grupos
 Arma grupos equilibrados para el año escolar en segundos. Gratis, sin registro.
 ```
 
-### 詳しい説明（2269字 / 4000）
+### 詳しい説明（2281字 / 4000）
 
 ```
-Antes de que empiece el año escolar hay que armar los grupos: equilibrar niñas y niños, el desempeño académico, los estudiantes con NEE que necesitan apoyo y las amistades o conflictos que conocen los docentes. Hacerlo a mano toma días. Mosaic hace la distribución de estudiantes en grupos en segundos, y la decisión final siempre es tuya.
+Antes de que empiece el año escolar hay que armar los grupos: equilibrar niñas y niños, el desempeño académico, los estudiantes con NEE que necesitan apoyo y las amistades o conflictos que conocen los docentes. Hacerlo a mano toma días. FairClass hace la distribución de estudiantes en grupos en segundos, y la decisión final siempre es tuya.
 
 CÓMO FUNCIONA
 • Carga la lista de estudiantes desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app.
 • Agrega los criterios que quieras (género, desempeño, apoyo en el aprendizaje, convivencia) y dale un peso a cada uno.
 • Indica qué estudiantes mantener juntos y a quiénes separar.
-• Elige el número de grupos y toca “Armar grupos”. Mosaic reparte cada criterio de forma pareja, siempre deja juntos a los estudiantes que unes y separa a los demás en la medida de lo posible. Si alguna condición no se puede cumplir, lo ves de inmediato.
+• Elige el número de grupos y toca “Armar grupos”. FairClass reparte cada criterio de forma pareja, siempre deja juntos a los estudiantes que unes y separa a los demás en la medida de lo posible. Si alguna condición no se puede cumplir, lo ves de inmediato.
 • Revisa las tablas de equilibrio y mueve a cualquier estudiante a otro grupo con un toque. Los totales se recalculan al instante.
 
 POR QUÉ LO USAN LOS DOCENTES
@@ -252,12 +252,12 @@ POR QUÉ LO USAN LOS DOCENTES
 • Funciona en tablets Android y Chromebook, en vertical u horizontal, con mouse y teclado.
 • También sirve para armar equipos de trabajo dentro de la clase.
 
-MOSAIC PRO (PAGO ÚNICO)
+FAIRCLASS PRO (PAGO ÚNICO)
 • Exporta los resultados a Excel y Google Drive: distribución, listas por grupo, una hoja por grupo, condiciones y resumen.
 • Imprime o guarda en PDF para el consejo de profesores: listas por grupo con las condiciones en colores y una leyenda, más las tablas de equilibrio.
 • Pagas una vez y es tuyo: no es una suscripción.
 
-Mosaic usa el mismo motor que la versión web gratuita, y los archivos de Excel funcionan en ambas.
+FairClass usa el mismo motor que la versión web gratuita, y los archivos de Excel funcionan en ambas.
 
 Privacidad: las listas y los resultados se guardan solo en tu dispositivo. Para verificar la compra de Pro, la tienda y RevenueCat reciben un identificador anónimo y el recibo, nunca nombres de estudiantes ni datos de la lista.
 ```
@@ -269,10 +269,10 @@ Privacidad: las listas y los resultados se guardan solo en tu dispositivo. Para 
 - 価格: **5,99 €**（ユーロ圏は全加盟国で同じ。`pricing.csv`）
 - ASO キーワード（本文の地の文に入れてある）: `reparto en grupos`, `agrupamiento del alumnado`, `sin registro`, `Chromebook`
 
-### アプリ名（25字 / 30）
+### アプリ名（28字 / 30）
 
 ```
-Mosaic: reparto en grupos
+FairClass: reparto en grupos
 ```
 
 ### 短い説明（78字 / 80）
@@ -281,16 +281,16 @@ Mosaic: reparto en grupos
 Reparte al alumnado en grupos equilibrados en segundos. Gratis y sin registro.
 ```
 
-### 詳しい説明（2295字 / 4000）
+### 詳しい説明（2307字 / 4000）
 
 ```
-Cada curso hay que repartir al alumnado en grupos siguiendo los criterios del centro: equilibrio entre niñas y niños, rendimiento variado en cada grupo, alumnado con necesidades de apoyo repartido de forma justa y las incompatibilidades que conoce el equipo docente. Mosaic hace ese reparto en grupos en segundos y deja la última palabra al profesorado.
+Cada curso hay que repartir al alumnado en grupos siguiendo los criterios del centro: equilibrio entre niñas y niños, rendimiento variado en cada grupo, alumnado con necesidades de apoyo repartido de forma justa y las incompatibilidades que conoce el equipo docente. FairClass hace ese reparto en grupos en segundos y deja la última palabra al profesorado.
 
 CÓMO FUNCIONA
 • Carga la lista desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app. La app usa vocabulario latinoamericano (“Armar grupos”, “estudiantes”), y los ejemplos incluidos usan la escala de notas de 1 a 7; con tu propio Excel puedes usar la de 0 a 10.
 • Añade los criterios del centro y dale un peso a cada uno.
 • Indica qué estudiantes mantener juntos y a quiénes separar.
-• Elige el número de grupos y pulsa “Armar grupos”. Mosaic reparte cada criterio de forma equilibrada: los grupos quedan heterogéneos y parecidos entre sí, sin agrupar por rendimiento. Los estudiantes que unes quedan siempre juntos y los que separas, separados en la medida de lo posible; si alguna condición no se puede cumplir, lo ves de inmediato.
+• Elige el número de grupos y pulsa “Armar grupos”. FairClass reparte cada criterio de forma equilibrada: los grupos quedan heterogéneos y parecidos entre sí, sin agrupar por rendimiento. Los estudiantes que unes quedan siempre juntos y los que separas, separados en la medida de lo posible; si alguna condición no se puede cumplir, lo ves de inmediato.
 • Revisa las tablas de equilibrio y mueve a cualquier estudiante a otro grupo con un toque.
 
 POR QUÉ LO USA EL PROFESORADO
@@ -300,12 +300,12 @@ POR QUÉ LO USA EL PROFESORADO
 • Funciona en tablets Android y Chromebook, en vertical u horizontal, con ratón y teclado.
 • También sirve para equipos de trabajo dentro del aula.
 
-MOSAIC PRO (PAGO ÚNICO)
+FAIRCLASS PRO (PAGO ÚNICO)
 • Exporta los resultados a Excel y Google Drive: reparto, listas por grupo, una hoja por grupo, condiciones y resumen.
 • Imprime o guarda en PDF para la sesión de evaluación: listas por grupo con colores y leyenda, más las tablas de equilibrio.
 • Pagas una vez: no es una suscripción.
 
-Mosaic usa el mismo motor que la versión web gratuita y los archivos de Excel sirven en las dos.
+FairClass usa el mismo motor que la versión web gratuita y los archivos de Excel sirven en las dos.
 
 Privacidad: las listas y los resultados se guardan solo en el dispositivo. Para verificar la compra de Pro, la tienda y RevenueCat reciben un identificador anónimo y el recibo, nunca nombres del alumnado ni datos de la lista.
 ```
@@ -317,10 +317,10 @@ Privacidad: las listas y los resultados se guardan solo en el dispositivo. Para 
 - 価格: **5,99 €**（スイスは CHF 5.00。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `Klasseneinteilung`, `Klassenbildung`, `Alle Daten bleiben auf dem Gerät`, `Chromebook`, `Gruppeneinteilung`
 
-### アプリ名（24字 / 30）
+### アプリ名（27字 / 30）
 
 ```
-Mosaic Klasseneinteilung
+FairClass Klasseneinteilung
 ```
 
 ### 短い説明（79字 / 80）
@@ -329,18 +329,18 @@ Mosaic Klasseneinteilung
 Ausgewogene Klassen in Sekunden. Alle Daten bleiben auf dem Gerät – ohne Konto.
 ```
 
-### 詳しい説明（2575字 / 4000）
+### 詳しい説明（2590字 / 4000）
 
 ```
-Alle Daten bleiben auf dem Gerät. Keine Cloud, kein Konto: Mosaic berechnet die Klasseneinteilung direkt auf Ihrem Smartphone, Tablet oder Chromebook.
+Alle Daten bleiben auf dem Gerät. Keine Cloud, kein Konto: FairClass berechnet die Klasseneinteilung direkt auf Ihrem Smartphone, Tablet oder Chromebook.
 
-Ob Einschulung oder Übergang in Klasse 5 – bei der Klassenbildung müssen viele Kriterien gleichzeitig passen: ausgeglichenes Verhältnis von Mädchen und Jungen, gemischte Leistung, Schülerinnen und Schüler mit Förderbedarf gerecht verteilt, Freundschaftswünsche der Eltern und Kinder, die getrennt werden sollten. Mosaic erledigt diese Einteilung in Sekunden – die letzte Entscheidung treffen immer Sie.
+Ob Einschulung oder Übergang in Klasse 5 – bei der Klassenbildung müssen viele Kriterien gleichzeitig passen: ausgeglichenes Verhältnis von Mädchen und Jungen, gemischte Leistung, Schülerinnen und Schüler mit Förderbedarf gerecht verteilt, Freundschaftswünsche der Eltern und Kinder, die getrennt werden sollten. FairClass erledigt diese Einteilung in Sekunden – die letzte Entscheidung treffen immer Sie.
 
 SO FUNKTIONIERT ES
 • Schülerliste aus Excel (.xlsx) laden, mit einem Beispiel beginnen oder direkt in der App eingeben.
 • Merkmale festlegen (z. B. Geschlecht, Leistung, Förderbedarf, DaZ) und jedem Merkmal ein Gewicht geben.
 • Freundschaftswünsche als „zusammen“ und Kinder, die getrennt werden sollen, als „trennen“ eintragen.
-• Anzahl der Klassen wählen und „Klassen einteilen“ antippen. Mosaic verteilt jedes Merkmal möglichst gleichmäßig, hält „zusammen“ immer ein und trennt die anderen so weit wie möglich. Was sich nicht erfüllen lässt, wird sofort angezeigt.
+• Anzahl der Klassen wählen und „Klassen einteilen“ antippen. FairClass verteilt jedes Merkmal möglichst gleichmäßig, hält „zusammen“ immer ein und trennt die anderen so weit wie möglich. Was sich nicht erfüllen lässt, wird sofort angezeigt.
 • Verteilungstabellen prüfen und einzelne Kinder mit einem Tipp in eine andere Klasse verschieben. Die Auswertung wird sofort neu berechnet.
 
 WARUM LEHRKRÄFTE ES NUTZEN
@@ -351,12 +351,12 @@ WARUM LEHRKRÄFTE ES NUTZEN
 • Läuft auf Android-Tablets und Chromebooks, im Hoch- und Querformat, auch mit Maus und Tastatur.
 • Auch für die Gruppeneinteilung im Unterricht geeignet.
 
-MOSAIC PRO (EINMALKAUF)
+FAIRCLASS PRO (EINMALKAUF)
 • Ergebnis nach Excel und Google Drive exportieren: Einteilung, Klassenlisten, ein Blatt pro Klasse, Wünsche und Auswertung.
 • Drucken oder als PDF für die Konferenz: Klassenlisten mit farbig markierten Wünschen und Legende sowie Verteilungstabellen auf A4.
 • Einmal kaufen, dauerhaft nutzen – kein Abo.
 
-Mosaic nutzt dieselbe Berechnung wie die kostenlose Webversion; die Excel-Dateien funktionieren in beiden.
+FairClass nutzt dieselbe Berechnung wie die kostenlose Webversion; die Excel-Dateien funktionieren in beiden.
 
 Datenschutz: Schülerlisten und Ergebnisse werden nur auf dem Gerät gespeichert. Zur Prüfung eines Pro-Kaufs erhalten der Store und RevenueCat eine anonyme Kennung und den Beleg – niemals Namen oder Inhalte der Schülerliste. Ob der Einsatz an Ihrer Schule zulässig ist, entscheiden Schule und Land.
 ```
@@ -368,10 +368,10 @@ Datenschutz: Schülerlisten und Ergebnisse werden nur auf dem Gerät gespeichert
 - 価格: **R$ 19,90**（A.8 の帯の上端。R$ 14,90 は価格テストの候補。`pricing.md`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `montar turmas`, `enturmação`, `distribuição de alunos`, `sem cadastro`, `Chromebook`, `LGPD`
 
-### アプリ名（21字 / 30）
+### アプリ名（24字 / 30）
 
 ```
-Mosaic: montar turmas
+FairClass: montar turmas
 ```
 
 ### 短い説明（76字 / 80）
@@ -380,16 +380,16 @@ Mosaic: montar turmas
 Enturmação equilibrada em segundos. Grátis, sem cadastro e sem enviar dados.
 ```
 
-### 詳しい説明（2277字 / 4000）
+### 詳しい説明（2289字 / 4000）
 
 ```
-Antes do início do ano letivo, a coordenação pedagógica precisa montar as turmas: equilibrar meninas e meninos, desempenho, alunos com deficiência ou atendidos pelo AEE, comportamento e os pedidos das famílias. Fazer a enturmação à mão leva dias. O Mosaic faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
+Antes do início do ano letivo, a coordenação pedagógica precisa montar as turmas: equilibrar meninas e meninos, desempenho, alunos com deficiência ou atendidos pelo AEE, comportamento e os pedidos das famílias. Fazer a enturmação à mão leva dias. O FairClass faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
 
 COMO FUNCIONA
 • Carregue a lista de alunos do Excel (.xlsx), comece com um exemplo ou digite no app.
 • Adicione os critérios que quiser (gênero, desempenho, apoio à aprendizagem, comportamento) e dê um peso para cada um.
 • Indique quais alunos manter juntos e quais separar.
-• Escolha o número de turmas e toque em “Montar turmas”. O Mosaic distribui cada critério de forma equilibrada, sempre mantém juntos os alunos que você une e separa os outros na medida do possível. Se alguma condição não puder ser atendida, você vê na hora.
+• Escolha o número de turmas e toque em “Montar turmas”. O FairClass distribui cada critério de forma equilibrada, sempre mantém juntos os alunos que você une e separa os outros na medida do possível. Se alguma condição não puder ser atendida, você vê na hora.
 • Confira as tabelas de equilíbrio e mova qualquer aluno para outra turma com um toque. Os totais são recalculados na hora.
 
 POR QUE AS ESCOLAS USAM
@@ -399,12 +399,12 @@ POR QUE AS ESCOLAS USAM
 • Funciona em tablets Android e Chromebook, na vertical ou horizontal, com mouse e teclado.
 • Também serve para montar grupos de trabalho em sala.
 
-MOSAIC PRO (COMPRA ÚNICA)
+FAIRCLASS PRO (COMPRA ÚNICA)
 • Exporte os resultados para Excel e Google Drive: enturmação, listas por turma, uma aba por turma, condições e resumo.
 • Imprima ou salve em PDF para o conselho de classe: listas com as condições coloridas e legenda, além das tabelas de equilíbrio.
 • Compre uma vez e use para sempre: não é assinatura. Dá para pagar com Pix pelo Google Play.
 
-O Mosaic usa o mesmo motor da versão web gratuita, e os arquivos do Excel funcionam nas duas.
+O FairClass usa o mesmo motor da versão web gratuita, e os arquivos do Excel funcionam nas duas.
 
 Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a compra do Pro, a loja e o RevenueCat recebem um identificador anônimo e o recibo, nunca nomes de alunos nem dados da lista. Para a LGPD, vale saber que a lista de alunos não sai do aparelho.
 ```
@@ -416,10 +416,10 @@ Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a c
 - 価格: **¥980**（買い切り。`docs/research/competitors.md` 第5節の ¥610〜¥980 帯の上端。`pricing.md`）
 - ASO キーワード（本文の地の文に入れてある）: `クラス編成`, `クラス分け`, `班分け`, `Chromebook`
 
-### アプリ名（12字 / 30）
+### アプリ名（22字 / 30）
 
 ```
-Mosaic クラス編成
+FairClass（フェアクラス）クラス編成
 ```
 
 ### 短い説明（44字 / 80）
@@ -428,10 +428,10 @@ Mosaic クラス編成
 男女・学力・支援の必要な子を各クラスに均等に。同じ組・別の組の指定も反映して数秒で編成。
 ```
 
-### 詳しい説明（889字 / 4000）
+### 詳しい説明（898字 / 4000）
 
 ```
-新年度のクラス編成は、男女比、学力、支援の必要な子、同じクラスにしたい子・離したい子まで、いくつもの条件を同時に満たす作業です。付箋と名簿で何日もかかることも珍しくありません。Mosaic はこのクラス分けを数秒で行い、最後の判断は先生に委ねます。
+新年度のクラス編成は、男女比、学力、支援の必要な子、同じクラスにしたい子・離したい子まで、いくつもの条件を同時に満たす作業です。付箋と名簿で何日もかかることも珍しくありません。FairClass はこのクラス分けを数秒で行い、最後の判断は先生に委ねます。
 
 使い方
 ・Excel（.xlsx）の名簿を読み込むか、サンプル・新規作成から始めます。
@@ -447,12 +447,12 @@ Mosaic クラス編成
 ・Android タブレット・Chromebook の横画面や分割画面、マウスとキーボードでも使えます。
 ・授業の班分け・グループ分けにも使えます。
 
-Mosaic Pro（買い切り）
+FairClass Pro（買い切り）
 ・結果を Excel・Google ドライブへ書き出し（組分け・クラス別名簿・各組・ペア指定・集計）。
 ・会議用に印刷・PDF（ペア指定の色分けと凡例つきのクラス別名簿、集計・バランス表を A4 縦に）。
 ・一度の購入でずっと使えます。サブスクリプションではありません。
 
-無料の Web 版 Mosaic と同じエンジンで、Excel ファイルはどちらでもそのまま使えます。
+無料の Web 版 FairClass と同じエンジンで、Excel ファイルはどちらでもそのまま使えます。
 
 プライバシー: 名簿と結果は端末の中だけに保存されます。Pro の購入確認のため、ストアと RevenueCat が匿名の識別子とレシートを受け取りますが、生徒の名前や名簿の内容は送りません。
 ```

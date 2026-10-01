@@ -2,8 +2,8 @@ import type { WebCopyKey } from './en'
 
 // Português do Brasil, tratamento “você”. Termos: docs/i18n-glossary.md（turma, manter juntos, separar）
 export const PT_BR_COPY: Record<WebCopyKey, string> = {
-  docTitle: 'Mosaic — Enturmação equilibrada',
-  metaDescription: 'O Mosaic distribui os alunos em turmas equilibradas de forma automática. Os dados são processados só no seu navegador.',
+  docTitle: 'FairClass — Enturmação equilibrada',
+  metaDescription: 'O FairClass distribui os alunos em turmas equilibradas de forma automática. Os dados são processados só no seu navegador.',
   tagline: 'Otimizador de enturmação',
   language: 'Idioma',
   close: 'Fechar',
@@ -17,7 +17,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   heroTitle2a: 'turmas equilibradas',
   heroTitle2b: 'em segundos.',
   heroDesc:
-    'O Mosaic distribui gênero, desempenho, necessidades de apoio e outros critérios de forma equilibrada entre as turmas. Também respeita quem manter juntos ou separar, e você pode ajustar o resultado na hora.',
+    'O FairClass distribui gênero, desempenho, necessidades de apoio e outros critérios de forma equilibrada entre as turmas. Também respeita quem manter juntos ou separar, e você pode ajustar o resultado na hora.',
   heroLocal: 'Os dados são processados só no navegador',
   heroFree: 'Sem cadastro nem conta, totalmente grátis',
   warningsTitle: 'Avisos ao carregar',
@@ -81,7 +81,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   savedToSheet: 'Gravado na planilha',
   fileResults: 'enturmacao',
   fileRoster: 'lista-de-alunos',
-  footer: 'Mosaic · otimizador de enturmação — MIT License',
+  footer: 'FairClass · otimizador de enturmação — MIT License',
 
   statClasses: 'Turmas',
   statClassesSub: '{n} alunos distribuídos',
@@ -207,7 +207,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   googleAuthFailed: 'Falha no login do Google: {msg}',
   googleApiError: 'Erro da API do Google: {msg}',
   googlePickerTitle: 'Escolha a planilha com a lista de alunos',
-  googleTemplateTitle: 'Modelo de lista do Mosaic',
+  googleTemplateTitle: 'Modelo de lista do FairClass',
 
   parseRosterMissing: 'A aba “{sheet}” não foi encontrada ou está vazia',
   parseNoStudents: 'Nenhum aluno encontrado (preencha nº e nome a partir da linha 3)',

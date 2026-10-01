@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// docs/play-console/pricing.csv の国別価格を、Google Play の買い切り商品（Mosaic Pro）へ反映する。
-// UnitCalc（si-unit-calculator）の scripts/push-play-pricing.mjs を Mosaic 用に移植したもの。
+// docs/play-console/pricing.csv の国別価格を、Google Play の買い切り商品（FairClass Pro）へ反映する。
+// UnitCalc（si-unit-calculator）の scripts/push-play-pricing.mjs を FairClass 用に移植したもの。
 //
 //   node scripts/push-play-pricing.mjs                    # ドライラン（既定。通信しない・鍵も要らない）
 //   node scripts/push-play-pricing.mjs --list --key sa.json        # 商品の一覧を読むだけ
@@ -10,7 +10,7 @@
 //   node scripts/push-play-pricing.mjs --commit --include-unconfirmed   # status=confirm の行も送る
 //
 // 前提:
-// - Play Console のアプリ内アイテム（一回限りの商品）を先に作っておく（既定の商品 ID は mosaic_pro）。
+// - Play Console のアプリ内アイテム（一回限りの商品）を先に作っておく（既定の商品 ID は fairclass_pro）。
 //   このスクリプトは商品を作らない。**既存の購入オプションの国別価格だけ**を書き換え、CSV に無い国は
 //   今の設定（Play の自動換算）のまま残す。販売の可否（availability）は国ごとに今の値を保ち、
 //   まだ設定の無い国は --enable-new-regions を付けたときだけ足す。
@@ -31,8 +31,8 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
 export const CSV_PATH = join(ROOT, 'docs', 'play-console', 'pricing.csv')
 const API = 'https://androidpublisher.googleapis.com/androidpublisher/v3'
 // mobile/app.config.ts の APP_ID と同じ値（**初回アップロード前に確定させること**。公開後は変えられない）
-const DEFAULT_PACKAGE = 'com.ohru131.mosaic'
-const DEFAULT_SKU = 'mosaic_pro'
+const DEFAULT_PACKAGE = 'com.ohru131.fairclass'
+const DEFAULT_SKU = 'fairclass_pro'
 const DEFAULT_KEY = join(ROOT, 'play-service-account.json')
 const HEADER = 'region,currency,price_display,price_micros,status,basis'
 
@@ -189,7 +189,7 @@ async function api(token, method, path, json) {
 async function main() {
   const args = parseArgs(process.argv.slice(2))
   if (args.help) {
-    console.log('node scripts/push-play-pricing.mjs [--dry-run|--plan|--commit] [--list] [--include-unconfirmed] [--enable-new-regions] [--package com.ohru131.mosaic] [--sku mosaic_pro] [--key sa.json]')
+    console.log('node scripts/push-play-pricing.mjs [--dry-run|--plan|--commit] [--list] [--include-unconfirmed] [--enable-new-regions] [--package com.ohru131.fairclass] [--sku fairclass_pro] [--key sa.json]')
     return
   }
 

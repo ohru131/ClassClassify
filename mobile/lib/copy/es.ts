@@ -3,7 +3,7 @@ import type { CopyKey } from './en'
 
 // Español con vocabulario latinoamericano (tú, “grupo”, “estudiantes”). Términos: docs/i18n-glossary.md
 export const ES_COPY: Record<CopyKey, string> = {
-  appEyebrow: 'Mosaic · Distribución de grupos',
+  appEyebrow: 'FairClass · Distribución de grupos',
   close: 'Cerrar',
   cancel: 'Cancelar',
   delete: 'Eliminar',
@@ -175,7 +175,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   noPairsBody: 'No se indicaron condiciones.',
 
   proTitle: 'Pro y ajustes',
-  proName: 'Mosaic Pro',
+  proName: 'FairClass Pro',
   active: '✓ Activo',
   proIntro: 'Cargar, editar, armar y ajustar los grupos es gratis y sin anuncios. Consigue Pro cuando necesites exportar o imprimir.',
   feat1Title: 'Exportar resultados a Excel y Google Drive',
@@ -197,7 +197,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   clearData: 'Borrar la lista y los resultados de este dispositivo',
   clearTitle: 'Borrar lista y resultados',
   clearBody: 'Se eliminarán la lista y los resultados guardados en este dispositivo. No se puede deshacer.',
-  footer: 'Mosaic · optimizador de distribución de grupos (versión web gratuita: https://ohru131.github.io/ClassClassify/)',
+  footer: 'FairClass · optimizador de distribución de grupos (versión web gratuita: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'Las compras están disponibles en la app de iOS o Android.',
   revenueCatKeyMissing: 'No está configurada la clave pública del SDK de RevenueCat.',
@@ -222,7 +222,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   popupBlocked: 'Se bloqueó la ventana emergente. Permítela en la configuración del navegador.',
   fileResults: 'distribucion-grupos',
   fileRoster: 'lista',
-  fileTemplate: 'plantilla-mosaic',
+  fileTemplate: 'plantilla-fairclass',
 
   printTitle: 'Distribución de estudiantes en grupos',
   printCreated: 'Fecha: {date}',

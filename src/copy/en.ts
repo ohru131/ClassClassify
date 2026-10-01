@@ -1,8 +1,8 @@
 // Web 版の UI 文言。英語のキー集合が正（他の言語はこのキーを全部持たないと型エラー。src/copy/index.ts）。
 // 訳語は docs/i18n-glossary.md（スマホ版と同じ語）に揃える。{name} は format() で埋める。
 export const EN_COPY = {
-  docTitle: 'Mosaic — Class placement optimizer',
-  metaDescription: 'Mosaic balances student attributes across classes automatically. Your data is processed only in your browser.',
+  docTitle: 'FairClass — Class placement optimizer',
+  metaDescription: 'FairClass balances student attributes across classes automatically. Your data is processed only in your browser.',
   tagline: 'Class placement optimizer',
   language: 'Language',
   close: 'Close',
@@ -16,7 +16,7 @@ export const EN_COPY = {
   heroTitle2a: 'balanced classes',
   heroTitle2b: 'in seconds.',
   heroDesc:
-    'Mosaic spreads student attributes — gender, academics, support needs and more — evenly across classes. It also respects the students you want to keep together or apart, and you can adjust the result right away.',
+    'FairClass spreads student attributes — gender, academics, support needs and more — evenly across classes. It also respects the students you want to keep together or apart, and you can adjust the result right away.',
   heroLocal: 'Data is processed only in your browser',
   heroFree: 'No sign-up, no account, completely free',
   warningsTitle: 'Notes from loading',
@@ -67,7 +67,7 @@ export const EN_COPY = {
   noPairsAdd: 'None — click to add',
 
   runTitle: 'Build classes',
-  runDesc: 'Mosaic searches on several CPU cores at once and keeps the best-balanced plan.',
+  runDesc: 'FairClass searches on several CPU cores at once and keeps the best-balanced plan.',
   searching: 'Finding the best combination… {p}%',
   stop: 'Stop',
   runBtn: 'Build classes',
@@ -80,7 +80,7 @@ export const EN_COPY = {
   savedToSheet: 'Written to the spreadsheet',
   fileResults: 'class-placement',
   fileRoster: 'roster',
-  footer: 'Mosaic · class placement optimizer — MIT License',
+  footer: 'FairClass · class placement optimizer — MIT License',
 
   statClasses: 'Classes',
   statClassesSub: '{n} students placed',
@@ -206,7 +206,7 @@ export const EN_COPY = {
   googleAuthFailed: 'Google sign-in failed: {msg}',
   googleApiError: 'Google API error: {msg}',
   googlePickerTitle: 'Choose the roster spreadsheet',
-  googleTemplateTitle: 'Mosaic roster template',
+  googleTemplateTitle: 'FairClass roster template',
 
   parseRosterMissing: 'The "{sheet}" sheet is missing or has no data',
   parseNoStudents: 'No students found (enter No. and name from row 3 on)',

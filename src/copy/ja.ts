@@ -2,8 +2,8 @@ import type { WebCopyKey } from './en'
 
 // 日本語は多言語化の前と一字一句同じ文言にする（既存の利用者の見た目を変えない）
 export const JA_COPY: Record<WebCopyKey, string> = {
-  docTitle: 'Mosaic — クラス編成最適化',
-  metaDescription: 'Mosaic — 生徒の個性をバランスよく配置するクラス編成最適化ツール。データはブラウザ内だけで処理されます。',
+  docTitle: 'FairClass — クラス編成最適化',
+  metaDescription: 'FairClass — 生徒の個性をバランスよく配置するクラス編成最適化ツール。データはブラウザ内だけで処理されます。',
   tagline: 'クラス編成オプティマイザー',
   language: '言語',
   close: '閉じる',
@@ -81,7 +81,7 @@ export const JA_COPY: Record<WebCopyKey, string> = {
   savedToSheet: 'スプレッドシートに書き出しました',
   fileResults: 'クラス編成結果',
   fileRoster: '名簿',
-  footer: 'Mosaic · クラス編成オプティマイザー — MIT License',
+  footer: 'FairClass · クラス編成オプティマイザー — MIT License',
 
   statClasses: 'クラス',
   statClassesSub: '{n} 名を編成',
@@ -207,7 +207,7 @@ export const JA_COPY: Record<WebCopyKey, string> = {
   googleAuthFailed: 'Google 認証に失敗しました: {msg}',
   googleApiError: 'Google API エラー: {msg}',
   googlePickerTitle: '名簿のスプレッドシートを選択',
-  googleTemplateTitle: 'Mosaic 名簿ひな形',
+  googleTemplateTitle: 'FairClass 名簿ひな形',
 
   parseRosterMissing: '「{sheet}」シートが見つからないか、データがありません',
   parseNoStudents: '生徒データがありません（3行目以降に NO と名前を入力してください）',

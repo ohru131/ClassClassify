@@ -3,7 +3,7 @@ import type { CopyKey } from './en'
 
 // Anrede „Sie“. Begriffe: docs/i18n-glossary.md（Klasseneinteilung, zusammen, trennen）
 export const DE_COPY: Record<CopyKey, string> = {
-  appEyebrow: 'Mosaic · Klasseneinteilung',
+  appEyebrow: 'FairClass · Klasseneinteilung',
   close: 'Schließen',
   cancel: 'Abbrechen',
   delete: 'Löschen',
@@ -175,7 +175,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   noPairsBody: 'Es wurden keine Wünsche angegeben.',
 
   proTitle: 'Pro & Einstellungen',
-  proName: 'Mosaic Pro',
+  proName: 'FairClass Pro',
   active: '✓ Aktiv',
   proIntro: 'Laden, Bearbeiten, Einteilen und Nachbessern sind kostenlos und werbefrei. Pro brauchen Sie erst zum Exportieren und Drucken.',
   feat1Title: 'Ergebnis nach Excel und Google Drive exportieren',
@@ -197,7 +197,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   clearData: 'Liste und Ergebnis auf diesem Gerät löschen',
   clearTitle: 'Liste und Ergebnis löschen',
   clearBody: 'Die auf diesem Gerät gespeicherte Liste und Einteilung werden gelöscht. Das lässt sich nicht rückgängig machen.',
-  footer: 'Mosaic · Werkzeug für die Klasseneinteilung (kostenlose Webversion: https://ohru131.github.io/ClassClassify/)',
+  footer: 'FairClass · Werkzeug für die Klasseneinteilung (kostenlose Webversion: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'Käufe sind in der iOS- oder Android-App möglich.',
   revenueCatKeyMissing: 'Der öffentliche RevenueCat-SDK-Schlüssel ist nicht konfiguriert.',
@@ -222,7 +222,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   popupBlocked: 'Das Pop-up wurde blockiert. Bitte in den Browsereinstellungen erlauben.',
   fileResults: 'Klasseneinteilung',
   fileRoster: 'Schuelerliste',
-  fileTemplate: 'Mosaic-Vorlage',
+  fileTemplate: 'FairClass-Vorlage',
 
   printTitle: 'Klasseneinteilung',
   printCreated: 'Erstellt: {date}',

@@ -15,7 +15,7 @@ const { withAppBuildGradle, withDangerousMod } = require("expo/config-plugins");
 // Android アプリはパッケージ名に紐づくので、".debug" は別アプリとして扱われる。
 // 購入まわりを実機で確かめるときは release ビルド（applicationId はそのまま）を使う。
 
-const marker = "// mosaic: debug builds install alongside the Play build";
+const marker = "// fairclass: debug builds install alongside the Play build";
 
 module.exports = function withDebugPackageSuffix(config) {
   config = withAppBuildGradle(config, (config) => {

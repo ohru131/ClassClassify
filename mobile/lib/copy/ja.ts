@@ -2,7 +2,7 @@ import { PRIVACY_TITLE } from './privacy'
 import type { CopyKey } from './en'
 
 export const JA_COPY: Record<CopyKey, string> = {
-  appEyebrow: 'Mosaic · クラス編成',
+  appEyebrow: 'FairClass · クラス編成',
   close: '閉じる',
   cancel: 'キャンセル',
   delete: '削除',
@@ -174,7 +174,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   noPairsBody: 'ペアの指定はありません。',
 
   proTitle: 'Pro・設定',
-  proName: 'Mosaic Pro',
+  proName: 'FairClass Pro',
   active: '✓ 利用中',
   proIntro: '名簿の読み込み・編集・編成・手直しは無料で、広告もありません。書き出しと印刷が必要になったら Pro をどうぞ。',
   feat1Title: '結果を Excel・Google ドライブへ書き出し',
@@ -196,7 +196,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   clearData: 'この端末の名簿と結果を消去',
   clearTitle: '名簿と結果を消去',
   clearBody: 'この端末に保存している名簿と編成結果を削除します。元に戻せません。',
-  footer: 'Mosaic · クラス編成オプティマイザー（Web 版は無料・https://ohru131.github.io/ClassClassify/）',
+  footer: 'FairClass · クラス編成オプティマイザー（Web 版は無料・https://ohru131.github.io/ClassClassify/）',
 
   purchaseStoreOnly: '購入は iOS / Android のアプリ版でご利用いただけます。',
   revenueCatKeyMissing: 'RevenueCat の公開 SDK キーが設定されていません。',

@@ -2,8 +2,8 @@ import type { WebCopyKey } from './en'
 
 // Español con vocabulario latinoamericano (tú, “grupo”, “estudiantes”). Términos: docs/i18n-glossary.md
 export const ES_COPY: Record<WebCopyKey, string> = {
-  docTitle: 'Mosaic — Distribución de estudiantes en grupos',
-  metaDescription: 'Mosaic reparte a los estudiantes en grupos equilibrados de forma automática. Los datos se procesan solo en tu navegador.',
+  docTitle: 'FairClass — Distribución de estudiantes en grupos',
+  metaDescription: 'FairClass reparte a los estudiantes en grupos equilibrados de forma automática. Los datos se procesan solo en tu navegador.',
   tagline: 'Optimizador de grupos',
   language: 'Idioma',
   close: 'Cerrar',
@@ -17,7 +17,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   heroTitle2a: 'grupos equilibrados',
   heroTitle2b: 'en segundos.',
   heroDesc:
-    'Mosaic reparte de forma pareja entre los grupos el género, el desempeño, las necesidades de apoyo y otros criterios. También respeta a quiénes mantener juntos o separar, y puedes ajustar el resultado al momento.',
+    'FairClass reparte de forma pareja entre los grupos el género, el desempeño, las necesidades de apoyo y otros criterios. También respeta a quiénes mantener juntos o separar, y puedes ajustar el resultado al momento.',
   heroLocal: 'Los datos se procesan solo en tu navegador',
   heroFree: 'Sin registro ni cuenta, totalmente gratis',
   warningsTitle: 'Avisos al cargar',
@@ -81,7 +81,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   savedToSheet: 'Se escribió en la hoja de cálculo',
   fileResults: 'distribucion-grupos',
   fileRoster: 'lista',
-  footer: 'Mosaic · optimizador de grupos — MIT License',
+  footer: 'FairClass · optimizador de grupos — MIT License',
 
   statClasses: 'Grupos',
   statClassesSub: '{n} estudiantes distribuidos',
@@ -207,7 +207,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   googleAuthFailed: 'Falló el inicio de sesión con Google: {msg}',
   googleApiError: 'Error de la API de Google: {msg}',
   googlePickerTitle: 'Elige la hoja de cálculo con la lista',
-  googleTemplateTitle: 'Plantilla de lista de Mosaic',
+  googleTemplateTitle: 'Plantilla de lista de FairClass',
 
   parseRosterMissing: 'No se encontró la hoja “{sheet}” o no tiene datos',
   parseNoStudents: 'No hay estudiantes (escribe el N.º y el nombre desde la fila 3)',

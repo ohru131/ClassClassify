@@ -15,7 +15,7 @@ const { withAppBuildGradle, withDangerousMod } = require("expo/config-plugins");
 // 含めない（.gitignore 済み＝EASのarchiveにも入らない）ので、EAS側が注入する署名設定を
 // このプラグインが壊すことはない。
 
-const marker = "// mosaic: local release signing from credentials.json";
+const marker = "// fairclass: local release signing from credentials.json";
 const DEBUG_SIGNING_LINE = "            signingConfig signingConfigs.debug\n";
 const RELEASE_SIGNING_LINE =
   '            signingConfig rootProject.file("keystore.properties").exists() ? signingConfigs.release : signingConfigs.debug\n';

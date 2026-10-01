@@ -2,8 +2,8 @@ import type { WebCopyKey } from './en'
 
 // Anrede „Sie“. Begriffe: docs/i18n-glossary.md（Klasseneinteilung, zusammen, trennen）
 export const DE_COPY: Record<WebCopyKey, string> = {
-  docTitle: 'Mosaic — Klasseneinteilung optimieren',
-  metaDescription: 'Mosaic verteilt die Merkmale der Schülerinnen und Schüler automatisch gleichmäßig auf die Klassen. Die Daten werden nur im Browser verarbeitet.',
+  docTitle: 'FairClass — Klasseneinteilung optimieren',
+  metaDescription: 'FairClass verteilt die Merkmale der Schülerinnen und Schüler automatisch gleichmäßig auf die Klassen. Die Daten werden nur im Browser verarbeitet.',
   tagline: 'Klasseneinteilung optimieren',
   language: 'Sprache',
   close: 'Schließen',
@@ -17,7 +17,7 @@ export const DE_COPY: Record<WebCopyKey, string> = {
   heroTitle2a: 'ausgewogene Klassen',
   heroTitle2b: 'in Sekunden.',
   heroDesc:
-    'Mosaic verteilt Geschlecht, Leistung, Förderbedarf und weitere Merkmale gleichmäßig auf die Klassen. Freundschaftswünsche und Trennungen werden berücksichtigt, und Sie können das Ergebnis sofort nachbessern.',
+    'FairClass verteilt Geschlecht, Leistung, Förderbedarf und weitere Merkmale gleichmäßig auf die Klassen. Freundschaftswünsche und Trennungen werden berücksichtigt, und Sie können das Ergebnis sofort nachbessern.',
   heroLocal: 'Daten werden nur im Browser verarbeitet',
   heroFree: 'Ohne Konto und Anmeldung, völlig kostenlos',
   warningsTitle: 'Hinweise beim Laden',
@@ -68,7 +68,7 @@ export const DE_COPY: Record<WebCopyKey, string> = {
   noPairsAdd: 'Keine — zum Hinzufügen klicken',
 
   runTitle: 'Einteilen',
-  runDesc: 'Mosaic sucht auf mehreren CPU-Kernen gleichzeitig und übernimmt die ausgewogenste Einteilung.',
+  runDesc: 'FairClass sucht auf mehreren CPU-Kernen gleichzeitig und übernimmt die ausgewogenste Einteilung.',
   searching: 'Beste Einteilung wird gesucht … {p} %',
   stop: 'Stopp',
   runBtn: 'Klassen einteilen',
@@ -81,7 +81,7 @@ export const DE_COPY: Record<WebCopyKey, string> = {
   savedToSheet: 'In die Tabelle geschrieben',
   fileResults: 'Klasseneinteilung',
   fileRoster: 'Schuelerliste',
-  footer: 'Mosaic · Klasseneinteilung optimieren — MIT License',
+  footer: 'FairClass · Klasseneinteilung optimieren — MIT License',
 
   statClasses: 'Klassen',
   statClassesSub: '{n} Schüler eingeteilt',
@@ -207,7 +207,7 @@ export const DE_COPY: Record<WebCopyKey, string> = {
   googleAuthFailed: 'Google-Anmeldung fehlgeschlagen: {msg}',
   googleApiError: 'Google-API-Fehler: {msg}',
   googlePickerTitle: 'Tabelle mit der Schülerliste auswählen',
-  googleTemplateTitle: 'Mosaic-Vorlage Schülerliste',
+  googleTemplateTitle: 'FairClass-Vorlage Schülerliste',
 
   parseRosterMissing: 'Das Blatt „{sheet}“ fehlt oder enthält keine Daten',
   parseNoStudents: 'Keine Schüler gefunden (Nr. und Name ab Zeile 3 eintragen)',

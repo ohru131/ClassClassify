@@ -2,8 +2,8 @@ import type { WebCopyKey } from './en'
 
 // 합니다체. 용어는 docs/i18n-glossary.md（반 편성・같은 반 배정・분리 배정）
 export const KO_COPY: Record<WebCopyKey, string> = {
-  docTitle: 'Mosaic — 반 편성 최적화',
-  metaDescription: 'Mosaic — 학생의 특성을 각 반에 고르게 나누는 반 편성 최적화 도구. 데이터는 브라우저 안에서만 처리됩니다.',
+  docTitle: 'FairClass — 반 편성 최적화',
+  metaDescription: 'FairClass — 학생의 특성을 각 반에 고르게 나누는 반 편성 최적화 도구. 데이터는 브라우저 안에서만 처리됩니다.',
   tagline: '반 편성 최적화 도구',
   language: '언어',
   close: '닫기',
@@ -81,7 +81,7 @@ export const KO_COPY: Record<WebCopyKey, string> = {
   savedToSheet: '스프레드시트에 내보냈습니다',
   fileResults: '반편성_결과',
   fileRoster: '명단',
-  footer: 'Mosaic · 반 편성 최적화 도구 — MIT License',
+  footer: 'FairClass · 반 편성 최적화 도구 — MIT License',
 
   statClasses: '반',
   statClassesSub: '학생 {n}명 편성',
@@ -207,7 +207,7 @@ export const KO_COPY: Record<WebCopyKey, string> = {
   googleAuthFailed: 'Google 인증에 실패했습니다: {msg}',
   googleApiError: 'Google API 오류: {msg}',
   googlePickerTitle: '명단 스프레드시트 선택',
-  googleTemplateTitle: 'Mosaic 명단 양식',
+  googleTemplateTitle: 'FairClass 명단 양식',
 
   parseRosterMissing: '"{sheet}" 시트가 없거나 데이터가 없습니다',
   parseNoStudents: '학생 데이터가 없습니다(3행부터 번호와 이름을 입력하십시오)',

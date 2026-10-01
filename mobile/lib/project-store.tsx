@@ -47,6 +47,7 @@ type ProjectContextValue = {
   setError: (e: string | null) => void
 }
 
+// 旧名 Mosaic のままにしてある（変えると保存済みの名簿・結果を読めなくなる）
 const STORAGE_KEY = 'mosaic.project.v1'
 const ProjectContext = createContext<ProjectContextValue | null>(null)
 

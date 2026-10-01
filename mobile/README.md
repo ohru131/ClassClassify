@@ -1,4 +1,4 @@
-# Mosaic クラス編成（スマホ・タブレット版）
+# FairClass クラス編成（スマホ・タブレット版）
 
 Web 版（リポジトリ直下）と同じソルバー（`../src/solver`）を使う Expo / React Native アプリ。
 Web 版は従来どおり無料。このアプリは**広告なしの無料版＋ Pro（買い切り）**で配布し、収益は買い切り一本にする（広告・サブスクは無い）。
@@ -100,7 +100,7 @@ npx expo start --dev-client
 
 `eas.json` の `appVersionSource: "remote"` は、EAS 側のカウンタが未初期化だと versionCode 1 から始まる。
 既存の Play アプリへ上書きする場合は、先に `eas build:version:set` で合わせる。
-**アプリ ID（`com.ohru131.mosaic`）は公開後に変えないこと。**
+**アプリ ID（`com.ohru131.fairclass`）は公開後に変えないこと。**
 
 ## ローカルビルド（gradle）
 
@@ -111,10 +111,10 @@ npx expo prebuild -p android --no-install          # android/ を作り直す（
 cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 ```
 
-- **debug は `com.ohru131.mosaic.debug`（ホーム画面の名前は「Mosaic dev」）の別アプリとして入る**（`plugins/withDebugPackageSuffix.js`）。Play 版と署名が違っても上書きにならないので、Play 版の名簿を消さずに試せる。引き換えに debug では課金を試せない（RevenueCat の商品はパッケージ名に紐づく）。
+- **debug は `com.ohru131.fairclass.debug`（ホーム画面の名前は「FairClass dev」）の別アプリとして入る**（`plugins/withDebugPackageSuffix.js`）。Play 版と署名が違っても上書きにならないので、Play 版の名簿を消さずに試せる。引き換えに debug では課金を試せない（RevenueCat の商品はパッケージ名に紐づく）。
 - 実機の ABI だけビルドすれば速い: `./gradlew.bat installDebug -PreactNativeArchitectures=arm64-v8a`。
 - JS だけの変更なら debug APK の作り直しは要らない（dev-client が Metro から読む）。作り直すのは依存・`app.config.ts`・`plugins/` が変わったときだけ。
-- Metro は `npx expo start --dev-client --port 8082`（この開発機は 8081 を別プロセスが占有している）→ `adb reverse tcp:8081 tcp:8082` と `adb reverse tcp:8082 tcp:8082` → `adb shell am start -a android.intent.action.VIEW -d "'mosaic://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8082'" com.ohru131.mosaic.debug`。
+- Metro は `npx expo start --dev-client --port 8082`（この開発機は 8081 を別プロセスが占有している）→ `adb reverse tcp:8081 tcp:8082` と `adb reverse tcp:8082 tcp:8082` → `adb shell am start -a android.intent.action.VIEW -d "'fairclass://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8082'" com.ohru131.fairclass.debug`。
 - `expo start` が `tsconfig.json` を整形し直す（`expo-env.d.ts` が include から消える）ことがある。コミットに混ぜない。
 - **release の署名**: `credentials.json`（`android.keystore` に `keystorePath` / `keystorePassword` / `keyAlias` / `keyPassword`）を置くと、`plugins/withLocalReleaseSigning.js` が prebuild のたびに `android/keystore.properties` を作り、`bundleRelease` を upload key で署名する。無ければ debug 鍵で署名される（Play に弾かれる）。`credentials.json`・`credentials/`・`keystore.properties` は .gitignore 済み。**絶対にコミットしない。**
 - バージョンは `app.config.ts` の `version` と `android.versionCode`（Play で未使用の値）を上げてから prebuild する。
@@ -124,7 +124,7 @@ cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 
 ## RevenueCat の設定（買い切りのみ）
 
-1. Play Console で **一回限りの商品（定期購入ではない）** を作る（例: `mosaic_pro`）。iOS も出すなら App Store Connect で「非消費型」。
+1. Play Console で **一回限りの商品（定期購入ではない）** を作る（例: `fairclass_pro`）。iOS も出すなら App Store Connect で「非消費型」。
 2. RevenueCat でプロジェクト・アプリを作り、その商品を登録する。
 3. **Entitlement `pro`** を作り、商品を紐付ける（紐付け忘れると、支払っても Pro にならない。アプリはその場合「復元」とサポートへ案内する）。
 4. **RevenueCat のダッシュボードでその商品を Non-consumable（非消費型）に設定する（必須）。** Google Play の一回限りの商品を

@@ -1,17 +1,18 @@
 import type { ExpoConfig } from 'expo/config'
 
 // ストアに出すアプリの識別子。**公開後は変えないこと**（別アプリ扱いになり、購入の復元もできなくなる）。
-const APP_ID = 'com.ohru131.mosaic'
+const APP_ID = 'com.ohru131.fairclass'
 
 const config: ExpoConfig = {
   // 端末の言語に合わせてホーム画面の名前を変える（locales/*.json）。既定は短い製品名
-  name: 'Mosaic',
+  name: 'FairClass',
+  // EAS のプロジェクトと一致している必要があるので旧名のまま（利用者には見えない）
   slug: 'mosaic-class-classify',
   version: '1.0.0',
   // 学校のタブレット・Chromebook では横向き・分割画面で使うので、向きを固定しない。
   orientation: 'default',
   icon: './assets/icon.png',
-  scheme: 'mosaic',
+  scheme: 'fairclass',
   userInterfaceStyle: 'light',
   ios: {
     supportsTablet: true,

@@ -11,7 +11,7 @@ Play Console →「アプリのコンテンツ」→「アプリへのアクセ�
 ## 審査員に渡す説明（英語。Play Console の「その他の手順」欄・審査への返信にそのまま貼れる）
 
 ```
-Mosaic is a class placement tool for teachers. No account or login is required, and all data stays on the device.
+FairClass is a class placement tool for teachers. No account or login is required, and all data stays on the device.
 
 How to test (about 2 minutes):
 1. Open the app. On the "Roster" tab, under "Try a sample", tap "Class placement (80 students, 4 classes)".
@@ -37,7 +37,7 @@ The app shows no ads and has no account. Privacy policy: https://ohru131.github.
 | 方法 | 使いどころ | 手順 |
 |---|---|---|
 | **ライセンステスター** | 審査員・クローズドテストの参加者・自分の実機確認 | Play Console →「設定」→「ライセンス テスト」に Google アカウント（Gmail）を追加。その端末で購入すると「テスト用のカード」が選べ、課金されない。RevenueCat には sandbox の購入として届き、`pro` entitlement が付く |
-| **プロモーション コード** | 先行して使ってもらう先生・レビュー依頼 | Play Console →「収益化」→「プロモーション」で `mosaic_pro` のコードを発行（四半期ごとの上限あり）。Play ストアのアプリで「コードを利用」 |
+| **プロモーション コード** | 先行して使ってもらう先生・レビュー依頼 | Play Console →「収益化」→「プロモーション」で `fairclass_pro` のコードを発行（四半期ごとの上限あり）。Play ストアのアプリで「コードを利用」 |
 
 - **買い切りには無料トライアルを設定できない**（Play の無料試用期間は定期購入だけの機能）。審査員にはライセンステスターかプロモコードを使ってもらう。
 - 審査用・テスト用のビルドにも RevenueCat の Android 公開 SDK キー（`EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY`）を入れておく。

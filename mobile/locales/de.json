@@ -1,8 +1,8 @@
 {
   "ios": {
-    "CFBundleDisplayName": "Mosaic Klassen"
+    "CFBundleDisplayName": "FairClass Klassen"
   },
   "android": {
-    "app_name": "Mosaic Klassen"
+    "app_name": "FairClass Klassen"
   }
 }

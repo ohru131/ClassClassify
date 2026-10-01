@@ -1,4 +1,4 @@
-# Mosaic Pro の国別価格（買い切り1本）
+# FairClass Pro の国別価格（買い切り1本）
 
 価格の実体は [`pricing.csv`](pricing.csv)（Play へ流し込む唯一の情報源）。このファイルはその**根拠**と反映のしかた。
 反映は `node scripts/push-play-pricing.mjs`（既定はドライラン。`--commit` で反映）。
@@ -10,7 +10,7 @@
 
 ## 先に: 商品と前提
 
-- 商品: **一回限りの商品（One-time product）**、商品 ID **`mosaic_pro`**（RevenueCat に登録し、entitlement `pro` に紐付ける。
+- 商品: **一回限りの商品（One-time product）**、商品 ID **`fairclass_pro`**（RevenueCat に登録し、entitlement `pro` に紐付ける。
   `mobile/README.md` の「RevenueCat の設定」）。**RevenueCat のダッシュボードで非消費型（Non-consumable）に設定しないと、RevenueCat が購入を consume して買い切りでなくなる**（`submission-checklist.md` 5節）。
 - **サブスクリプションは作らない**（`mobile/lib/purchase-offering.ts` がサブスクを売らないよう弾いている）。
 - **Play Console の価格 CSV インポートと価格テンプレートは 2025 年に廃止された**。まとめて入れる手段は
@@ -104,7 +104,7 @@ node scripts/push-play-pricing.mjs --commit --include-unconfirmed --key play-ser
 
 - 鍵（サービスアカウントの JSON）は Google Cloud で作り、Play Console の「ユーザーと権限」で招待して
   「財務データの表示」「注文と定期購入の管理」を与える。**ファイルはコミットしない**（`.gitignore` の `*service-account*.json`）。
-- スクリプトは**商品を作らない**。Play Console で `mosaic_pro` と購入オプションを先に作る（そのとき基準価格 US$5.99 を入れる）。
+- スクリプトは**商品を作らない**。Play Console で `fairclass_pro` と購入オプションを先に作る（そのとき基準価格 US$5.99 を入れる）。
 - **販売の可否（availability）は国ごとに今の値を保つ**（Play Console で販売を止めた国を、価格の更新で勝手に再開しない）。
   商品にまだ設定の無い国は `--enable-new-regions` を付けたときだけ AVAILABLE で足す。
 - `--key` / `--package` / `--sku` に値が無い（`--key --commit` のような打ち間違い）ときは、既定値に落とさず止める。

@@ -1,8 +1,8 @@
 {
   "ios": {
-    "CFBundleDisplayName": "Mosaic Grupos"
+    "CFBundleDisplayName": "FairClass Grupos"
   },
   "android": {
-    "app_name": "Mosaic Grupos"
+    "app_name": "FairClass Grupos"
   }
 }
