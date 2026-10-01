@@ -1,3 +1,4 @@
+import { PRIVACY_TITLE } from './privacy'
 import type { CopyKey } from './en'
 
 // Português do Brasil, tratamento “você”. Termos: docs/i18n-glossary.md（turma, manter juntos, separar）
@@ -14,7 +15,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   tabRun: 'Configurar',
   tabResults: 'Resultado',
   tabPro: 'Pro',
-  privacyTitle: 'Política de privacidade',
+  privacyTitle: PRIVACY_TITLE['pt-BR'],
 
   loadTitle: 'Carregar lista de alunos',
   loadDesc: 'Preencha o modelo de Excel (mesmo formato da versão web) e escolha o arquivo, ou comece com um exemplo ou uma lista em branco. A lista fica salva só neste aparelho.',

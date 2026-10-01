@@ -1,3 +1,4 @@
+import { PRIVACY_TITLE } from './privacy'
 import type { CopyKey } from './en'
 
 // 합니다체로 통일. 용어는 docs/i18n-glossary.md（반 편성・같은 반 배정・분리 배정）
@@ -14,7 +15,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   tabRun: '설정·실행',
   tabResults: '결과',
   tabPro: 'Pro·설정',
-  privacyTitle: '개인정보 처리방침',
+  privacyTitle: PRIVACY_TITLE['ko'],
 
   loadTitle: '명단 불러오기',
   loadDesc: '엑셀 양식(웹 버전과 같은 형식)에 학생 특성을 입력해 선택하거나, 예시나 빈 명단으로 시작하십시오. 명단은 이 기기에만 저장됩니다.',

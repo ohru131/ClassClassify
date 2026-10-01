@@ -1,3 +1,4 @@
+import { PRIVACY_TITLE } from './privacy'
 import type { CopyKey } from './en'
 
 // Español con vocabulario latinoamericano (tú, “grupo”, “estudiantes”). Términos: docs/i18n-glossary.md
@@ -14,7 +15,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   tabRun: 'Configurar',
   tabResults: 'Resultados',
   tabPro: 'Pro',
-  privacyTitle: 'Política de privacidad',
+  privacyTitle: PRIVACY_TITLE['es'],
 
   loadTitle: 'Cargar una lista',
   loadDesc: 'Completa la plantilla de Excel (el mismo formato que la versión web) y elige el archivo, o empieza con un ejemplo o una lista vacía. La lista se guarda solo en este dispositivo.',

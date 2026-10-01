@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { PRIVACY, PRIVACY_SCOPE } from '../mobile/lib/copy/privacy'
+import { PRIVACY, PRIVACY_SCOPE } from '../src/i18n/privacy'
 import { APP_LANGUAGES } from '../src/i18n/languages'
 import { linkify, renderPrivacyContent } from '../src/privacy/render'
 
