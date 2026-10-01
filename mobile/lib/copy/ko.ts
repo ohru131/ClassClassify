@@ -141,6 +141,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   violationsOk: '배정 조건을 모두 충족합니다',
   undoMoves: '직접 옮긴 것 되돌리기',
   shareXlsx: '결과를 엑셀로 공유',
+  saveToFile: '드라이브·기기에 저장',
   print: '인쇄',
   printPdf: '인쇄 / PDF',
   sharePdf: 'PDF로 공유',

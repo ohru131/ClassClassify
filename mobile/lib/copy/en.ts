@@ -141,6 +141,7 @@ export const EN_COPY = {
   violationsOk: 'All pairings are met',
   undoMoves: 'Undo manual changes',
   shareXlsx: 'Share results as Excel',
+  saveToFile: 'Save to Drive or device',
   print: 'Print',
   printPdf: 'Print / PDF',
   sharePdf: 'Share as PDF',

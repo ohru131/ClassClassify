@@ -140,6 +140,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   violationsOk: 'ペア条件をすべて満たしています',
   undoMoves: '手動変更を戻す',
   shareXlsx: '結果を Excel で共有',
+  saveToFile: 'ドライブ等に保存',
   print: '印刷',
   printPdf: '印刷・PDF',
   sharePdf: 'PDF で共有',

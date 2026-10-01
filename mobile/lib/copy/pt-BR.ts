@@ -141,6 +141,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   violationsOk: 'Todas as condições atendidas',
   undoMoves: 'Desfazer mudanças manuais',
   shareXlsx: 'Compartilhar em Excel',
+  saveToFile: 'Salvar no Drive ou no aparelho',
   print: 'Imprimir',
   printPdf: 'Imprimir / PDF',
   sharePdf: 'Compartilhar PDF',

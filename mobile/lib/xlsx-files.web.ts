@@ -13,6 +13,9 @@ export async function pickXlsx(): Promise<{ data: ArrayBuffer; name: string } | 
   return { data, name: asset.name }
 }
 
+export const canSaveToFile = false
+export const saveXlsx = async (_wb: WorkBook, _fileName: string): Promise<boolean> => false
+
 export const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|\s]+/g, '_')
 
 /** Web（動作確認用）はダウンロードする */

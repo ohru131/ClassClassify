@@ -141,6 +141,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   violationsOk: 'Alle Wünsche erfüllt',
   undoMoves: 'Änderungen zurücksetzen',
   shareXlsx: 'Als Excel teilen',
+  saveToFile: 'In Drive oder auf Gerät speichern',
   print: 'Drucken',
   printPdf: 'Drucken / PDF',
   sharePdf: 'Als PDF teilen',

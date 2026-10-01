@@ -6,7 +6,7 @@ import { useI18n } from './language-provider'
 import { printHtml, sharePdf } from './print'
 import { useProject } from './project-store'
 import { usePro } from './revenuecat-provider'
-import { shareXlsx } from './xlsx-files'
+import { canSaveToFile, saveXlsx, shareXlsx } from './xlsx-files'
 
 const today = () => {
   const d = new Date()
@@ -25,12 +25,12 @@ export function useProExport() {
   const { setError } = useProject()
   const { t } = useI18n()
   const router = useRouter()
-  const [busy, setBusy] = useState<null | 'xlsx' | 'print' | 'pdf'>(null)
+  const [busy, setBusy] = useState<null | 'xlsx' | 'save' | 'print' | 'pdf'>(null)
   // busy は再描画後の値なので、同じフレームの2回目のタップはすり抜ける。同期のロックで止める
   const lockRef = useRef(false)
   const messages = { sharingUnavailable: t('sharingUnavailable'), popupBlocked: t('popupBlocked') }
 
-  const run = (kind: 'xlsx' | 'print' | 'pdf', task: () => Promise<void>) => {
+  const run = (kind: 'xlsx' | 'save' | 'print' | 'pdf', task: () => Promise<void>) => {
     if (!isPro) {
       router.navigate('/pro')
       return
@@ -54,8 +54,9 @@ export function useProExport() {
   }
 
   const exportXlsx = (build: () => WorkBook, baseName: string) => run('xlsx', () => shareXlsx(build(), `${baseName}_${today()}.xlsx`, messages.sharingUnavailable))
+  const saveToFile = (build: () => WorkBook, baseName: string) => run('save', async () => void (await saveXlsx(build(), `${baseName}_${today()}.xlsx`)))
   const print = (build: () => string) => run('print', () => printHtml(build(), messages))
   const exportPdf = (build: () => string, baseName: string) => run('pdf', () => sharePdf(build(), `${baseName}_${today()}.pdf`, messages))
 
-  return { exportXlsx, print, exportPdf, busy, isPro }
+  return { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, busy, isPro }
 }

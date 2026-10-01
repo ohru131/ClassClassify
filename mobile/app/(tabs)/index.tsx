@@ -17,7 +17,7 @@ type Tab = 'students' | 'columns' | 'wanted' | 'unwanted'
 
 export default function RosterScreen() {
   const { hydrated, problem, fileName, numClasses, modifyProblem, dismissWarnings, error, setError } = useProject()
-  const { exportXlsx, busy, isPro } = useProExport()
+  const { exportXlsx, saveToFile, canSaveToFile, busy, isPro } = useProExport()
   const { t, fileLang } = useI18n()
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('students')
@@ -74,6 +74,15 @@ export default function RosterScreen() {
                   busy={busy === 'xlsx'}
                   onPress={() => exportXlsx(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster'))}
                 />
+                {canSaveToFile ? (
+                  <Btn
+                    small
+                    icon={isPro ? 'save-outline' : 'lock-closed-outline'}
+                    label={t('saveToFile')}
+                    busy={busy === 'save'}
+                    onPress={() => saveToFile(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster'))}
+                  />
+                ) : null}
                 <Btn small variant="primary" icon="arrow-forward" label={t('toRun')} onPress={() => router.navigate('/run')} />
               </View>
             </View>
