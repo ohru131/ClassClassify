@@ -5,26 +5,27 @@
   米豪英 = 無料・登録不要・端末内、韓国 = 2月の 반 편성と分離配置（학교폭력 の語は使わない）、南米 = 学年始まり・LGPD、独 = Datenschutz を最初に。
 - 字数は Python の `len()`（Unicode 文字数）で実測した値。Play の上限はアプリ名 30・短い説明 80・詳しい説明 4000。
 - **法的な保証と読める表現は書かない**（「FERPA/DSGVO/LGPD に準拠」とは書かず、「データを送信しない」という事実だけを書く）。
-- 価格はストア側で設定する（アプリはストアのローカライズ済みの価格をそのまま表示する）。下の価格は目安で、【推定】のものは要確認。
-- **Play Console ではタブレット（7インチ・10インチ）と Chromebook 用のスクリーンショットも登録する**（1280×800・800×1280 など）。
+- 価格はストア側で設定する（アプリはストアのローカライズ済みの価格をそのまま表示する）。各ロケールの「価格」は `docs/play-console/pricing.csv`（国別価格の唯一の情報源。根拠は `docs/play-console/pricing.md`）の値で、【推定】を含む。
+- 掲載文で言ってよいこと（アプリの実態と一致させる）: 広告なし・アカウント／登録なし、読み込み・編集・編成・手直しは無料、Pro は**買い切り（one-time purchase）**で Excel への書き出しと印刷・PDF、名簿は端末の外へ出ない（外へ出るのは購入確認のための匿名 ID とレシートだけ）、スマホ・Android タブレット・Chromebook 対応。
+- **Play Console ではタブレット（7インチ・10インチ）と Chromebook 用のスクリーンショットも登録する**（`submission-assets/screenshots/` の phone 1080×1920・tablet7 1200×1920・tablet10 1920×1200・chromebook 1920×1080。上げる順は `submission-assets/README.md`）。
 
 | Play のロケール | アプリ名 | 短い説明 | 詳しい説明 |
 |---|---|---|---|
-| en-US | 23 | 80 | 2236 |
-| en-AU | 23 | 77 | 2029 |
-| en-GB | 22 | 76 | 1954 |
+| en-US | 23 | 80 | 2243 |
+| en-AU | 23 | 77 | 2036 |
+| en-GB | 22 | 76 | 1961 |
 | ko-KR | 11 | 55 | 1057 |
-| es-419 | 20 | 79 | 2250 |
+| es-419 | 20 | 79 | 2269 |
 | es-ES | 25 | 78 | 2295 |
 | de-DE | 24 | 79 | 2575 |
-| pt-BR | 21 | 76 | 2261 |
+| pt-BR | 21 | 76 | 2277 |
 | ja-JP | 12 | 44 | 889 |
 
 ## en-US（英語・米国）
 
 - 狙い: 学区が SaaS を契約していない学校・個人の教員。春（4〜6月）のクラス替え。無料・登録不要・端末内
 - 繁忙期（掲載文・スクショを差し替える時期）: 3〜5月（米）
-- 価格の目安: US$4.99〜6.99（`docs/research/overseas-demand.md` O 節の推定）
+- 価格: **US$5.99**（買い切り。`docs/play-console/pricing.md`）
 - ASO キーワード（本文の地の文に入れてある）: `class placement`, `class lists`, `no sign-up`, `Chromebook`, `keep apart`
 
 ### アプリ名（23字 / 30）
@@ -39,7 +40,7 @@ Mosaic: Class Placement
 Balanced class lists in seconds. Free, no sign-up, student data stays on device.
 ```
 
-### 詳しい説明（2236字 / 4000）
+### 詳しい説明（2243字 / 4000）
 
 ```
 Building next year's class lists by hand takes hours: balancing boys and girls, academic levels, students who need extra support, and the friendships and conflicts parents and teachers tell you about. Mosaic does the class placement for you in seconds, and you stay in control of every decision.
@@ -53,7 +54,7 @@ HOW IT WORKS
 
 WHY TEACHERS USE IT
 • Free to build class lists — no ads, no account, no sign-up.
-• Student data never leaves your device. Nothing is uploaded; the optimization runs on your phone, tablet or Chromebook.
+• Student data never leaves your device. No roster data is uploaded; the optimization runs on your phone, tablet or Chromebook.
 • Works on phones, Android tablets and Chromebooks, in portrait or landscape, with a mouse and keyboard too.
 • Every class gets a balanced mix, not just an even headcount: you can see the target range for each attribute and whether every class is inside it.
 • Great for group work as well: make balanced teams or table groups in the same way.
@@ -72,7 +73,7 @@ Privacy: rosters and results are stored only on your device. To verify a Pro pur
 
 - 狙い: Class Placement Policy に沿って Term 4 に翌年のクラスを作る小学校。Class Creator 等を契約していない学校・担任
 - 繁忙期（掲載文・スクショを差し替える時期）: 9〜11月（Term 3〜4）
-- 価格の目安: A$8.99 前後【推定：US$4.99〜6.99 の相当額。要確認】
+- 価格: **A$8.99**（NZ は NZ$9.99。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `class placement`, `Term 4`, `no sign-up`, `Chromebook`, `keep apart`
 
 ### アプリ名（23字 / 30）
@@ -87,7 +88,7 @@ Mosaic: Class Placement
 Next year's classes, balanced in seconds. Free, no sign-up, data stays local.
 ```
 
-### 詳しい説明（2029字 / 4000）
+### 詳しい説明（2036字 / 4000）
 
 ```
 Every Term 4, teachers sit down with sticky notes and spreadsheets to build next year's classes: an even spread of girls and boys, learning levels, behaviour, students with a support plan or EAL/D support, and the friendship requests from families. Mosaic turns that into a few seconds of work and leaves every final decision with you.
@@ -101,7 +102,7 @@ HOW IT WORKS
 
 WHY SCHOOLS USE IT
 • Free to build your classes — no ads, no account and no sign-up.
-• Student data stays on your device. Nothing is uploaded; the calculation runs on your phone, tablet or Chromebook.
+• Student data stays on your device. No roster data is uploaded; the calculation runs on your phone, tablet or Chromebook.
 • Works on Android tablets and Chromebooks in portrait or landscape, with mouse and keyboard.
 • See the target range for every attribute and whether each class is inside it, so you can explain the lists to your leadership team.
 • Also handy for balanced groups and teams within a class.
@@ -120,7 +121,7 @@ Privacy: rosters and results are stored only on your device. To verify a Pro pur
 
 - 狙い: 2学級以上の小学校の mixing classes（6〜7月）。MIS 連携の SaaS を使っていない学校
 - 繁忙期（掲載文・スクショを差し替える時期）: 5〜7月
-- 価格の目安: £4.99 前後【推定。要確認】
+- 価格: **£4.99**（アイルランドはユーロ圏の €5,99。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `mixing classes`, `class lists`, `no sign-up`, `Chromebook`, `keep apart`
 
 ### アプリ名（22字 / 30）
@@ -135,7 +136,7 @@ Mosaic: Mixing Classes
 Mix classes fairly in seconds. Free, no sign-up, pupil data stays on device.
 ```
 
-### 詳しい説明（1954字 / 4000）
+### 詳しい説明（1961字 / 4000）
 
 ```
 Mixing classes in a two-form or three-form entry school is one of the hardest jobs of the summer term: balancing girls and boys, attainment, behaviour, pupils with a support plan, EAL, and the friendship groups parents ask about. Mosaic does the number-crunching in seconds and leaves every decision with you.
@@ -149,7 +150,7 @@ HOW IT WORKS
 
 WHY TEACHERS USE IT
 • Free to build class lists — no ads, no account, no sign-up.
-• Pupil data stays on your device. Nothing is uploaded; the calculation runs on your phone, tablet or Chromebook.
+• Pupil data stays on your device. No roster data is uploaded; the calculation runs on your phone, tablet or Chromebook.
 • Works on Android tablets and Chromebooks, in portrait or landscape, with a mouse and keyboard.
 • Shows the target range for every attribute and whether each class sits inside it — useful when you explain the new classes to parents and governors.
 • Also works for balanced groups and teams within a class.
@@ -168,7 +169,7 @@ Privacy: class lists and results are stored only on your device. To verify a Pro
 
 - 狙い: 2月に全学年で반 편성をする学年担任団。분리가 필요한 학생の分離配置（学폭の語は使わない）
 - 繁忙期（掲載文・スクショを差し替える時期）: 12〜2月（2月上〜中旬に반편성）
-- 価格の目安: ₩6,900 전후【推定：¥980 相当。要確認】
+- 価格: **₩7,900**（手取りで US$5.99 と揃える。₩6,900 は価格テストの候補。`pricing.md`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `반 편성`, `분리 배정`, `모둠 편성`, `크롬북`
 
 ### アプリ名（11字 / 30）
@@ -217,7 +218,7 @@ Mosaic Pro(1회 구매)
 
 - 狙い: 南半球の学年始まり（2〜3月）前に grupos / cursos を作る学校。データは端末内（チリの新個人情報法・各国の個人情報保護）
 - 繁忙期（掲載文・スクショを差し替える時期）: 10〜2月（南半球・コロンビア A）、メキシコは 6〜8月
-- 価格の目安: BR 以外の目安: CLP 2.990〜3.990、COP 12.900〜16.900、PEN 9,90〜14,90、MXN・ARS は Play の自動換算の低い帯（`overseas-demand.md` A.8 の推定。要確認）
+- 価格: **MX$79・CLP 3.990・COP 12.900・PEN 10,90・US$3.99（EC）**、ARS は Play 側の通貨を確認してから（`pricing.csv` の status=confirm）。その他の中南米は自動換算（`pricing.md`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `armar grupos`, `distribución de estudiantes`, `sin registro`, `Chromebook`, `equipos de trabajo`
 
 ### アプリ名（20字 / 30）
@@ -232,7 +233,7 @@ Mosaic: armar grupos
 Arma grupos equilibrados para el año escolar en segundos. Gratis, sin registro.
 ```
 
-### 詳しい説明（2250字 / 4000）
+### 詳しい説明（2269字 / 4000）
 
 ```
 Antes de que empiece el año escolar hay que armar los grupos: equilibrar niñas y niños, el desempeño académico, los estudiantes con NEE que necesitan apoyo y las amistades o conflictos que conocen los docentes. Hacerlo a mano toma días. Mosaic hace la distribución de estudiantes en grupos en segundos, y la decisión final siempre es tuya.
@@ -246,7 +247,7 @@ CÓMO FUNCIONA
 
 POR QUÉ LO USAN LOS DOCENTES
 • Armar los grupos es gratis: sin anuncios, sin cuenta y sin registro.
-• Los datos de los estudiantes se quedan en tu dispositivo. No se sube nada a internet; el cálculo se hace en tu celular, tablet o Chromebook.
+• Los datos de los estudiantes se quedan en tu dispositivo. No se sube ningún dato de la lista a internet; el cálculo se hace en tu celular, tablet o Chromebook.
 • Grupos heterogéneos y parejos: ves el rango ideal de cada criterio y si cada grupo está dentro, algo fácil de explicar en el consejo de profesores.
 • Funciona en tablets Android y Chromebook, en vertical u horizontal, con mouse y teclado.
 • También sirve para armar equipos de trabajo dentro de la clase.
@@ -265,7 +266,7 @@ Privacidad: las listas y los resultados se guardan solo en tu dispositivo. Para 
 
 - 狙い: 学校の計画書で編成基準（agrupamiento del alumnado）を公開する義務がある公立校。成績による同質な組分けは禁止なので「異質性を保つ」訴求
 - 繁忙期（掲載文・スクショを差し替える時期）: 5〜7月
-- 価格の目安: 5,99 € 前後【推定。要確認】
+- 価格: **5,99 €**（ユーロ圏は全加盟国で同じ。`pricing.csv`）
 - ASO キーワード（本文の地の文に入れてある）: `reparto en grupos`, `agrupamiento del alumnado`, `sin registro`, `Chromebook`
 
 ### アプリ名（25字 / 30）
@@ -313,7 +314,7 @@ Privacidad: las listas y los resultados se guardan solo en el dispositivo. Para 
 
 - 狙い: Einschulung・Klasse 5 のクラス編成（5〜7月）。DSGVO と学校データ規則で「送信しない」が最も効く（「DSGVO-konform」とは書かない）
 - 繁忙期（掲載文・スクショを差し替える時期）: 4〜7月（Einschulung・Klasse 5）
-- 価格の目安: 5,99 € 前後【推定：WTP 高。要確認】
+- 価格: **5,99 €**（スイスは CHF 5.00。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `Klasseneinteilung`, `Klassenbildung`, `Alle Daten bleiben auf dem Gerät`, `Chromebook`, `Gruppeneinteilung`
 
 ### アプリ名（24字 / 30）
@@ -364,7 +365,7 @@ Datenschutz: Schülerlisten und Ergebnisse werden nur auf dem Gerät gespeichert
 
 - 狙い: 2月の始業前に enturmação をする coordenação pedagógica・secretaria。heterogênea の規範、LGPD（「準拠」とは書かない）、Pix で購入可能
 - 繁忙期（掲載文・スクショを差し替える時期）: 11〜2月
-- 価格の目安: R$ 14,90〜19,90（`overseas-demand.md` A.8・O 節の推定。要確認）
+- 価格: **R$ 19,90**（A.8 の帯の上端。R$ 14,90 は価格テストの候補。`pricing.md`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `montar turmas`, `enturmação`, `distribuição de alunos`, `sem cadastro`, `Chromebook`, `LGPD`
 
 ### アプリ名（21字 / 30）
@@ -379,7 +380,7 @@ Mosaic: montar turmas
 Enturmação equilibrada em segundos. Grátis, sem cadastro e sem enviar dados.
 ```
 
-### 詳しい説明（2261字 / 4000）
+### 詳しい説明（2277字 / 4000）
 
 ```
 Antes do início do ano letivo, a coordenação pedagógica precisa montar as turmas: equilibrar meninas e meninos, desempenho, alunos com deficiência ou atendidos pelo AEE, comportamento e os pedidos das famílias. Fazer a enturmação à mão leva dias. O Mosaic faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
@@ -393,7 +394,7 @@ COMO FUNCIONA
 
 POR QUE AS ESCOLAS USAM
 • Montar turmas é grátis: sem anúncios, sem conta e sem cadastro.
-• Os dados dos alunos não saem do aparelho. Nada é enviado para a internet; o cálculo é feito no seu celular, tablet ou Chromebook.
+• Os dados dos alunos não saem do aparelho. Nenhum dado da lista é enviado para a internet; o cálculo é feito no seu celular, tablet ou Chromebook.
 • Turmas heterogêneas e parecidas entre si: você vê a faixa ideal de cada critério e se cada turma está dentro dela, fácil de mostrar no conselho de classe.
 • Funciona em tablets Android e Chromebook, na vertical ou horizontal, com mouse e teclado.
 • Também serve para montar grupos de trabalho em sala.
@@ -412,7 +413,7 @@ Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a c
 
 - 狙い: 3月のクラス編成（新年度）を担う学年主任・担任。国内の既存の掲載方針（無料で編成・端末内・買い切り）
 - 繁忙期（掲載文・スクショを差し替える時期）: 2〜3月
-- 価格の目安: ¥980 程度（`docs/research/competitors.md` 第5節の ¥610〜¥980 帯）
+- 価格: **¥980**（買い切り。`docs/research/competitors.md` 第5節の ¥610〜¥980 帯の上端。`pricing.md`）
 - ASO キーワード（本文の地の文に入れてある）: `クラス編成`, `クラス分け`, `班分け`, `Chromebook`
 
 ### アプリ名（12字 / 30）
