@@ -84,9 +84,10 @@
 - [ ] **フィーチャー グラフィック** 1024×500・24 ビット PNG（アルファなし）: `submission-assets/store/play-feature-graphic-<lang>-1024x500.png`
 - [ ] **スクリーンショット**（言語ごと。en-AU / en-GB は en、es-ES / es-419 は es を使う）
   - スマートフォン（2〜8枚）: `submission-assets/screenshots/phone/<lang>-0N-*.png`（1080×1920）
-  - 7 インチ タブレット（最大8枚）: `…/tablet7/`（1200×1920）
-  - 10 インチ タブレット（最大8枚）: `…/tablet10/`（1920×1200）
-  - Chromebook（最大8枚）: `…/chromebook/`（1920×1080）
+  - 7 インチ タブレット（最大8枚）: `…/tablet7/`（1296×2304・9:16）
+  - 10 インチ タブレット（最大8枚）: `…/tablet10/`（1920×1080・16:9）
+  - Chromebook（最大8枚）: `…/chromebook/`（1920×1080・16:9）
+  - タブレット・Chromebook の画像は **16:9 か 9:16**（10 インチと Chromebook は各辺 1080px 以上）。`node scripts/check-submission-assets.mjs` で検査できる
   - 上げる順と各枚の中身は `submission-assets/README.md`。**タブレット・Chromebook は各4枚以上**上げておくと大画面向けの掲載・おすすめの対象になる【要確認】
 - [ ] 動画（YouTube URL）: 今回は無し（任意）
 

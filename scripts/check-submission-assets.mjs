@@ -8,6 +8,8 @@
 //   フィーチャーグラフィック 1024×500、JPEG または 24 ビット PNG（アルファなし）
 //   スクリーンショット       JPEG または 24 ビット PNG（アルファなし）、各辺 320〜3840px、長辺:短辺 ≤ 2:1
 //                            スマホは 2〜8 枚、7・10 インチタブレット・Chromebook は各 8 枚まで
+//                            タブレット・Chromebook は 16:9 か 9:16、10 インチと Chromebook は各辺 1080px 以上
+// 期待する寸法は scripts/capture-submission-assets.mjs の FORMS と同じ（撮り方を変えたら両方直す）
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -15,7 +17,8 @@ import { fileURLToPath } from 'node:url'
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const DIR = join(ROOT, 'submission-assets')
 const LANGS = ['ja', 'en', 'ko', 'es', 'de', 'pt-BR']
-const FORMS = ['phone', 'tablet7', 'tablet10', 'chromebook']
+const EXPECTED = { phone: [1080, 1920], tablet7: [1296, 2304], tablet10: [1920, 1080], chromebook: [1920, 1080] }
+const FORMS = Object.keys(EXPECTED)
 
 /** PNG の幅・高さ・色の種類（2 = RGB、6 = RGBA）と1色あたりのビット数 */
 function pngInfo(file) {
@@ -59,7 +62,12 @@ for (const form of FORMS) {
       const short = Math.min(info.width, info.height)
       check(short >= 320 && long <= 3840, `${form}/${f}: 辺の長さが 320〜3840 の外（${info.width}×${info.height}）`)
       check(long / short <= 2, `${form}/${f}: 縦横比が 2:1 を超える`)
-      check(info.colorType === 2, `${form}/${f}: アルファ付き（24 ビット PNG にする）`)
+      check(info.colorType === 2 && info.bitDepth === 8, `${form}/${f}: 24 ビット PNG（RGB・8 ビット・アルファなし）ではない（色の種類 ${info.colorType}・${info.bitDepth} ビット）`)
+      check(info.width === EXPECTED[form][0] && info.height === EXPECTED[form][1], `${form}/${f}: ${EXPECTED[form].join('×')} ではない（${info.width}×${info.height}）`)
+      if (form !== 'phone') {
+        check(long * 9 === short * 16, `${form}/${f}: 16:9 / 9:16 ではない`)
+        if (form !== 'tablet7') check(short >= 1080, `${form}/${f}: 短辺が 1080 未満`)
+      }
       if (form === 'phone') check(short >= 1080, `${form}/${f}: 短辺が 1080 未満（おすすめ枠の条件）`)
     }
   }

@@ -10,8 +10,8 @@ submission-assets/
 │   └── play-feature-graphic-<lang>-1024x500.png  フィーチャーグラフィック（6言語）
 └── screenshots/
     ├── phone/<lang>-NN-<name>.png       スマートフォン      1080×1920（9:16）
-    ├── tablet7/<lang>-NN-<name>.png     7 インチ タブレット 1200×1920（縦）
-    ├── tablet10/<lang>-NN-<name>.png    10 インチ タブレット 1920×1200（横）
+    ├── tablet7/<lang>-NN-<name>.png     7 インチ タブレット 1296×2304（縦 9:16）
+    ├── tablet10/<lang>-NN-<name>.png    10 インチ タブレット 1920×1080（横 16:9）
     └── chromebook/<lang>-NN-<name>.png  Chromebook          1920×1080（横 16:9）
 ```
 
@@ -26,9 +26,9 @@ submission-assets/
 | アプリのアイコン | 512×512・32 ビット PNG | `store/play-icon-512.png`（全言語同じ。角丸と影は Play が付けるので四角いまま） |
 | フィーチャー グラフィック | 1024×500・JPEG / 24 ビット PNG（アルファなし） | `store/play-feature-graphic-<lang>-1024x500.png` |
 | スマートフォンのスクリーンショット | 2〜8枚・各辺 320〜3840px・長辺:短辺 ≤ 2:1 | `screenshots/phone/<lang>-*.png` |
-| 7 インチ タブレットのスクリーンショット | 最大8枚・同上 | `screenshots/tablet7/<lang>-*.png` |
-| 10 インチ タブレットのスクリーンショット | 最大8枚・同上 | `screenshots/tablet10/<lang>-*.png` |
-| Chromebook のスクリーンショット | 最大8枚・同上 | `screenshots/chromebook/<lang>-*.png` |
+| 7 インチ タブレットのスクリーンショット | 最大8枚・**9:16 か 16:9**・各辺 320〜3840px | `screenshots/tablet7/<lang>-*.png` |
+| 10 インチ タブレットのスクリーンショット | 最大8枚・**16:9 か 9:16**・各辺 1080px 以上 | `screenshots/tablet10/<lang>-*.png` |
+| Chromebook のスクリーンショット | 最大8枚・**16:9 か 9:16**・各辺 1080px 以上 | `screenshots/chromebook/<lang>-*.png` |
 
 ### 掲載のロケールと、使う画像の言語
 
@@ -70,8 +70,10 @@ submission-assets/
 - **スマホ版の Web 書き出し（`mobile/dist`）を Playwright（Chromium）で操作して撮っている。** 画面の構成・文言・サンプルは
   ネイティブと同じコードだが、**フォント（Noto Sans）・ステータスバー・ナビゲーションバー・スクロールバーは実機と違う**。
   端末の枠・評価・「No.1」のような装飾は付けていない（実際の画面以外を載せない）。
-- 画面サイズ（dp）× 倍率: phone 360×640 ×3、tablet7 600×960 ×2、tablet10 1280×800 ×1.5、chromebook 1280×720 ×1.5。
-  幅 768dp 以上で大画面のレイアウト（クラスの横並び・名簿の表）に切り替わる（`mobile/lib/layout.ts`）ので、7 インチ（縦 600dp）はスマホと同じ1列。
+- 画面サイズ（dp）× 倍率: phone 360×640 ×3、tablet7 648×1152 ×2、tablet10 1280×720 ×1.5、chromebook 1280×720 ×1.5。
+  **タブレットと Chromebook のスクリーンショットは 16:9 か 9:16 にする**（Play の規格。10 インチと Chromebook は各辺 1080px 以上）。
+  10 インチと Chromebook は同じ大きさだが、Chromebook はタッチ無し（マウス操作）として撮っている。
+  幅 768dp 以上で大画面のレイアウト（クラスの横並び・名簿の表）に切り替わる（`mobile/lib/layout.ts`）ので、7 インチ（縦 648dp）はスマホと同じ1列。
 - `07-print` は Pro の印刷用 HTML（`mobile/lib/print-html.ts`）を `?pro=preview`（Web 版だけで有効な確認用のモード。購入はできない）で開き、
   A4 の幅で組んだものを他の画像と同じ画素数で撮っている。
 - `08-pro` は購入前の状態。Web 版にだけ出る「購入はアプリ版で」の注記を消し、Web では押せない購入ボタンの半透明をネイティブと同じ見た目に戻している。

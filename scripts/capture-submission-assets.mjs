@@ -33,17 +33,18 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const DIST = join(ROOT, 'mobile', 'dist')
 const OUT = join(ROOT, 'submission-assets', 'screenshots')
 
-// Play の規格: PNG / JPEG、各辺 320〜3840px、長辺:短辺 ≤ 2:1。
+// Play の規格: PNG / JPEG、各辺 320〜3840px、長辺:短辺 ≤ 2:1。**タブレット（7・10インチ）と Chromebook は
+// 16:9 または 9:16** で、10インチと Chromebook は各辺 1080px 以上（7680px まで）。
 // css の大きさ × deviceScaleFactor が出力の画素数になる。幅 768dp 以上でタブレット用の
 // 横並びレイアウト（mobile/lib/layout.ts の WIDE_BREAKPOINT）に切り替わる。
 export const FORMS = {
   // スマホ（9:16、1080×1920）
   phone: { viewport: { width: 360, height: 640 }, scale: 3 },
-  // 7インチタブレット（縦。Nexus 7 と同じ 600×960dp、1200×1920）。幅が 768dp 未満なのでスマホと同じ1列
-  tablet7: { viewport: { width: 600, height: 960 }, scale: 2 },
-  // 10インチタブレット（横。1280×800dp、1920×1200）。クラスを横に並べるレイアウト
-  tablet10: { viewport: { width: 1280, height: 800 }, scale: 1.5 },
-  // Chromebook（横 16:9、1920×1080）
+  // 7インチタブレット（縦 9:16、1296×2304）。幅が 768dp 未満なのでスマホと同じ1列
+  tablet7: { viewport: { width: 648, height: 1152 }, scale: 2 },
+  // 10インチタブレット（横 16:9、1920×1080）。クラスを横に並べるレイアウト
+  tablet10: { viewport: { width: 1280, height: 720 }, scale: 1.5 },
+  // Chromebook（横 16:9、1920×1080）。タッチ無しのマウス操作として撮る
   chromebook: { viewport: { width: 1280, height: 720 }, scale: 1.5 },
 }
 

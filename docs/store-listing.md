@@ -7,7 +7,7 @@
 - **法的な保証と読める表現は書かない**（「FERPA/DSGVO/LGPD に準拠」とは書かず、「データを送信しない」という事実だけを書く）。
 - 価格はストア側で設定する（アプリはストアのローカライズ済みの価格をそのまま表示する）。各ロケールの「価格」は `docs/play-console/pricing.csv`（国別価格の唯一の情報源。根拠は `docs/play-console/pricing.md`）の値で、【推定】を含む。
 - 掲載文で言ってよいこと（アプリの実態と一致させる）: 広告なし・アカウント／登録なし、読み込み・編集・編成・手直しは無料、Pro は**買い切り（one-time purchase）**で Excel への書き出しと印刷・PDF、名簿は端末の外へ出ない（外へ出るのは購入確認のための匿名 ID とレシートだけ）、スマホ・Android タブレット・Chromebook 対応。
-- **Play Console ではタブレット（7インチ・10インチ）と Chromebook 用のスクリーンショットも登録する**（`submission-assets/screenshots/` の phone 1080×1920・tablet7 1200×1920・tablet10 1920×1200・chromebook 1920×1080。上げる順は `submission-assets/README.md`）。
+- **Play Console ではタブレット（7インチ・10インチ）と Chromebook 用のスクリーンショットも登録する**（`submission-assets/screenshots/` の phone 1080×1920・tablet7 1296×2304・tablet10 1920×1080・chromebook 1920×1080。タブレット・Chromebook は 16:9 / 9:16。上げる順は `submission-assets/README.md`）。
 
 | Play のロケール | アプリ名 | 短い説明 | 詳しい説明 |
 |---|---|---|---|
