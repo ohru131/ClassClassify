@@ -11,7 +11,7 @@
 ## 先に: 商品と前提
 
 - 商品: **一回限りの商品（One-time product）**、商品 ID **`mosaic_pro`**（RevenueCat に登録し、entitlement `pro` に紐付ける。
-  `mobile/README.md` の「RevenueCat の設定」）。消費（consume）しないので再購入は起きない＝非消費型として振る舞う。
+  `mobile/README.md` の「RevenueCat の設定」）。**RevenueCat のダッシュボードで非消費型（Non-consumable）に設定しないと、RevenueCat が購入を consume して買い切りでなくなる**（`submission-checklist.md` 5節）。
 - **サブスクリプションは作らない**（`mobile/lib/purchase-offering.ts` がサブスクを売らないよう弾いている）。
 - **Play Console の価格 CSV インポートと価格テンプレートは 2025 年に廃止された**。まとめて入れる手段は
   Play Developer API（`monetization.onetimeproducts`）だけで、`scripts/push-play-pricing.mjs` はそれを使う。

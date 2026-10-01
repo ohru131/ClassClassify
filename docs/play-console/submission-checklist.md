@@ -97,14 +97,21 @@
   - 名前: `Mosaic Pro`（言語ごとの名前・説明も入れる。例: ja「Mosaic Pro（買い切り）」「Excel への書き出しと印刷・PDF」）
   - 購入オプション: 「購入（Buy）」1つ。**基準価格 US$5.99** を入れて保存・有効化
   - 国別価格: [`pricing.csv`](pricing.csv) を `node scripts/push-play-pricing.mjs --commit` で反映（[`pricing.md`](pricing.md)）
-  - **定期購入（サブスクリプション）は作らない。** アプリは「消費（consume）」を呼ばないので、一度買えば再購入できない＝非消費型として振る舞う
-    （RevenueCat の標準の購入フローだけを使う。`mobile/lib/revenuecat-provider.tsx`）
+  - **定期購入（サブスクリプション）は作らない。**
+  - Google Play の一回限りの商品は、**消費（consume）されると再び買える＝買い切りではなくなる**。消費するかどうかを決めるのは
+    アプリのコードではなく **RevenueCat**: SDK は購入を RevenueCat に送り、返ってきた商品ごとの `should_consume` に従って consume する
+    （`react-native-purchases` が内部で使う purchases-android の `PostReceiptHelper`。RevenueCat の SDK のメッセージも
+    「ダッシュボードで一回限りの商品を消費型か非消費型か正しく設定せよ」と案内している）。**RevenueCat は Google Play の
+    一回限りの商品を既定で消費型として扱う**ので、下の「非消費型の設定」をしないと Pro が consume され、復元できない・再購入できてしまう。
 - [ ] **RevenueCat**（`mobile/README.md` の「RevenueCat の設定」）
   - [ ] RevenueCat のプロジェクトに Android アプリ（パッケージ名＝上の App ID）を作る
   - [ ] **Play のサービス アカウントの認証情報**を RevenueCat に登録（購入の検証に要る。権限が反映されるまで最大 36 時間かかることがある【要確認】）
   - [ ] （推奨）リアルタイム デベロッパー通知（Pub/Sub）を RevenueCat の案内どおりに設定（返金の反映が早くなる）
   - [ ] 商品 `mosaic_pro` を取り込み、**Entitlement `pro`** に紐付ける（紐付け忘れると支払っても Pro にならない）
+  - [ ] **RevenueCat のダッシュボードで商品 `mosaic_pro` の種類を「Non-consumable（非消費型）」に設定する（必須）**。
+    **Lifetime パッケージに入れるだけでは非消費型にならない**（パッケージの種類は offering の中の並べ方で、consume するかどうかとは別の設定）
   - [ ] Offering（current）に **Lifetime パッケージ**として入れる
+  - [ ] 内部テストでライセンステスターとして購入 → アプリを入れ直して「購入を復元」で Pro が戻ること、もう一度「購入」しようとすると「購入済み」になることを確かめる（consume されていればどちらも失敗する）
   - [ ] Android の公開 SDK キー（`goog_…`）を EAS の環境変数 `EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY` に登録してからビルド
 - [ ] **ライセンス テスト**: 「設定」→「ライセンス テスト」に自分とテスターの Google アカウントを追加（課金されずに購入を試せる）
 
@@ -138,7 +145,7 @@
 | 内部テスト（最大100人・審査が速い） | 最初のビルドの動作確認。自分の端末・タブレット・Chromebook で購入（ライセンステスター）・復元・印刷・Excel 共有を確認 |
 | **クローズド テスト** | **個人アカウントの本番公開の条件（12人以上 × 14日連続）**をここで満たす |
 | オープン テスト | 任意（使わなくてよい） |
-| 製品版（本番） | 段階的公開（例: 20% → 50% → 100%）で出す |
+| 製品版（本番） | **初回の公開は段階的公開にできない**（全体公開になる）。2回目以降の更新は段階的公開（例: 20% → 50% → 100%）で出す |
 
 ### クローズドテストの計画（個人アカウントの場合）【要確認：規約の人数・日数】
 
@@ -172,7 +179,7 @@
 1. **App ID を確定**（`com.ohru131.mosaic` のままでよいか）—— 最初のアップロード前に必ず。
 2. 公開する連絡先メール・デベロッパー名を決める。
 3. お支払いプロファイル・税務情報・本人確認。
-4. EAS プロジェクトの作成、RevenueCat のプロジェクト・Android アプリ・`pro` entitlement・Lifetime の offering、SDK キーを EAS へ。
+4. EAS プロジェクトの作成、RevenueCat のプロジェクト・Android アプリ・`pro` entitlement・**商品を非消費型に設定**・Lifetime の offering、SDK キーを EAS へ。
 5. Play Console でアプリ作成 → アプリのコンテンツの各申告（このフォルダの回答を写す）→ ストアの設定・掲載情報（`docs/store-listing.md`・`submission-assets/`）。
 6. `mosaic_pro` を作成し、`pricing.csv` を `scripts/push-play-pricing.mjs` で反映（サービスアカウントの鍵は手元だけに置く）。
 7. 内部テストで実機確認（購入・復元・印刷・Excel 共有・タブレット・Chromebook）→ クローズドテスト（12人 × 14日）→ 本番申請。

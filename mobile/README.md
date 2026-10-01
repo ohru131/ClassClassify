@@ -104,10 +104,14 @@ npx expo start --dev-client
 
 ## RevenueCat の設定（買い切りのみ）
 
-1. Play Console で **アプリ内アイテム（非消費型・定期購入ではない）** を作る（例: `mosaic_pro`）。iOS も出すなら App Store Connect で「非消費型」。
+1. Play Console で **一回限りの商品（定期購入ではない）** を作る（例: `mosaic_pro`）。iOS も出すなら App Store Connect で「非消費型」。
 2. RevenueCat でプロジェクト・アプリを作り、その商品を登録する。
 3. **Entitlement `pro`** を作り、商品を紐付ける（紐付け忘れると、支払っても Pro にならない。アプリはその場合「復元」とサポートへ案内する）。
-4. Offering（current）に **Lifetime パッケージ**としてその商品を入れる。
+4. **RevenueCat のダッシュボードでその商品を Non-consumable（非消費型）に設定する（必須）。** Google Play の一回限りの商品を
+   consume するかどうかは RevenueCat の商品設定で決まり（SDK は RevenueCat が返す `should_consume` に従う）、既定は消費型。
+   設定しないと Pro が consume され、復元できず再購入できてしまう。**Lifetime パッケージに入れるだけでは非消費型にならない。**
+5. Offering（current）に **Lifetime パッケージ**としてその商品を入れる。
+6. 内部テストで購入 → 入れ直して「購入を復元」で Pro が戻ることを確かめる（`../docs/play-console/submission-checklist.md` 5節）。
 
 アプリ側の不変条件（既存アプリ UnitCalc と同じ）:
 
