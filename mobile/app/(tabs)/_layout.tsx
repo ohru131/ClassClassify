@@ -22,7 +22,9 @@ export default function TabsLayout() {
           tabBarInactiveTintColor: C.muted,
           // 広い画面ではアイコンとラベルを横に並べる
           tabBarLabelPosition: isWide ? 'beside-icon' : 'below-icon',
-          tabBarStyle: { backgroundColor: '#fff', borderTopColor: C.border },
+          // 既定の高さ（49dp）はラベル 10px 前提で、12px 太字のラベルだと下が欠ける（Web 版のストア用
+          // スクリーンショットで判明）。高さを指定すると下端の安全領域は自動で足されないので自分で足す
+          tabBarStyle: { backgroundColor: '#fff', borderTopColor: C.border, height: 58 + insets.bottom },
           tabBarLabelStyle: { fontSize: 12, fontWeight: '700' },
         }}
       >
