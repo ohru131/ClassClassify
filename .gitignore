@@ -3,3 +3,7 @@ dist
 *.log
 .DS_Store
 *.tsbuildinfo
+
+# Play Developer API のサービスアカウント鍵（scripts/push-play-pricing.mjs）。絶対にコミットしない
+play-service-account*.json
+*service-account*.json
