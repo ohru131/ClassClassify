@@ -17,13 +17,13 @@ describe('公開用プライバシーポリシー', () => {
     const html = renderPrivacyContent()
     for (const lang of APP_LANGUAGES) {
       expect(html).toContain(`data-lang="${lang}"`)
-      expect(html).toContain(`href="?lang=${lang}"`)
+      expect(html).toContain(`href="#${lang}"`)
+      expect(html).toContain(`id="${lang}"`)
       for (const s of PRIVACY[lang]) expect(html).toContain(s.title.replace(/&/g, '&amp;'))
       expect(PRIVACY_SCOPE[lang].length).toBeGreaterThan(20)
     }
-    // JavaScript が動かなくても英語だけは見える
-    expect(html).toMatch(/data-lang="en">/)
-    expect(html).not.toMatch(/data-lang="en" hidden/)
+    // JavaScript が動かなくても全言語が読める（隠すのは main.ts が動いたときだけ）
+    expect(html).not.toMatch(/\bhidden\b/)
   })
 
   it('URL だけをリンクにし、他はエスケープする', () => {

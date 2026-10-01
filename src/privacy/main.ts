@@ -3,7 +3,8 @@ import { isAppLanguage, LANGUAGE_META, matchLanguageTag, resolveLanguageTags, ty
 import { LANGUAGE_STORAGE_KEY } from '../i18n/storage-key'
 
 // 公開用プライバシーポリシーの言語切り替え。本文はビルド時に HTML へ埋め込み済みなので、
-// ここは「どの言語を見せるか」だけを決める（?lang= → Web 版で選んだ言語 → ブラウザの言語 → 英語）。
+// ここは「どの言語を見せるか」だけを決める（#ja などのフラグメント → ?lang= → Web 版で選んだ言語 → ブラウザの言語 → 英語）。
+// JavaScript が動かないときは全言語が並んだまま見える（render.ts）。
 const readStored = () => {
   try {
     return localStorage.getItem(LANGUAGE_STORAGE_KEY)
@@ -26,7 +27,9 @@ function show(lang: AppLanguage) {
 }
 
 const stored = readStored()
+const fromHash = window.location.hash.slice(1)
 const initial =
+  (isAppLanguage(fromHash) ? fromHash : null) ??
   matchLanguageTag(new URLSearchParams(window.location.search).get('lang')) ??
   (isAppLanguage(stored) ? stored : resolveLanguageTags(navigator.languages?.length ? navigator.languages : [navigator.language]))
 show(initial)
@@ -39,6 +42,8 @@ document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) => 
     show(l)
     const url = new URL(window.location.href)
     url.searchParams.set('lang', l)
+    url.hash = ''
     window.history.replaceState(null, '', url)
+    window.scrollTo(0, 0)
   })
 })
