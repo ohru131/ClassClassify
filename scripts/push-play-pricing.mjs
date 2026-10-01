@@ -4,13 +4,16 @@
 //
 //   node scripts/push-play-pricing.mjs                    # ドライラン（既定。通信しない・鍵も要らない）
 //   node scripts/push-play-pricing.mjs --list --key sa.json        # 商品の一覧を読むだけ
-//   node scripts/push-play-pricing.mjs --commit --key sa.json      # 反映する
+//   node scripts/push-play-pricing.mjs --plan --key sa.json        # 商品の今の設定と突き合わせるだけ（書き込まない）
+//   node scripts/push-play-pricing.mjs --commit --key sa.json      # 反映する（既に設定がある国の価格だけ）
+//   node scripts/push-play-pricing.mjs --commit --enable-new-regions --key sa.json  # 設定の無い国も販売開始する
 //   node scripts/push-play-pricing.mjs --commit --include-unconfirmed   # status=confirm の行も送る
 //
 // 前提:
 // - Play Console のアプリ内アイテム（一回限りの商品）を先に作っておく（既定の商品 ID は mosaic_pro）。
 //   このスクリプトは商品を作らない。**既存の購入オプションの国別価格だけ**を書き換え、CSV に無い国は
-//   今の設定（Play の自動換算）のまま残す。
+//   今の設定（Play の自動換算）のまま残す。販売の可否（availability）は国ごとに今の値を保ち、
+//   まだ設定の無い国は --enable-new-regions を付けたときだけ足す。
 // - サービスアカウントの鍵（JSON）は **コミットしない**（.gitignore の play-service-account*.json）。
 //   --key か環境変数 GOOGLE_PLAY_SERVICE_ACCOUNT_JSON で渡す。既定はリポジトリ直下の
 //   play-service-account.json。Play Console の「ユーザーと権限」でこのアカウントに
@@ -96,21 +99,54 @@ export function microsToMoney(currencyCode, priceMicros) {
   return { currencyCode, units: (micros / 1000000n).toString(), nanos: Number((micros % 1000000n) * 1000n) }
 }
 
-function parseArgs(argv) {
-  const args = { mode: 'dry-run', package: DEFAULT_PACKAGE, sku: DEFAULT_SKU, key: null, list: false, includeUnconfirmed: false }
+// 値を取る引数。値が無い（末尾）・次が別の引数（- で始まる）ときは、既定値に落とさずに止める
+// （`--key --commit` の打ち間違いで既定の鍵・既定の商品へ黙って送らないため）
+const VALUE_FLAGS = { '--package': 'package', '--sku': 'sku', '--key': 'key' }
+
+export function parseArgs(argv) {
+  const args = { mode: 'dry-run', package: DEFAULT_PACKAGE, sku: DEFAULT_SKU, key: null, list: false, plan: false, includeUnconfirmed: false, enableNewRegions: false }
   for (let i = 0; i < argv.length; i += 1) {
     const value = argv[i]
-    if (value === '--commit') args.mode = 'commit'
+    if (value in VALUE_FLAGS) {
+      const next = argv[i + 1]
+      if (next === undefined || next === '' || next.startsWith('-')) throw new Error(`${value} に値がない（例: ${value} <値>）`)
+      args[VALUE_FLAGS[value]] = next
+      i += 1
+    } else if (value === '--commit') args.mode = 'commit'
     else if (value === '--dry-run') args.mode = 'dry-run'
-    else if (value === '--package') args.package = argv[++i]
-    else if (value === '--sku') args.sku = argv[++i]
-    else if (value === '--key') args.key = argv[++i]
     else if (value === '--list') args.list = true
+    else if (value === '--plan') args.plan = true
     else if (value === '--include-unconfirmed') args.includeUnconfirmed = true
+    else if (value === '--enable-new-regions') args.enableNewRegions = true
     else if (value === '--help' || value === '-h') args.help = true
     else throw new Error(`不明な引数: ${value}`)
   }
   return args
+}
+
+/**
+ * 今の購入オプションの国別設定に CSV の価格を重ねる。
+ * - 既に設定がある国: 価格だけを差し替え、**availability は今の値のまま**（販売を止めた国を勝手に再開しない）
+ * - 設定が無い国: enableNewRegions のときだけ AVAILABLE で足す。既定では足さずに newRegions として返す
+ * - CSV に無い国: 触らない
+ */
+export function mergeRegionalConfigs(existing, rows, { enableNewRegions = false } = {}) {
+  const byRegion = new Map((existing ?? []).map((c) => [c.regionCode, c]))
+  const updated = []
+  const added = []
+  const newRegions = []
+  for (const r of rows) {
+    const price = microsToMoney(r.currency, r.priceMicros)
+    const cur = byRegion.get(r.region)
+    if (cur) {
+      byRegion.set(r.region, { ...cur, price })
+      updated.push(r.region)
+    } else if (enableNewRegions) {
+      byRegion.set(r.region, { regionCode: r.region, price, availability: 'AVAILABLE' })
+      added.push(r.region)
+    } else newRegions.push(r.region)
+  }
+  return { configs: [...byRegion.values()], updated, added, newRegions }
 }
 
 async function getAccessToken(keyPath) {
@@ -153,7 +189,7 @@ async function api(token, method, path, json) {
 async function main() {
   const args = parseArgs(process.argv.slice(2))
   if (args.help) {
-    console.log('node scripts/push-play-pricing.mjs [--dry-run|--commit] [--list] [--include-unconfirmed] [--package com.ohru131.mosaic] [--sku mosaic_pro] [--key sa.json]')
+    console.log('node scripts/push-play-pricing.mjs [--dry-run|--plan|--commit] [--list] [--include-unconfirmed] [--enable-new-regions] [--package com.ohru131.mosaic] [--sku mosaic_pro] [--key sa.json]')
     return
   }
 
@@ -164,8 +200,8 @@ async function main() {
   console.log(`送る価格: ${rows.length}地域（CSV に無い国は今の設定＝Play の自動換算のまま）`)
   for (const r of rows) console.log(`  ${r.region}: ${r.currency} ${r.display}`)
   if (skipped.length) console.log(`送らない（status=confirm。確認後に --include-unconfirmed か status=set へ）: ${skipped.map((r) => `${r.region} ${r.currency} ${r.display}`).join(', ')}`)
-  if (args.mode === 'dry-run' && !args.list) {
-    console.log('ドライラン。反映するには --commit を付ける。')
+  if (args.mode === 'dry-run' && !args.list && !args.plan) {
+    console.log('ドライラン（通信しない）。商品の今の設定と突き合わせるには --plan、反映するには --commit を付ける。')
     return
   }
 
@@ -186,25 +222,31 @@ async function main() {
   console.log(`既存の商品: ${current.productId} / 購入オプション ${current.purchaseOptions.length}`)
 
   // 先頭の購入オプション（買い切りの「購入」）だけを書き換える。他の国の設定はそのまま残す
-  const purchaseOptions = current.purchaseOptions.map((option, index) => {
-    if (index !== 0) return option
-    const byRegion = new Map((option.regionalPricingAndAvailabilityConfigs ?? []).map((c) => [c.regionCode, c]))
-    for (const r of rows) byRegion.set(r.region, { regionCode: r.region, price: microsToMoney(r.currency, r.priceMicros), availability: 'AVAILABLE' })
-    return { ...option, regionalPricingAndAvailabilityConfigs: [...byRegion.values()] }
-  })
+  const merged = mergeRegionalConfigs(current.purchaseOptions[0].regionalPricingAndAvailabilityConfigs, rows, { enableNewRegions: args.enableNewRegions })
+  console.log(`価格を差し替える国（販売の可否は今のまま）: ${merged.updated.join(', ') || 'なし'}`)
+  if (merged.added.length) console.log(`新しく販売を始める国（--enable-new-regions）: ${merged.added.join(', ')}`)
+  if (merged.newRegions.length) console.log(`商品にまだ設定が無いので送らない国（足すなら --enable-new-regions）: ${merged.newRegions.join(', ')}`)
+  if (args.mode !== 'commit') {
+    console.log('--plan は読むだけ。反映するには --commit を付ける。')
+    return
+  }
+  const purchaseOptions = current.purchaseOptions.map((option, index) => (index === 0 ? { ...option, regionalPricingAndAvailabilityConfigs: merged.configs } : option))
   const query = new URLSearchParams({ updateMask: 'purchaseOptions', 'regionsVersion.version': current.regionsVersion.version })
-  const updated = await api(token, 'PATCH', `/applications/${args.package}/oneTimeProducts/${args.sku}?${query}`, { ...current, purchaseOptions })
+  // 公式の REST パスは get / list が `oneTimeProducts`、patch だけが `onetimeproducts`（小文字）。
+  // androidpublisher v3 の discovery 文書（monetization.onetimeproducts）で確認した（2026-10-01）
+  const updated = await api(token, 'PATCH', `/applications/${args.package}/onetimeproducts/${args.sku}?${query}`, { ...current, purchaseOptions })
 
-  // 送った全地域が期待どおりになったかを読み戻して確かめる
+  // 送った地域が期待どおりになったかを読み戻して確かめる
+  const sent = new Set([...merged.updated, ...merged.added])
   const configs = updated?.purchaseOptions?.[0]?.regionalPricingAndAvailabilityConfigs ?? []
   const actual = new Map(configs.map((c) => [c.regionCode, c.price]))
-  const wrong = rows.filter((r) => {
+  const wrong = rows.filter((r) => sent.has(r.region)).filter((r) => {
     const p = actual.get(r.region)
     if (!p || p.currencyCode !== r.currency) return true
     return BigInt(p.units ?? 0) * 1000000n + BigInt(p.nanos ?? 0) / 1000n !== BigInt(r.priceMicros)
   })
   if (wrong.length) throw new Error(`反映を確認できない地域: ${wrong.map((r) => r.region).join(', ')}`)
-  console.log(`反映した（${rows.length}地域を読み戻して一致を確認）。`)
+  console.log(`反映した（${sent.size}地域を読み戻して一致を確認）。`)
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

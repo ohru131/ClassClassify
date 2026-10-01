@@ -92,8 +92,12 @@
 node scripts/push-play-pricing.mjs
 # 2. 商品が見えるか（読むだけ）
 node scripts/push-play-pricing.mjs --list --key play-service-account.json
-# 3. 反映（送った全地域を読み戻して一致を確かめる）
+# 3. 商品の今の設定と突き合わせる（読むだけ。価格を差し替える国・まだ設定の無い国を一覧する）
+node scripts/push-play-pricing.mjs --plan --key play-service-account.json
+# 4. 反映（既に設定がある国の価格だけ。販売の可否は今のまま。送った国を読み戻して一致を確かめる）
 node scripts/push-play-pricing.mjs --commit --key play-service-account.json
+# 商品にまだ設定の無い国も販売を始めるとき
+node scripts/push-play-pricing.mjs --commit --enable-new-regions --key play-service-account.json
 # status=confirm の行（BG・AR）も送るとき
 node scripts/push-play-pricing.mjs --commit --include-unconfirmed --key play-service-account.json
 ```
@@ -101,5 +105,9 @@ node scripts/push-play-pricing.mjs --commit --include-unconfirmed --key play-ser
 - 鍵（サービスアカウントの JSON）は Google Cloud で作り、Play Console の「ユーザーと権限」で招待して
   「財務データの表示」「注文と定期購入の管理」を与える。**ファイルはコミットしない**（`.gitignore` の `*service-account*.json`）。
 - スクリプトは**商品を作らない**。Play Console で `mosaic_pro` と購入オプションを先に作る（そのとき基準価格 US$5.99 を入れる）。
-- **このスクリプトは実際の API に対して一度も実行していない**（鍵が無いため）。初回は `--list` で読めることを確かめてから
-  `--commit` すること。API のパスとリクエストの形は UnitCalc の同名スクリプト（実運用済み）に合わせてある。
+- **販売の可否（availability）は国ごとに今の値を保つ**（Play Console で販売を止めた国を、価格の更新で勝手に再開しない）。
+  商品にまだ設定の無い国は `--enable-new-regions` を付けたときだけ AVAILABLE で足す。
+- `--key` / `--package` / `--sku` に値が無い（`--key --commit` のような打ち間違い）ときは、既定値に落とさず止める。
+- **このスクリプトは実際の API に対して一度も実行していない**（鍵が無いため）。初回は `--list`・`--plan` で読めることを確かめてから
+  `--commit` すること。REST のパスは androidpublisher v3 の discovery 文書で確かめた（get / list は `oneTimeProducts`、
+  patch だけ `onetimeproducts`）。

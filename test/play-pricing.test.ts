@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error JavaScript のスクリプト（型定義なし）
-import { CSV_PATH, microsToMoney, parsePricingCsv } from '../scripts/push-play-pricing.mjs'
+import { CSV_PATH, mergeRegionalConfigs, microsToMoney, parseArgs, parsePricingCsv } from '../scripts/push-play-pricing.mjs'
 
 // docs/play-console/pricing.csv（Play の国別価格の唯一の情報源）が、送る前の検証を通ることを確かめる
 describe('Pro の国別価格（pricing.csv）', () => {
@@ -34,5 +34,39 @@ describe('Pro の国別価格（pricing.csv）', () => {
   it('API の Money 型（units + nanos）に直す', () => {
     expect(microsToMoney('USD', '5990000')).toEqual({ currencyCode: 'USD', units: '5', nanos: 990000000 })
     expect(microsToMoney('JPY', '980000000')).toEqual({ currencyCode: 'JPY', units: '980', nanos: 0 })
+  })
+
+  it('値を取る引数に値が無いときは既定値に落とさず止める', () => {
+    expect(() => parseArgs(['--key'])).toThrow(/--key に値がない/)
+    expect(() => parseArgs(['--key', '--commit'])).toThrow(/--key に値がない/)
+    expect(() => parseArgs(['--package', ''])).toThrow(/--package に値がない/)
+    expect(() => parseArgs(['--sku', '-x'])).toThrow(/--sku に値がない/)
+    // 指定しなければ既定値（指定なしと値なしを区別する）
+    expect(parseArgs([])).toMatchObject({ mode: 'dry-run', package: 'com.ohru131.mosaic', sku: 'mosaic_pro', key: null, enableNewRegions: false })
+    expect(parseArgs(['--commit', '--key', 'sa.json', '--sku', 'pro2'])).toMatchObject({ mode: 'commit', key: 'sa.json', sku: 'pro2' })
+  })
+
+  it('既存の国は価格だけ差し替えて販売の可否を保ち、設定の無い国は明示したときだけ足す', () => {
+    const existing = [
+      { regionCode: 'JP', price: microsToMoney('JPY', '800000000'), availability: 'AVAILABLE' },
+      { regionCode: 'BR', price: microsToMoney('BRL', '9900000'), availability: 'NO_LONGER_AVAILABLE' },
+      { regionCode: 'IN', price: microsToMoney('INR', '99000000'), availability: 'AVAILABLE' },
+    ]
+    const csv = [
+      { region: 'JP', currency: 'JPY', priceMicros: '980000000' },
+      { region: 'BR', currency: 'BRL', priceMicros: '19900000' },
+      { region: 'CL', currency: 'CLP', priceMicros: '3990000000' },
+    ]
+    const r = mergeRegionalConfigs(existing, csv)
+    const by = new Map(r.configs.map((c: { regionCode: string }) => [c.regionCode, c]))
+    expect(by.get('JP')).toEqual({ regionCode: 'JP', price: microsToMoney('JPY', '980000000'), availability: 'AVAILABLE' })
+    expect(by.get('BR')).toMatchObject({ availability: 'NO_LONGER_AVAILABLE', price: { units: '19' } })
+    expect(by.get('IN')).toEqual(existing[2])
+    expect(by.has('CL')).toBe(false)
+    expect(r).toMatchObject({ updated: ['JP', 'BR'], added: [], newRegions: ['CL'] })
+
+    const withNew = mergeRegionalConfigs(existing, csv, { enableNewRegions: true })
+    expect(withNew).toMatchObject({ added: ['CL'], newRegions: [] })
+    expect(withNew.configs.find((c: { regionCode: string }) => c.regionCode === 'CL')).toMatchObject({ availability: 'AVAILABLE' })
   })
 })
