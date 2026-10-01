@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { pairStatus, resultWorkbook, rowColor, violationText, type ColumnReport, type PairTag, type Problem, type Report } from '@/lib/solver'
-import { clampPage, offsetForPage, pageFromOffset, pageLayout, stepPage } from '@/lib/class-pager'
+import { clampPage, offsetForPage, pageFromOffset, pageLayout, resolvePagerScroll, stepPage } from '@/lib/class-pager'
 import { canSharePdf } from '@/lib/print'
 import { buildResultPrintHtml } from '@/lib/print-html'
 import { useProExport } from '@/lib/use-pro-export'
@@ -337,7 +337,8 @@ function ClassBoard({
  * ネイティブモジュールは足さず、横向きの FlatList（pagingEnabled）だけで組む（Web 書き出しでも同じ）。
  * 縦のスクロールは画面全体の ScrollView が受け持ち、ページの中では縦に入れ子にしない
  * （向きの違うスクロールは OS が方向で振り分けるので、生徒の一覧を縦に送る指と左右のスワイプが干渉しない）。
- * 今どのページかは onScroll の位置から求める（react-native-web は onMomentumScrollEnd を出さないため）。
+ * 今どのページかは onScroll の位置から求め、止まったら（onMomentumScrollEnd、Web は最後の scroll から一定時間後）
+ * 実際の位置で選び直す（react-native-web は onMomentumScrollEnd を出さない）。判定は lib/class-pager.ts の resolvePagerScroll。
  */
 function ClassPager({
   k,
@@ -379,19 +380,28 @@ function ClassPager({
     [k, width, onChange],
   )
 
-  // ページ幅が変わった（回転・ウィンドウのリサイズ）・クラス数が変わったときは、今のクラスの位置へ戻す
+  // ページ幅が変わった（回転・ウィンドウのリサイズ）・クラス数が変わったときは、保留中の移動を捨てて今のクラスの位置へ戻す
   useEffect(() => {
+    settling.current = null
     if (width > 0) listRef.current?.scrollToOffset({ offset: offsetForPage(cur, width), animated: false })
     // cur はここでは追わない（スワイプのたびに位置を戻すと指の動きと喧嘩する）
   }, [width, k]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // スクロールが止まったことの検出（Web には onMomentumScrollEnd が無いので、最後の scroll から一定時間で止まったとみなす）
+  const endTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => () => {
+    if (endTimer.current) clearTimeout(endTimer.current)
+  }, [])
+  const handle = (phase: 'drag' | 'scroll' | 'end', x: number) => {
+    const r = resolvePagerScroll({ settling: settling.current, current: cur }, { phase, page: pageFromOffset(x, width, k) })
+    settling.current = r.settling
+    if (r.select !== null) onChange(r.select)
+  }
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const page = pageFromOffset(e.nativeEvent.contentOffset.x, width, k)
-    if (settling.current !== null) {
-      if (page === settling.current) settling.current = null
-      return
-    }
-    if (page !== cur) onChange(page)
+    const x = e.nativeEvent.contentOffset.x
+    handle('scroll', x)
+    if (endTimer.current) clearTimeout(endTimer.current)
+    endTimer.current = setTimeout(() => handle('end', x), 160)
   }
 
   const prev = stepPage(cur, -1, k)
@@ -430,7 +440,9 @@ function ClassPager({
           initialScrollIndex={cur}
           getItemLayout={(_, index) => pageLayout(width, index)}
           onScroll={onScroll}
-          onMomentumScrollEnd={onScroll}
+          // 利用者が触ったら、タブ・矢印で始めた移動の行き先を捨てて指の動きに従う
+          onScrollBeginDrag={(e) => handle('drag', e.nativeEvent.contentOffset.x)}
+          onMomentumScrollEnd={(e) => handle('end', e.nativeEvent.contentOffset.x)}
           scrollEventThrottle={16}
           // 高さはいちばん長いクラスに揃う（人数差はふつう1人以内なので、短いクラスの下の余白はわずか）
           style={{ width }}

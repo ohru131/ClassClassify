@@ -24,3 +24,23 @@ export function stepPage(index: number, delta: -1 | 1, count: number): number | 
   const next = index + delta
   return next < 0 || next >= count ? null : next
 }
+
+/**
+ * スクロールのイベントごとに「今どのページを選んでいることにするか」を決める。
+ * settling はタブ・矢印で動かし始めたときの行き先（アニメーション中の途中のページでタブが点滅しないよう、
+ * 着くまでは途中の位置を無視する）。
+ * - drag: 利用者が指（マウス）で触った。行き先の予約を捨て、以後は実際の位置に従う
+ * - scroll: 途中経過。予約があれば、その行き先に着いたときだけ予約を外す
+ * - end: スクロールが止まった（ネイティブは onMomentumScrollEnd、Web は止まってからの一定時間）。
+ *   予約の有無に関係なく実際の位置で選び直す（割り込まれて予約が残ったままにならないように）
+ */
+export function resolvePagerScroll(
+  state: { settling: number | null; current: number },
+  event: { phase: 'drag' | 'scroll' | 'end'; page: number },
+): { settling: number | null; select: number | null } {
+  const changed = (page: number) => (page !== state.current ? page : null)
+  if (event.phase === 'drag') return { settling: null, select: null }
+  if (event.phase === 'end') return { settling: null, select: changed(event.page) }
+  if (state.settling !== null) return { settling: event.page === state.settling ? null : state.settling, select: null }
+  return { settling: null, select: changed(event.page) }
+}

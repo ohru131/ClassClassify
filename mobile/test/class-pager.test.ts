@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clampPage, offsetForPage, pageFromOffset, pageLayout, stepPage } from '../lib/class-pager'
+import { clampPage, offsetForPage, pageFromOffset, pageLayout, resolvePagerScroll, stepPage } from '../lib/class-pager'
 
 describe('結果画面のクラスのページ送り', () => {
   it('スクロール位置からいちばん近いページを選ぶ', () => {
@@ -38,5 +38,23 @@ describe('結果画面のクラスのページ送り', () => {
     expect(stepPage(0, 1, 4)).toBe(1)
     expect(stepPage(3, 1, 4)).toBeNull()
     expect(stepPage(2, -1, 4)).toBe(1)
+  })
+})
+
+describe('タブ・矢印で動かしている途中の割り込み', () => {
+  it('行き先に着くまでは途中のページを選ばず、着いたら予約を外す', () => {
+    expect(resolvePagerScroll({ settling: 3, current: 3 }, { phase: 'scroll', page: 1 })).toEqual({ settling: 3, select: null })
+    expect(resolvePagerScroll({ settling: 3, current: 3 }, { phase: 'scroll', page: 3 })).toEqual({ settling: null, select: null })
+  })
+
+  it('途中で指で触ったら予約を捨て、以後のスワイプに従う', () => {
+    const afterDrag = resolvePagerScroll({ settling: 3, current: 3 }, { phase: 'drag', page: 1 })
+    expect(afterDrag).toEqual({ settling: null, select: null })
+    expect(resolvePagerScroll({ settling: afterDrag.settling, current: 3 }, { phase: 'scroll', page: 1 })).toEqual({ settling: null, select: 1 })
+  })
+
+  it('止まったら予約が残っていても実際の位置で選び直す', () => {
+    expect(resolvePagerScroll({ settling: 3, current: 3 }, { phase: 'end', page: 1 })).toEqual({ settling: null, select: 1 })
+    expect(resolvePagerScroll({ settling: null, current: 2 }, { phase: 'end', page: 2 })).toEqual({ settling: null, select: null })
   })
 })
