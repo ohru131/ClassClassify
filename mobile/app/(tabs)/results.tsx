@@ -36,6 +36,13 @@ export default function ResultsScreen() {
   // 無料版の保存件数の上限に達したときの案内
   const [limitHit, setLimitHit] = useState(false)
   const saved = useSavedResults()
+  // 編成し直した・生徒を移したら、表示中の結果はもう保存済みのものではない。
+  // 「〜として保存しました」を残すと、新しい結果まで保存済みに見える
+  useEffect(() => {
+    setSavedName(null)
+    setSaveName(null)
+    setLimitHit(false)
+  }, [solution])
 
   if (!problem || !solution || !report)
     return (
