@@ -111,7 +111,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   standard: 'ふつう 10秒',
   thorough: 'じっくり 30秒',
   timeInfo: '{s} 秒',
-  timeInfoStarts: '{s} 秒 · {n} 通りの案を考えて、いちばん良い案を選びます',
+  timeInfoStarts: '{s} 秒 · {n} 通りの案からいちばん良い案を選びます',
   balancedItems: '均等にする項目',
   editAttributes: '項目・重みを編集',
   noEnabled: '均等にする項目がありません（人数だけをそろえます）。',
