@@ -11,22 +11,23 @@
 
 | Play のロケール | アプリ名 | 短い説明 | 詳しい説明 |
 |---|---|---|---|
-| en-US | 26 | 80 | 2258 |
-| en-AU | 26 | 77 | 2051 |
-| en-GB | 25 | 76 | 1976 |
-| ko-KR | 14 | 55 | 1066 |
-| es-419 | 23 | 79 | 2281 |
-| es-ES | 28 | 78 | 2307 |
-| de-DE | 27 | 79 | 2590 |
-| pt-BR | 24 | 76 | 2289 |
-| ja-JP | 22 | 44 | 898 |
+| en-US | 26 | 79 | 2520 |
+| en-AU | 26 | 77 | 2506 |
+| en-GB | 25 | 76 | 2416 |
+| ko-KR | 14 | 57 | 1194 |
+| es-419 | 23 | 76 | 2589 |
+| es-ES | 28 | 78 | 2709 |
+| de-DE | 27 | 80 | 2926 |
+| pt-BR | 24 | 79 | 2611 |
+| ja-JP | 22 | 52 | 1039 |
 
 ## en-US（英語・米国）
 
-- 狙い: 学区が SaaS を契約していない学校・個人の教員。春（4〜6月）のクラス替え。無料・登録不要・端末内
+- 狙い: 学区が SaaS を契約していない学校・個人の教員。春（4〜6月）のクラス替え（spring class lists）。無料・登録不要・端末内
 - 繁忙期（掲載文・スクショを差し替える時期）: 3〜5月（米）
 - 価格: **US$5.99**（買い切り。`docs/play-console/pricing.md`）
 - ASO キーワード（本文の地の文に入れてある）: `class placement`, `class lists`, `no sign-up`, `Chromebook`, `keep apart`
+- 語彙: IEP/504・English learners (ELL)・behavior（米綴り）・principal・parent requests。技術用語（optimization・algorithm・engine・CPU）は使わない
 
 ### アプリ名（26字 / 30）
 
@@ -34,47 +35,48 @@
 FairClass: Class Placement
 ```
 
-### 短い説明（80字 / 80）
+### 短い説明（79字 / 80）
 
 ```
-Balanced class lists in seconds. Free, no sign-up, student data stays on device.
+Balanced class lists in seconds. Free, no sign-up, student data stays with you.
 ```
 
-### 詳しい説明（2258字 / 4000）
+### 詳しい説明（2520字 / 4000）
 
 ```
-Building next year's class lists by hand takes hours: balancing boys and girls, academic levels, students who need extra support, and the friendships and conflicts parents and teachers tell you about. FairClass does the class placement for you in seconds, and you stay in control of every decision.
+Every spring, the same puzzle: next year's class lists. You want a fair mix of boys and girls and of reading and math levels in every room, students with IEPs, 504 plans and English learners spread thoughtfully, and the parent requests and "please don't put these two together" notes all remembered. FairClass gives you a balanced first draft in seconds, so your team can spend the meeting talking about kids instead of shuffling sticky notes. Every final decision stays with you.
 
 HOW IT WORKS
-• Load your roster from an Excel file (.xlsx), start from a sample, or type it in.
-• Add any attributes you care about — gender, reading level, behavior, IEP or 504 support, English learners — and give each one a weight.
-• Mark students to keep together and students to keep apart.
-• Choose the number of classes and tap "Build classes". FairClass spreads every attribute as evenly as possible, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
-• Check the balance tables, then move any student to another class with one tap. Totals update instantly.
+• Bring in your roster from an Excel file (.xlsx), start from a sample, or type it in.
+• Add whatever matters at your school — gender, reading level, math level, behavior support, IEP or 504, English learner, leadership — and choose how much each one counts.
+• Note which students should stay together (like a friend request) and which should be kept apart.
+• Pick the number of classes and tap "Build classes". FairClass spreads every group of students as evenly as it can, always keeps paired students together, and keeps apart the ones you separate as far as possible. If a request can't be met, it tells you right away.
+• Look over the balance tables, then move any student to another class with one tap. The totals update instantly, so you can try ideas with your grade-level team.
 
-WHY TEACHERS USE IT
+WHY TEACHERS LOVE IT
 • Free to build class lists — no ads, no account, no sign-up.
-• Student data never leaves your device. No roster data is uploaded; the optimization runs on your phone, tablet or Chromebook.
+• Your students' information stays on your device. FairClass never uploads names or notes.
 • Works on phones, Android tablets and Chromebooks, in portrait or landscape, with a mouse and keyboard too.
-• Every class gets a balanced mix, not just an even headcount: you can see the target range for each attribute and whether every class is inside it.
-• Great for group work as well: make balanced teams or table groups in the same way.
+• More than an even headcount: for each thing you balance, you can see the target range and whether every class is inside it — handy when your principal or a parent asks how the lists were made.
+• Great for group work too: make balanced table groups, reading groups or teams the same way.
 
 FAIRCLASS PRO (ONE-TIME PURCHASE)
-• Export the results to Excel and Google Drive: placement, class lists, one sheet per class, pairings and a summary.
-• Print or save as PDF for staff meetings: class lists with color-coded pairings and a legend, plus the balance tables, on print-ready pages.
-• Buy once and keep it — Pro is not a subscription.
+• Export your results to Excel, then share them to Google Drive or email: class lists, one sheet per class, pairings and a summary.
+• Print or save as PDF for your placement meeting: class lists with color-coded pairings and a legend, plus the balance tables.
+• Buy once and it's yours — Pro is not a subscription.
 
-FairClass uses the same engine as the free FairClass web app, and Excel files work in both. The class placement uses simulated annealing, an optimization method that tries a huge number of combinations.
+Prefer a bigger screen? FairClass also comes as a free web app, and your Excel files open in both.
 
-Privacy: rosters and results are stored only on your device. To verify a Pro purchase, the app store and RevenueCat receive an anonymous ID and the receipt — never student names or roster data.
+Privacy: rosters and results are saved only on your device. To confirm a Pro purchase, Google Play and our purchase service (RevenueCat) receive an anonymous ID and the receipt — never student names or roster data.
 ```
 
 ## en-AU（英語・オーストラリア）
 
-- 狙い: Class Placement Policy に沿って Term 4 に翌年のクラスを作る小学校。Class Creator 等を契約していない学校・担任
+- 狙い: Class Placement Policy に沿って Term 4 に翌年のクラスを作る小学校（新学年は1月末〜2月始業）。Class Creator 等を契約していない学校・担任
 - 繁忙期（掲載文・スクショを差し替える時期）: 9〜11月（Term 3〜4）
 - 価格: **A$8.99**（NZ は NZ$9.99。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `class placement`, `Term 4`, `no sign-up`, `Chromebook`, `keep apart`
+- 語彙: Term 4・NCCD / adjustments・EAL/D・behaviour／colour（英式綴り）・leadership team。技術用語（optimisation・algorithm・engine・CPU）は使わない
 
 ### アプリ名（26字 / 30）
 
@@ -88,41 +90,42 @@ FairClass: Class Placement
 Next year's classes, balanced in seconds. Free, no sign-up, data stays local.
 ```
 
-### 詳しい説明（2051字 / 4000）
+### 詳しい説明（2506字 / 4000）
 
 ```
-Every Term 4, teachers sit down with sticky notes and spreadsheets to build next year's classes: an even spread of girls and boys, learning levels, behaviour, students with a support plan or EAL/D support, and the friendship requests from families. FairClass turns that into a few seconds of work and leaves every final decision with you.
+Term 4 means class placements. Before the new school year starts in late January or February, you're juggling an even spread of girls and boys, learning levels and behaviour, students on the NCCD or with adjustments in place, EAL/D learners, and the friendship requests from families. FairClass gives you a balanced first draft of next year's classes in seconds, so the planning meeting can focus on the kids, not the sticky notes. Every final decision stays with you.
 
 HOW IT WORKS
-• Load your roster from Excel (.xlsx), start from a sample, or enter it in the app.
-• Add the attributes your class placement policy uses and give each a weight.
-• Record students to keep together (for example, one friend each) and students to keep apart.
-• Set the number of classes and tap "Build classes". FairClass spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
-• Review the balance tables and move any student to another class with a single tap. Totals update straight away.
+• Bring in your class lists from Excel (.xlsx), start from a sample, or enter them in the app.
+• Add the things your class placement policy looks at — for example gender, literacy and numeracy levels, behaviour, learning support, EAL/D, leadership — and choose how much each one counts.
+• Note which students should stay together (for example, at least one friend) and which should be kept apart.
+• Set the number of classes and tap "Build classes". FairClass spreads every group of students as evenly as it can, always keeps paired students together, and keeps apart the ones you separate as far as possible. If a request can't be met, it tells you straight away.
+• Look over the balance tables and move any student to another class with a single tap. The totals update straight away, so you can try ideas with your year-level team.
 
-WHY SCHOOLS USE IT
+WHY TEACHERS LOVE IT
 • Free to build your classes — no ads, no account and no sign-up.
-• Student data stays on your device. No roster data is uploaded; the calculation runs on your phone, tablet or Chromebook.
-• Works on Android tablets and Chromebooks in portrait or landscape, with mouse and keyboard.
-• See the target range for every attribute and whether each class is inside it, so you can explain the lists to your leadership team.
-• Also handy for balanced groups and teams within a class.
+• Student information stays on your device. FairClass never uploads names or notes.
+• Works on phones, Android tablets and Chromebooks, in portrait or landscape, with mouse and keyboard.
+• For each thing you balance, see the target range and whether every class sits inside it — handy when you walk your leadership team through the new classes.
+• Also great for balanced reading groups, table groups and sports teams within a class.
 
 FAIRCLASS PRO (ONE-OFF PURCHASE)
-• Export results to Excel and Google Drive: placement, class lists, a sheet per class, pairings and a summary.
-• Print or save as PDF for staff meetings: class lists with colour-coded pairings and a legend, plus balance tables.
-• Pay once and keep it — no subscription.
+• Export your results to Excel, then share them to Google Drive or email: class lists, a sheet per class, pairings and a summary.
+• Print or save as PDF for your placement meeting: class lists with colour-coded pairings and a legend, plus the balance tables, on A4.
+• Pay once and it's yours — no subscription.
 
-FairClass uses the same engine as the free FairClass web app, and the Excel files work in both.
+Prefer a bigger screen? FairClass also comes as a free web app, and your Excel files open in both.
 
-Privacy: rosters and results are stored only on your device. To verify a Pro purchase, the store and RevenueCat receive an anonymous ID and the receipt — never student names or roster data.
+Privacy: class lists and results are saved only on your device. To confirm a Pro purchase, Google Play and our purchase service (RevenueCat) receive an anonymous ID and the receipt — never student names or class list data.
 ```
 
 ## en-GB（英語・英国）
 
-- 狙い: 2学級以上の小学校の mixing classes（6〜7月）。MIS 連携の SaaS を使っていない学校
+- 狙い: 2学級以上の小学校の mixing classes（6〜7月、transition 前のクラス替え）。MIS 連携の SaaS を使っていない学校
 - 繁忙期（掲載文・スクショを差し替える時期）: 5〜7月
 - 価格: **£4.99**（アイルランドはユーロ圏の €5,99。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `mixing classes`, `class lists`, `no sign-up`, `Chromebook`, `keep apart`
+- 語彙: pupils・SEND / EHCP・EAL・attainment・transition・Year groups・SLT／governors・behaviour／colour（英式綴り）。技術用語（optimisation・algorithm・engine・CPU）は使わない
 
 ### アプリ名（25字 / 30）
 
@@ -136,33 +139,33 @@ FairClass: Mixing Classes
 Mix classes fairly in seconds. Free, no sign-up, pupil data stays on device.
 ```
 
-### 詳しい説明（1976字 / 4000）
+### 詳しい説明（2416字 / 4000）
 
 ```
-Mixing classes in a two-form or three-form entry school is one of the hardest jobs of the summer term: balancing girls and boys, attainment, behaviour, pupils with a support plan, EAL, and the friendship groups parents ask about. FairClass does the number-crunching in seconds and leaves every decision with you.
+Mixing classes is one of the trickiest jobs of the summer term, especially in a two- or three-form entry school. Before transition you're weighing up girls and boys, attainment, behaviour, pupils with SEND or an EHCP, EAL learners, and the friendship groups parents ask about. FairClass gives you a balanced first draft of the new class lists in seconds, so your Year group team can spend the meeting talking about the children, not shuffling sticky notes. Every final decision stays with you.
 
 HOW IT WORKS
-• Load your class list from Excel (.xlsx), start from a sample, or type it in.
-• Add the attributes you care about and give each one a weight.
-• Mark pupils to keep together and pupils to keep apart.
-• Choose the number of classes and tap "Build classes". FairClass spreads every attribute evenly, always keeps linked students together and keeps apart the ones you separate as far as possible. Any condition it cannot meet is shown right away.
-• Check the balance tables and move any pupil to another class with one tap. Totals update instantly.
+• Bring in your class list from Excel (.xlsx), start from a sample, or type it in.
+• Add whatever matters to your school — gender, reading and maths attainment, behaviour, SEND, EAL, previous class — and choose how much each one counts.
+• Note which pupils should stay together (such as a friend) and which should be kept apart.
+• Choose the number of classes and tap "Build classes". FairClass spreads every group of pupils as evenly as it can, always keeps paired pupils together, and keeps apart the ones you separate as far as possible. If a request can't be met, it tells you straight away.
+• Look over the balance tables and move any pupil to another class with one tap. The totals update instantly, so you can try ideas together.
 
-WHY TEACHERS USE IT
-• Free to build class lists — no ads, no account, no sign-up.
-• Pupil data stays on your device. No roster data is uploaded; the calculation runs on your phone, tablet or Chromebook.
-• Works on Android tablets and Chromebooks, in portrait or landscape, with a mouse and keyboard.
-• Shows the target range for every attribute and whether each class sits inside it — useful when you explain the new classes to parents and governors.
-• Also works for balanced groups and teams within a class.
+WHY TEACHERS LOVE IT
+• Free to mix your classes — no ads, no account, no sign-up.
+• Pupil information stays on your device. FairClass never uploads names or notes.
+• Works on phones, Android tablets and Chromebooks, in portrait or landscape, with a mouse and keyboard.
+• For each thing you balance, see the target range and whether every class sits inside it — useful when you explain the new classes to SLT, governors or parents.
+• Also handy for balanced table groups, reading groups and teams within a class.
 
 FAIRCLASS PRO (ONE-OFF PURCHASE)
-• Export results to Excel and Google Drive: placement, class lists, a sheet per class, pairings and a summary.
-• Print or save as PDF for staff meetings: colour-coded class lists with a legend and the balance tables on A4.
-• Pay once and keep it — no subscription.
+• Export your results to Excel, then share them to Google Drive or email: class lists, a sheet per class, pairings and a summary.
+• Print or save as PDF for staff meetings: class lists with colour-coded pairings and a legend, plus the balance tables, on A4.
+• Pay once and it's yours — no subscription.
 
-FairClass uses the same engine as the free FairClass web app, and the Excel files work in both.
+Prefer a bigger screen? FairClass also comes as a free web app, and your Excel files open in both.
 
-Privacy: class lists and results are stored only on your device. To verify a Pro purchase, the store and RevenueCat receive an anonymous ID and the receipt — never pupil names or class list data.
+Privacy: class lists and results are saved only on your device. To confirm a Pro purchase, Google Play and our purchase service (RevenueCat) receive an anonymous ID and the receipt — never pupil names or class list data.
 ```
 
 ## ko-KR（韓国語）
@@ -178,48 +181,48 @@ Privacy: class lists and results are stored only on your device. To verify a Pro
 FairClass 반 편성
 ```
 
-### 短い説明（55字 / 80）
+### 短い説明（57字 / 80）
 
 ```
-성별·학업·지원 필요 학생을 고르게, 분리 배정도 최대한 반영해 몇 초 만에 반 편성. 가입 없음.
+2월 반 편성, 남녀·학업·지원 필요 학생을 고르게 나누고 분리 배정도 최대한 반영합니다. 가입 없음.
 ```
 
-### 詳しい説明（1066字 / 4000）
+### 詳しい説明（1194字 / 4000）
 
 ```
-매년 2월, 다음 학년 반 편성은 담임 선생님들이 며칠씩 매달리는 일입니다. 남녀 비율, 학업 수준, 학습 지원이 필요한 학생, 같은 반에 두면 안 되는 학생까지 모두 고려해야 하니까요. FairClass는 이 반 편성을 몇 초 만에 끝내고, 최종 판단은 선생님께 맡깁니다.
+매년 2월이면 담임 선생님들이 모여 다음 학년 반 편성을 준비합니다. 남녀 비율, 학업 성취도, 도움이 필요한 학생, 출신 학교, 같은 반이 되면 안 되는 학생까지 하나하나 맞추다 보면 며칠이 금방 지나갑니다. FairClass는 고르게 나눈 반 편성안을 몇 초 만에 만들어 드립니다. 최종 결정은 언제나 선생님께서 내리십니다.
 
-사용 방법
+이렇게 사용합니다
 • 엑셀 파일(.xlsx)로 학생 명단을 불러오거나, 예시로 시작하거나, 앱에서 직접 입력합니다.
-• 성별, 학업, 학습 지원, 체육 등 고려할 항목을 넣고 항목마다 가중치를 정합니다.
-• 같은 반에 배정할 학생과 서로 다른 반에 배정할 학생(분리 배정)을 지정합니다.
-• 반 수를 정하고 "반 편성 실행"을 누르면 모든 항목이 각 반에 고르게 나뉩니다. 같은 반 배정은 항상 지키고, 분리 배정은 최대한 반영합니다.
-• 균형 표를 확인하고, 필요하면 학생을 눌러 다른 반으로 옮기세요. 집계는 바로 다시 계산됩니다.
+• 성별, 학업 성취도, 특수교육 대상, 출신 학교처럼 반마다 고르게 나누고 싶은 항목을 넣고, 항목마다 얼마나 중요한지(가중치) 정합니다.
+• 같은 반에 둘 학생(같은 반 배정)과 서로 다른 반으로 나눌 학생(분리 배정)을 지정합니다.
+• 반 수를 정하고 "반 편성 실행"을 누르면 모든 항목이 각 반에 고르게 나뉩니다. 같은 반 배정은 항상 지키고, 분리 배정은 최대한 반영합니다. 지키지 못한 조건이 있으면 바로 알려 드립니다.
+• 균형 표를 살펴보고, 필요하면 학생을 눌러 다른 반으로 옮길 수 있습니다. 집계도 바로 바뀝니다.
 
-선생님들이 쓰는 이유
+선생님들이 FairClass를 쓰는 이유
 • 반 편성은 무료입니다. 광고도, 회원 가입도 없습니다.
-• 학생 명단은 이 기기에만 저장되고 어디에도 전송되지 않습니다. 계산도 휴대폰·태블릿·크롬북 안에서 합니다.
+• 학생 명단은 이 기기에만 저장되고 어디에도 전송되지 않습니다. 반 편성도 휴대폰·태블릿·크롬북 안에서 이루어집니다.
 • 분리가 필요한 학생은 최대한 다른 반으로 나누고, 충족하지 못한 조건이 있으면 바로 표시합니다.
-• 항목마다 목표 범위와 각 반의 인원이 표로 보여서, 학년 협의회에서 설명하기 쉽습니다.
-• 안드로이드 태블릿과 크롬북에서 가로·세로 모두, 마우스와 키보드로도 쓸 수 있습니다.
-• 수업 중 모둠 편성에도 같은 방식으로 쓸 수 있습니다.
+• 항목마다 목표 범위와 반별 인원이 표로 보여서, 학년 협의회에서 편성 근거를 설명하기 쉽습니다.
+• 안드로이드 태블릿과 크롬북에서 가로·세로 화면 모두, 마우스와 키보드로도 쓸 수 있습니다.
+• 수업 시간의 모둠 편성에도 그대로 쓸 수 있습니다.
 
 FairClass Pro(1회 구매)
 • 결과를 엑셀·Google 드라이브로 내보내기: 반 편성, 반별 명단, 반마다의 시트, 배정 조건, 집계.
-• 회의용 인쇄·PDF: 배정 조건을 색으로 구분한 반별 명단과 범례, 균형 표를 A4로.
+• 협의회용 인쇄·PDF: 배정 조건을 색으로 구분한 반별 명단과 범례, 균형 표를 A4로.
 • 한 번 구매로 계속 사용합니다. 구독이 아닙니다.
 
-무료 웹 버전 FairClass와 같은 엔진을 쓰며, 엑셀 파일은 양쪽에서 그대로 열립니다.
+무료 웹 버전 FairClass와 똑같은 방식으로 반을 나누며, 엑셀 파일은 양쪽에서 그대로 열립니다.
 
 개인정보: 명단과 결과는 기기에만 저장됩니다. Pro 구매 확인을 위해 스토어와 RevenueCat이 익명 식별자와 영수증만 받으며, 학생 이름이나 명단 내용은 보내지 않습니다.
 ```
 
 ## es-419（スペイン語・中南米）
 
-- 狙い: 南半球の学年始まり（2〜3月）前に grupos / cursos を作る学校。データは端末内（チリの新個人情報法・各国の個人情報保護）
+- 狙い: 南半球の学年始まり（2〜3月）・メキシコの ciclo escolar（8〜9月）の前に grupos を作る学校の先生。tú で語りかけ、技術用語（optimización・algoritmo・motor）は使わない。データは端末内（チリの新個人情報法・各国の個人情報保護。「準拠」とは書かない）
 - 繁忙期（掲載文・スクショを差し替える時期）: 10〜2月（南半球・コロンビア A）、メキシコは 6〜8月
 - 価格: **MX$79・CLP 3.990・COP 12.900・PEN 10,90・US$3.99（EC）**、ARS は Play 側の通貨を確認してから（`pricing.csv` の status=confirm）。その他の中南米は自動換算（`pricing.md`【推定】）
-- ASO キーワード（本文の地の文に入れてある）: `armar grupos`, `distribución de estudiantes`, `sin registro`, `Chromebook`, `equipos de trabajo`
+- ASO キーワード（本文の地の文に入れてある）: `armar grupos`, `distribución de estudiantes`, `ciclo escolar`, `sin registro`, `Chromebook`, `equipos de trabajo`
 
 ### アプリ名（23字 / 30）
 
@@ -227,44 +230,44 @@ FairClass Pro(1회 구매)
 FairClass: armar grupos
 ```
 
-### 短い説明（79字 / 80）
+### 短い説明（76字 / 80）
 
 ```
-Arma grupos equilibrados para el año escolar en segundos. Gratis, sin registro.
+Arma grupos equilibrados para el nuevo ciclo escolar. Gratis y sin registro.
 ```
 
-### 詳しい説明（2281字 / 4000）
+### 詳しい説明（2589字 / 4000）
 
 ```
-Antes de que empiece el año escolar hay que armar los grupos: equilibrar niñas y niños, el desempeño académico, los estudiantes con NEE que necesitan apoyo y las amistades o conflictos que conocen los docentes. Hacerlo a mano toma días. FairClass hace la distribución de estudiantes en grupos en segundos, y la decisión final siempre es tuya.
+Sea en febrero, en marzo o en agosto, antes del inicio del ciclo escolar hay que armar los grupos: que queden parejos en niñas y niños y en desempeño, que los estudiantes con NEE estén bien repartidos, que los amigos que se apoyan sigan juntos y que algunos compañeros no coincidan. Hacerlo a mano, con listas y papelitos, puede llevar días. FairClass te propone una distribución de estudiantes en grupos en segundos, y la última palabra siempre es tuya.
 
-CÓMO FUNCIONA
-• Carga la lista de estudiantes desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app.
-• Agrega los criterios que quieras (género, desempeño, apoyo en el aprendizaje, convivencia) y dale un peso a cada uno.
-• Indica qué estudiantes mantener juntos y a quiénes separar.
-• Elige el número de grupos y toca “Armar grupos”. FairClass reparte cada criterio de forma pareja, siempre deja juntos a los estudiantes que unes y separa a los demás en la medida de lo posible. Si alguna condición no se puede cumplir, lo ves de inmediato.
-• Revisa las tablas de equilibrio y mueve a cualquier estudiante a otro grupo con un toque. Los totales se recalculan al instante.
+ASÍ DE FÁCIL
+• Carga tu lista de estudiantes desde Excel (.xlsx), empieza con un ejemplo o escríbela directamente en la app.
+• Agrega lo que tu escuela toma en cuenta (género, desempeño, NEE, convivencia, liderazgo…) y decide cuánta importancia le das a cada criterio.
+• Marca qué estudiantes deben ir juntos y a quiénes conviene separar.
+• Elige cuántos grupos necesitas y toca “Armar grupos”. FairClass reparte cada criterio de forma pareja. Los estudiantes que marcas como juntos quedan siempre en el mismo grupo, y a los que quieres separar los separa en la medida de lo posible. Si algo no se pudo cumplir, te lo muestra de inmediato.
+• Revisa cómo quedó cada grupo y, si quieres, mueve a cualquier estudiante a otro grupo con un toque. Los totales se actualizan al instante.
 
-POR QUÉ LO USAN LOS DOCENTES
+POR QUÉ LES GUSTA A LOS DOCENTES
 • Armar los grupos es gratis: sin anuncios, sin cuenta y sin registro.
-• Los datos de los estudiantes se quedan en tu dispositivo. No se sube ningún dato de la lista a internet; el cálculo se hace en tu celular, tablet o Chromebook.
-• Grupos heterogéneos y parejos: ves el rango ideal de cada criterio y si cada grupo está dentro, algo fácil de explicar en el consejo de profesores.
-• Funciona en tablets Android y Chromebook, en vertical u horizontal, con mouse y teclado.
-• También sirve para armar equipos de trabajo dentro de la clase.
+• La lista de tus estudiantes se queda en tu dispositivo. No se sube nada a internet: todo sucede en tu celular, tablet o Chromebook.
+• Grupos heterogéneos y parejos entre sí: para cada criterio ves el rango ideal y si cada grupo está dentro. Así es fácil explicar en el consejo de profesores, o a las familias, por qué los grupos quedaron así.
+• Funciona en celulares, tablets Android y Chromebook, en vertical u horizontal, y también con mouse y teclado.
+• También te sirve para armar equipos de trabajo dentro del aula.
 
 FAIRCLASS PRO (PAGO ÚNICO)
-• Exporta los resultados a Excel y Google Drive: distribución, listas por grupo, una hoja por grupo, condiciones y resumen.
-• Imprime o guarda en PDF para el consejo de profesores: listas por grupo con las condiciones en colores y una leyenda, más las tablas de equilibrio.
-• Pagas una vez y es tuyo: no es una suscripción.
+• Exporta a Excel y Google Drive: la distribución, las listas por grupo, una hoja por grupo, las condiciones y un resumen.
+• Imprime o guarda en PDF para el consejo de profesores: listas por grupo con las condiciones marcadas en colores y una leyenda, más las tablas de equilibrio.
+• Pagas una sola vez y es tuyo: no es una suscripción.
 
-FairClass usa el mismo motor que la versión web gratuita, y los archivos de Excel funcionan en ambas.
+¿Ya usas la versión web gratuita de FairClass? Arma los grupos de la misma manera, y tus archivos de Excel funcionan en las dos.
 
-Privacidad: las listas y los resultados se guardan solo en tu dispositivo. Para verificar la compra de Pro, la tienda y RevenueCat reciben un identificador anónimo y el recibo, nunca nombres de estudiantes ni datos de la lista.
+Privacidad: tus listas y resultados se guardan solo en tu dispositivo. Para confirmar la compra de Pro, la tienda y RevenueCat reciben solo un identificador anónimo y el recibo, nunca nombres de estudiantes ni datos de la lista.
 ```
 
 ## es-ES（スペイン語・スペイン）
 
-- 狙い: 学校の計画書で編成基準（agrupamiento del alumnado）を公開する義務がある公立校。成績による同質な組分けは禁止なので「異質性を保つ」訴求
+- 狙い: 学校の計画書で編成基準（agrupamiento del alumnado）を公開する義務がある公立校。9月の新学年の前（6〜7月・9月初め）に組む。成績による同質な組分けは禁止なので「異質性を保つ・desempeño を均等に」と書く。NEAE。技術用語は使わない
 - 繁忙期（掲載文・スクショを差し替える時期）: 5〜7月
 - 価格: **5,99 €**（ユーロ圏は全加盟国で同じ。`pricing.csv`）
 - ASO キーワード（本文の地の文に入れてある）: `reparto en grupos`, `agrupamiento del alumnado`, `sin registro`, `Chromebook`
@@ -281,38 +284,38 @@ FairClass: reparto en grupos
 Reparte al alumnado en grupos equilibrados en segundos. Gratis y sin registro.
 ```
 
-### 詳しい説明（2307字 / 4000）
+### 詳しい説明（2709字 / 4000）
 
 ```
-Cada curso hay que repartir al alumnado en grupos siguiendo los criterios del centro: equilibrio entre niñas y niños, rendimiento variado en cada grupo, alumnado con necesidades de apoyo repartido de forma justa y las incompatibilidades que conoce el equipo docente. FairClass hace ese reparto en grupos en segundos y deja la última palabra al profesorado.
+Al terminar el curso, o justo antes de que empiece el siguiente en septiembre, toca hacer los grupos siguiendo los criterios de agrupamiento del alumnado del centro: equilibrio entre niñas y niños, un desempeño equilibrado entre los grupos, el alumnado con NEAE repartido de forma justa y las incompatibilidades que conoce el equipo docente. Con papel, pósits y hojas de cálculo se van tardes enteras. FairClass hace ese reparto en grupos en segundos, y la última palabra la tiene siempre el profesorado.
 
 CÓMO FUNCIONA
-• Carga la lista desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app. La app usa vocabulario latinoamericano (“Armar grupos”, “estudiantes”), y los ejemplos incluidos usan la escala de notas de 1 a 7; con tu propio Excel puedes usar la de 0 a 10.
-• Añade los criterios del centro y dale un peso a cada uno.
-• Indica qué estudiantes mantener juntos y a quiénes separar.
-• Elige el número de grupos y pulsa “Armar grupos”. FairClass reparte cada criterio de forma equilibrada: los grupos quedan heterogéneos y parecidos entre sí, sin agrupar por rendimiento. Los estudiantes que unes quedan siempre juntos y los que separas, separados en la medida de lo posible; si alguna condición no se puede cumplir, lo ves de inmediato.
-• Revisa las tablas de equilibrio y mueve a cualquier estudiante a otro grupo con un toque.
+• Carga la lista desde Excel (.xlsx), empieza con un ejemplo o escríbela en la app. Un apunte: la app usa vocabulario latinoamericano (“Armar grupos”, “estudiantes”) y los ejemplos usan notas de 1 a 7; con tu propio Excel puedes usar la escala de 0 a 10.
+• Añade los criterios de tu centro (niñas y niños, notas, NEAE, convivencia…) y decide cuánto pesa cada uno.
+• Marca qué alumnos y alumnas deben ir juntos y a quiénes conviene separar.
+• Elige cuántos grupos necesitas y pulsa “Armar grupos”. FairClass reparte cada criterio de forma equilibrada: los grupos salen heterogéneos y parecidos entre sí, sin agrupar por rendimiento. Quienes marcas como juntos van siempre al mismo grupo, y quienes quieres separar quedan separados en la medida de lo posible; si algo no se puede cumplir, lo ves al momento.
+• Revisa cómo ha quedado cada grupo y pasa a quien quieras a otro grupo con un toque. Los totales se actualizan al instante.
 
 POR QUÉ LO USA EL PROFESORADO
 • Hacer los grupos es gratis: sin anuncios, sin cuenta y sin registro.
-• Los datos del alumnado no salen del dispositivo: no se sube nada a internet.
-• Muestra el rango ideal de cada criterio y si cada grupo lo cumple, útil para justificar el agrupamiento del alumnado ante el claustro.
-• Funciona en tablets Android y Chromebook, en vertical u horizontal, con ratón y teclado.
-• También sirve para equipos de trabajo dentro del aula.
+• Los datos del alumnado no salen del dispositivo: no se sube nada a internet, todo se hace en tu móvil, tableta o Chromebook.
+• Para cada criterio ves el rango ideal y si cada grupo está dentro: te ayuda a justificar el agrupamiento del alumnado ante el claustro, el equipo de ciclo o las familias.
+• Funciona en móviles, tabletas Android y Chromebook, en vertical u horizontal, con ratón y teclado.
+• También sirve para hacer equipos de trabajo cooperativo en el aula.
 
 FAIRCLASS PRO (PAGO ÚNICO)
-• Exporta los resultados a Excel y Google Drive: reparto, listas por grupo, una hoja por grupo, condiciones y resumen.
-• Imprime o guarda en PDF para la sesión de evaluación: listas por grupo con colores y leyenda, más las tablas de equilibrio.
-• Pagas una vez: no es una suscripción.
+• Exporta a Excel y Google Drive: el reparto, las listas por grupo, una hoja por grupo, las condiciones y un resumen.
+• Imprime o guarda en PDF para el claustro o la reunión de equipo: listas por grupo con colores y leyenda, más las tablas de equilibrio.
+• Pagas una sola vez: no es una suscripción.
 
-FairClass usa el mismo motor que la versión web gratuita y los archivos de Excel sirven en las dos.
+¿Ya usas la versión web gratuita de FairClass? Hace los grupos de la misma forma, y los archivos de Excel sirven en las dos.
 
-Privacidad: las listas y los resultados se guardan solo en el dispositivo. Para verificar la compra de Pro, la tienda y RevenueCat reciben un identificador anónimo y el recibo, nunca nombres del alumnado ni datos de la lista.
+Privacidad: las listas y los resultados se guardan solo en el dispositivo. Para confirmar la compra de Pro, la tienda y RevenueCat reciben solo un identificador anónimo y el recibo, nunca nombres del alumnado ni datos de la lista.
 ```
 
 ## de-DE（ドイツ語）
 
-- 狙い: Einschulung・Klasse 5 のクラス編成（5〜7月）。DSGVO と学校データ規則で「送信しない」が最も効く（「DSGVO-konform」とは書かない）
+- 狙い: Einschulung と、Grundschule から weiterführende Schule（Klasse 5）への移行時のクラス編成（5〜7月）。DSGVO と学校データ規則で「送信しない」が最も効くので Datenschutz を冒頭に置く（「DSGVO-konform」とは書かない）。Inklusion・Förderbedarf への配慮を明記
 - 繁忙期（掲載文・スクショを差し替える時期）: 4〜7月（Einschulung・Klasse 5）
 - 価格: **5,99 €**（スイスは CHF 5.00。`pricing.csv`【推定】）
 - ASO キーワード（本文の地の文に入れてある）: `Klasseneinteilung`, `Klassenbildung`, `Alle Daten bleiben auf dem Gerät`, `Chromebook`, `Gruppeneinteilung`
@@ -323,50 +326,50 @@ Privacidad: las listas y los resultados se guardan solo en el dispositivo. Para 
 FairClass Klasseneinteilung
 ```
 
-### 短い説明（79字 / 80）
+### 短い説明（80字 / 80）
 
 ```
-Ausgewogene Klassen in Sekunden. Alle Daten bleiben auf dem Gerät – ohne Konto.
+Klassen fair einteilen. Alle Daten bleiben auf dem Gerät – ohne Konto und Cloud.
 ```
 
-### 詳しい説明（2590字 / 4000）
+### 詳しい説明（2926字 / 4000）
 
 ```
-Alle Daten bleiben auf dem Gerät. Keine Cloud, kein Konto: FairClass berechnet die Klasseneinteilung direkt auf Ihrem Smartphone, Tablet oder Chromebook.
+Alle Daten bleiben auf dem Gerät. Keine Cloud, kein Konto, keine Registrierung: Die Schülerliste verlässt Ihr Smartphone, Tablet oder Chromebook nicht – auch die Klasseneinteilung selbst entsteht direkt dort.
 
-Ob Einschulung oder Übergang in Klasse 5 – bei der Klassenbildung müssen viele Kriterien gleichzeitig passen: ausgeglichenes Verhältnis von Mädchen und Jungen, gemischte Leistung, Schülerinnen und Schüler mit Förderbedarf gerecht verteilt, Freundschaftswünsche der Eltern und Kinder, die getrennt werden sollten. FairClass erledigt diese Einteilung in Sekunden – die letzte Entscheidung treffen immer Sie.
+Ob Einschulung oder Übergang von der Grundschule an die weiterführende Schule: Die Klassenbildung kostet jedes Jahr viel Zeit und Fingerspitzengefühl. Mädchen und Jungen sollen ausgewogen verteilt sein, die Leistungen gemischt, Freundschaftswünsche berücksichtigt – und manche Kinder kommen besser nicht in dieselbe Klasse. Damit Inklusion gelingt, sollen auch Schülerinnen und Schüler mit Förderbedarf gut auf alle Klassen verteilt sein. FairClass macht Ihnen in Sekunden einen ausgewogenen Vorschlag. Die Entscheidung treffen immer Sie und Ihr Kollegium.
 
-SO FUNKTIONIERT ES
-• Schülerliste aus Excel (.xlsx) laden, mit einem Beispiel beginnen oder direkt in der App eingeben.
-• Merkmale festlegen (z. B. Geschlecht, Leistung, Förderbedarf, DaZ) und jedem Merkmal ein Gewicht geben.
-• Freundschaftswünsche als „zusammen“ und Kinder, die getrennt werden sollen, als „trennen“ eintragen.
-• Anzahl der Klassen wählen und „Klassen einteilen“ antippen. FairClass verteilt jedes Merkmal möglichst gleichmäßig, hält „zusammen“ immer ein und trennt die anderen so weit wie möglich. Was sich nicht erfüllen lässt, wird sofort angezeigt.
-• Verteilungstabellen prüfen und einzelne Kinder mit einem Tipp in eine andere Klasse verschieben. Die Auswertung wird sofort neu berechnet.
+SO GEHT'S
+• Schülerliste aus Excel (.xlsx) laden, mit einem Beispiel beginnen oder die Namen direkt in der App eingeben.
+• Festlegen, worauf Sie achten möchten – z. B. Geschlecht, Notenschnitt, Förderbedarf, DaZ oder die Herkunftsgrundschule – und wie wichtig Ihnen jedes Merkmal ist.
+• Freundschaftswünsche als „zusammen“ eintragen, Kinder, die getrennt werden sollen, als „trennen“.
+• Anzahl der Klassen wählen und auf „Klassen einteilen“ tippen. Jedes Merkmal wird möglichst gleichmäßig auf die Klassen verteilt. „Zusammen“ wird immer eingehalten, „trennen“ so weit wie möglich. Was sich nicht erfüllen lässt, sehen Sie sofort.
+• Den Vorschlag in Ruhe prüfen und einzelne Kinder mit einem Tipp in eine andere Klasse verschieben. Die Übersicht passt sich sofort an.
 
-WARUM LEHRKRÄFTE ES NUTZEN
+WARUM LEHRKRÄFTE FAIRCLASS NUTZEN
 • Die Klasseneinteilung ist kostenlos – ohne Werbung, ohne Konto, ohne Registrierung.
-• Keine Übertragung von Schülerdaten: Nichts wird hochgeladen.
-• Für jedes Merkmal sehen Sie den Sollbereich und ob jede Klasse darin liegt – so lässt sich die Einteilung in der Konferenz gut begründen.
-• Große Gruppen aus verketteten Wünschen (A mit B, B mit C …) werden erkannt und gemeinsam eingeteilt.
+• Keine Übertragung von Schülerdaten: Nichts aus der Schülerliste wird hochgeladen.
+• Für jedes Merkmal sehen Sie den Sollbereich und ob jede Klasse darin liegt. So können Sie die Einteilung im Kollegium und gegenüber der Schulleitung gut begründen.
+• Lange Ketten von Freundschaftswünschen (A mit B, B mit C …) werden erkannt und gemeinsam eingeteilt.
 • Läuft auf Android-Tablets und Chromebooks, im Hoch- und Querformat, auch mit Maus und Tastatur.
 • Auch für die Gruppeneinteilung im Unterricht geeignet.
 
 FAIRCLASS PRO (EINMALKAUF)
 • Ergebnis nach Excel und Google Drive exportieren: Einteilung, Klassenlisten, ein Blatt pro Klasse, Wünsche und Auswertung.
-• Drucken oder als PDF für die Konferenz: Klassenlisten mit farbig markierten Wünschen und Legende sowie Verteilungstabellen auf A4.
+• Drucken oder als PDF für die Konferenz: Klassenlisten mit farbig markierten Wünschen und Legende sowie Tabellen zur Ausgewogenheit auf A4.
 • Einmal kaufen, dauerhaft nutzen – kein Abo.
 
-FairClass nutzt dieselbe Berechnung wie die kostenlose Webversion; die Excel-Dateien funktionieren in beiden.
+FairClass teilt die Klassen genauso ein wie die kostenlose Webversion; Ihre Excel-Dateien können Sie in beiden verwenden.
 
 Datenschutz: Schülerlisten und Ergebnisse werden nur auf dem Gerät gespeichert. Zur Prüfung eines Pro-Kaufs erhalten der Store und RevenueCat eine anonyme Kennung und den Beleg – niemals Namen oder Inhalte der Schülerliste. Ob der Einsatz an Ihrer Schule zulässig ist, entscheiden Schule und Land.
 ```
 
 ## pt-BR（ポルトガル語・ブラジル）
 
-- 狙い: 2月の始業前に enturmação をする coordenação pedagógica・secretaria。heterogênea の規範、LGPD（「準拠」とは書かない）、Pix で購入可能
+- 狙い: 2月の始業前に enturmação をする professores・coordenação pedagógica・secretaria。você で語りかけ、技術用語（otimização・algoritmo・motor）は使わない。heterogênea の規範、AEE・inclusão、LGPD は事実だけ（「準拠」「em conformidade」とは書かない）、Pix で購入可能
 - 繁忙期（掲載文・スクショを差し替える時期）: 11〜2月
 - 価格: **R$ 19,90**（A.8 の帯の上端。R$ 14,90 は価格テストの候補。`pricing.md`【推定】）
-- ASO キーワード（本文の地の文に入れてある）: `montar turmas`, `enturmação`, `distribuição de alunos`, `sem cadastro`, `Chromebook`, `LGPD`
+- ASO キーワード（本文の地の文に入れてある）: `montar turmas`, `enturmação`, `distribuição de alunos`, `ano letivo`, `sem cadastro`, `Chromebook`, `LGPD`
 
 ### アプリ名（24字 / 30）
 
@@ -374,44 +377,44 @@ Datenschutz: Schülerlisten und Ergebnisse werden nur auf dem Gerät gespeichert
 FairClass: montar turmas
 ```
 
-### 短い説明（76字 / 80）
+### 短い説明（79字 / 80）
 
 ```
-Enturmação equilibrada em segundos. Grátis, sem cadastro e sem enviar dados.
+Monte turmas equilibradas para o ano letivo em segundos. Grátis e sem cadastro.
 ```
 
-### 詳しい説明（2289字 / 4000）
+### 詳しい説明（2611字 / 4000）
 
 ```
-Antes do início do ano letivo, a coordenação pedagógica precisa montar as turmas: equilibrar meninas e meninos, desempenho, alunos com deficiência ou atendidos pelo AEE, comportamento e os pedidos das famílias. Fazer a enturmação à mão leva dias. O FairClass faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
+Todo ano é a mesma coisa: antes do início do ano letivo, em fevereiro, é preciso montar as turmas. Equilibrar meninas e meninos, desempenho e comportamento, distribuir com cuidado os alunos com deficiência ou atendidos pelo AEE, manter juntos os amigos que se apoiam e separar quem não deve ficar junto. Fazer a enturmação à mão, com listas e papeizinhos, leva dias. O FairClass faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
 
 COMO FUNCIONA
-• Carregue a lista de alunos do Excel (.xlsx), comece com um exemplo ou digite no app.
-• Adicione os critérios que quiser (gênero, desempenho, apoio à aprendizagem, comportamento) e dê um peso para cada um.
-• Indique quais alunos manter juntos e quais separar.
-• Escolha o número de turmas e toque em “Montar turmas”. O FairClass distribui cada critério de forma equilibrada, sempre mantém juntos os alunos que você une e separa os outros na medida do possível. Se alguma condição não puder ser atendida, você vê na hora.
-• Confira as tabelas de equilíbrio e mova qualquer aluno para outra turma com um toque. Os totais são recalculados na hora.
+• Carregue a lista de alunos do Excel (.xlsx), comece com um exemplo ou digite direto no app.
+• Inclua o que a sua escola leva em conta (gênero, desempenho, AEE, comportamento, liderança…) e diga quanto pesa cada critério.
+• Marque quais alunos devem ficar juntos e quais é melhor separar.
+• Escolha o número de turmas e toque em “Montar turmas”. O FairClass distribui cada critério de forma equilibrada. Quem você marca para ficar junto fica sempre na mesma turma, e quem você quer separar fica separado na medida do possível. Se alguma condição não puder ser atendida, você vê na hora.
+• Confira como ficou cada turma e, se quiser, mova qualquer aluno para outra turma com um toque. Os totais se atualizam na hora.
 
-POR QUE AS ESCOLAS USAM
+POR QUE PROFESSORES E COORDENADORES GOSTAM
 • Montar turmas é grátis: sem anúncios, sem conta e sem cadastro.
-• Os dados dos alunos não saem do aparelho. Nenhum dado da lista é enviado para a internet; o cálculo é feito no seu celular, tablet ou Chromebook.
-• Turmas heterogêneas e parecidas entre si: você vê a faixa ideal de cada critério e se cada turma está dentro dela, fácil de mostrar no conselho de classe.
-• Funciona em tablets Android e Chromebook, na vertical ou horizontal, com mouse e teclado.
+• Os dados dos alunos não saem do aparelho. Nada é enviado para a internet: tudo acontece no seu celular, tablet ou Chromebook.
+• Turmas heterogêneas e parecidas entre si: você vê a faixa ideal de cada critério e se cada turma está dentro dela. Fica fácil explicar a enturmação no conselho de classe ou para as famílias.
+• Funciona em celulares, tablets Android e Chromebook, na vertical ou horizontal, com mouse e teclado.
 • Também serve para montar grupos de trabalho em sala.
 
 FAIRCLASS PRO (COMPRA ÚNICA)
-• Exporte os resultados para Excel e Google Drive: enturmação, listas por turma, uma aba por turma, condições e resumo.
-• Imprima ou salve em PDF para o conselho de classe: listas com as condições coloridas e legenda, além das tabelas de equilíbrio.
-• Compre uma vez e use para sempre: não é assinatura. Dá para pagar com Pix pelo Google Play.
+• Exporte para Excel e Google Drive: enturmação, listas por turma, uma aba por turma, condições e resumo.
+• Imprima ou salve em PDF para o conselho de classe ou a secretaria: listas por turma com as condições em cores e legenda, além das tabelas de equilíbrio.
+• Pague uma vez e pronto: não é assinatura. Dá para pagar com Pix pelo Google Play.
 
-O FairClass usa o mesmo motor da versão web gratuita, e os arquivos do Excel funcionam nas duas.
+Já usa a versão web gratuita do FairClass? Ela monta as turmas do mesmo jeito, e os arquivos do Excel funcionam nas duas.
 
-Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a compra do Pro, a loja e o RevenueCat recebem um identificador anônimo e o recibo, nunca nomes de alunos nem dados da lista. Para a LGPD, vale saber que a lista de alunos não sai do aparelho.
+Privacidade: as listas e os resultados ficam só no aparelho. Para confirmar a compra do Pro, a loja e o RevenueCat recebem apenas um identificador anônimo e o recibo, nunca nomes de alunos nem dados da lista. Sobre a LGPD: a lista de alunos não sai do aparelho; se o uso é adequado à sua escola, quem decide é a própria escola.
 ```
 
 ## ja-JP（日本語）
 
-- 狙い: 3月のクラス編成（新年度）を担う学年主任・担任。国内の既存の掲載方針（無料で編成・端末内・買い切り）
+- 狙い: 3月のクラス編成（新年度）を担う学年主任・担任。国内の既存の掲載方針（無料で編成・端末内・買い切り）。学年会のたたき台・引き継ぎに使える、と先生に寄り添う言葉で書く
 - 繁忙期（掲載文・スクショを差し替える時期）: 2〜3月
 - 価格: **¥980**（買い切り。`docs/research/competitors.md` 第5節の ¥610〜¥980 帯の上端。`pricing.md`）
 - ASO キーワード（本文の地の文に入れてある）: `クラス編成`, `クラス分け`, `班分け`, `Chromebook`
@@ -422,37 +425,38 @@ Privacidade: as listas e os resultados ficam só no aparelho. Para verificar a c
 FairClass（フェアクラス）クラス編成
 ```
 
-### 短い説明（44字 / 80）
+### 短い説明（52字 / 80）
 
 ```
-男女・学力・支援の必要な子を各クラスに均等に。同じ組・別の組の指定も反映して数秒で編成。
+3月のクラス編成に。男女・学力・支援の必要な子を各クラスに均等に。名簿は端末の中だけで、登録も不要です。
 ```
 
-### 詳しい説明（898字 / 4000）
+### 詳しい説明（1039字 / 4000）
 
 ```
-新年度のクラス編成は、男女比、学力、支援の必要な子、同じクラスにしたい子・離したい子まで、いくつもの条件を同時に満たす作業です。付箋と名簿で何日もかかることも珍しくありません。FairClass はこのクラス分けを数秒で行い、最後の判断は先生に委ねます。
+3月、新年度に向けたクラス編成、本当におつかれさまです。男女比、学力、支援の必要な子、同じクラスにしたい子・離したい子……いくつもの条件を見比べながら、名前カードや付箋を何度も並べ替える。学年会で何日もかかることも珍しくありません。
+FairClass は、条件をそろえたクラス分けの案を数秒でつくります。学年会のたたき台にして、最後は先生方の目で決めてください。
 
 使い方
-・Excel（.xlsx）の名簿を読み込むか、サンプル・新規作成から始めます。
-・性別・学力・学習支援・体育など、均等にしたい項目と重みを決めます。
-・「同じ組にする」「別の組にする」生徒を指定します。
-・クラス数を決めて「クラスを編成する」を押すだけ。すべての項目が各クラスに均等に散らばります。同じ組の指定は必ず守り、別の組の指定はできる限り反映します（満たせなかった指定はすぐに表示されます）。
-・バランス表を確認し、必要なら生徒をタップして別の組へ移動。集計はすぐに再計算されます。
+・Excel（.xlsx）の名簿を読み込むか、サンプルや新しい名簿から始めます。
+・性別・学力・学習支援・登校支援・体育・ピアノなど、各クラスにそろえたい項目と、それぞれをどのくらい大事にするか（重み）を決めます。
+・「同じ組にする」「別の組にする」子を指定します。
+・クラス数を決めて「クラスを編成する」を押すだけ。すべての項目が各クラスに均等に散らばります。同じ組の指定は必ず守り、別の組の指定はできる限り反映します（守れなかった指定はすぐに表示されます）。
+・バランス表を見ながら、必要なら生徒をタップして別の組へ移動できます。集計もすぐに更新されます。
 
-選ばれる理由
+先生方に選ばれる理由
 ・クラス編成は無料。広告も会員登録もありません。
-・名簿はこの端末の中だけに保存し、外部へ送信しません。計算もスマホ・タブレット・Chromebook の中で行います。
-・項目ごとの理想の範囲と各クラスの人数を表で確認できるので、学年会で説明しやすくなります。
+・名簿はこの端末の中だけに保存し、外部へ送信しません。クラス分けもスマホ・タブレット・Chromebook の中で行います。
+・項目ごとの理想の範囲と各クラスの人数が表でひと目でわかるので、学年会や管理職に「偏りのない編成です」と説明しやすくなります。
 ・Android タブレット・Chromebook の横画面や分割画面、マウスとキーボードでも使えます。
 ・授業の班分け・グループ分けにも使えます。
 
 FairClass Pro（買い切り）
 ・結果を Excel・Google ドライブへ書き出し（組分け・クラス別名簿・各組・ペア指定・集計）。
-・会議用に印刷・PDF（ペア指定の色分けと凡例つきのクラス別名簿、集計・バランス表を A4 縦に）。
+・学年会や新しい担任への引き継ぎ用に印刷・PDF（ペア指定の色分けと凡例つきのクラス別名簿、集計・バランス表を A4 縦に）。
 ・一度の購入でずっと使えます。サブスクリプションではありません。
 
-無料の Web 版 FairClass と同じエンジンで、Excel ファイルはどちらでもそのまま使えます。
+無料の Web 版 FairClass と同じしくみでクラスを分けるので、Excel ファイルはどちらでもそのまま使えます。
 
 プライバシー: 名簿と結果は端末の中だけに保存されます。Pro の購入確認のため、ストアと RevenueCat が匿名の識別子とレシートを受け取りますが、生徒の名前や名簿の内容は送りません。
 ```
