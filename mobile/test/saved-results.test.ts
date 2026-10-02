@@ -71,6 +71,26 @@ describe('保存した編成', () => {
     expect(values[2]).toBe(ja.className(classOf[last - 2]))
   })
 
+  it('NO を振り直した名簿では、名前で見つからない生徒を NO で照らさない', () => {
+    const s = saved(problem, classOf, 4)
+    // 全員の NO をずらし、1人だけ名前を変える → 名簿が続いていないので、その子は空欄
+    const students = problem.students.map((st, i) => ({ ...st, no: st.no + 100, name: i === 0 ? '別の子' : st.name }))
+    const { values, matched } = previousClassValues({ ...problem, students }, s, ja.className)
+    expect(values[0]).toBe('')
+    expect(matched).toBe(students.length - 1)
+  })
+
+  it('今の名簿で同じ名前が2人いるときは、名前では照らさない', () => {
+    const s = saved(problem, classOf, 4)
+    const dup = problem.students[1].name
+    // NO も振り直す（名簿が続いていない）ので、同じ名前の2人はどちらも空欄
+    const students = problem.students.map((st, i) => ({ ...st, no: st.no + 100, name: i === 2 ? dup : st.name }))
+    const { values } = previousClassValues({ ...problem, students }, s, ja.className)
+    expect(values[1]).toBe('')
+    expect(values[2]).toBe('')
+    expect(values[3]).toBe(ja.className(classOf[3]))
+  })
+
   it('「前回の組」をカテゴリの列として入れ、チェックを外すと無効にする', () => {
     const s = saved(problem, classOf, 4)
     const { values } = previousClassValues(problem, s, ja.className)

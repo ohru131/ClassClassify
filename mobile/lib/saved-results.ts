@@ -68,20 +68,40 @@ const norm = (s: string) => s.replace(/\s+/g, '').normalize('NFKC')
 
 /**
  * 今の名簿の各生徒について、保存した編成で何組だったか（組の名前）。見つからない生徒は ''。
- * 名前で照らし合わせ（同じ名前が2人以上いる名前は使わない）、名前で見つからなければ NO で照らす。
+ * 名前で照らし合わせる（どちらかの名簿に同じ名前が2人以上いる名前は使わない）。
+ * 名前で見つからない生徒は、名簿が続いている（名前で見つかった生徒の大半が同じ NO のまま）ときだけ
+ * NO で照らす。年度が変わって NO を振り直した名簿で、別の子に前回の組を付けないように。
  */
 export function previousClassValues(current: Problem, saved: SavedResult, className: (c: number) => string): { values: string[]; matched: number } {
-  const byName = new Map<string, number | null>()
-  saved.problem.students.forEach((s, i) => {
+  const unique = <K,>(keys: K[]) => {
+    const m = new Map<K, number | null>()
+    keys.forEach((k, i) => m.set(k, m.has(k) ? null : i))
+    return m
+  }
+  const savedByName = unique(saved.problem.students.map((s) => norm(s.name)))
+  const currentByName = unique(current.students.map((s) => norm(s.name)))
+  const savedByNo = unique(saved.problem.students.map((s) => s.no))
+
+  const found: (number | null)[] = current.students.map((s) => {
     const key = norm(s.name)
-    if (!key) return
-    byName.set(key, byName.has(key) ? null : i)
+    if (!key || currentByName.get(key) === null) return null
+    return savedByName.get(key) ?? null
   })
-  const byNo = new Map<number, number | null>()
-  saved.problem.students.forEach((s, i) => byNo.set(s.no, byNo.has(s.no) ? null : i))
+  const byName = found.flatMap((i, j) => (i === null ? [] : [[i, j] as const]))
+  const sameNo = byName.filter(([i, j]) => saved.problem.students[i].no === current.students[j].no).length
+  const continuous = byName.length > 0 && sameNo >= byName.length * 0.8
+  if (continuous) {
+    const used = new Set(found.filter((i): i is number => i !== null))
+    current.students.forEach((s, j) => {
+      if (found[j] !== null) return
+      const i = savedByNo.get(s.no)
+      if (i === undefined || i === null || used.has(i)) return
+      found[j] = i
+      used.add(i)
+    })
+  }
   let matched = 0
-  const values = current.students.map((s) => {
-    const i = byName.get(norm(s.name)) ?? byNo.get(s.no) ?? null
+  const values = found.map((i) => {
     if (i === null) return ''
     matched++
     return className(saved.classOf[i])

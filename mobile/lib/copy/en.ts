@@ -265,6 +265,7 @@ export const EN_COPY = {
   savedCount: '{n} of {max} saved (free version)',
   manageSaved: 'See saved placements',
   seePro: 'See Pro',
+  eraseFailed: 'Couldn’t erase everything. Please try again.',
 }
 
 export type CopyKey = keyof typeof EN_COPY

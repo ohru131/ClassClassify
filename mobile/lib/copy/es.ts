@@ -265,4 +265,5 @@ export const ES_COPY: Record<CopyKey, string> = {
   savedCount: '{n} de {max} guardadas (versión gratuita)',
   manageSaved: 'Ver distribuciones guardadas',
   seePro: 'Ver Pro',
+  eraseFailed: 'No se pudo borrar todo. Inténtalo de nuevo.',
 }

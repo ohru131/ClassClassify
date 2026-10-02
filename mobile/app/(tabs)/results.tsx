@@ -53,7 +53,7 @@ export default function ResultsScreen() {
   const sizeGap = Math.max(...report.sizes) - Math.min(...report.sizes)
   const sel = selected !== null && selected < problem.students.length ? selected : null
   const doSave = async () => {
-    if (savingRef.current) return
+    if (savingRef.current || !saved.loaded) return
     if (!canSaveMore(isPro, saved.list.length)) {
       setSaveName(null)
       setLimitHit(true)
@@ -141,6 +141,7 @@ export default function ResultsScreen() {
             small
             icon="bookmark-outline"
             label={t('saveNamed')}
+            disabled={!saved.loaded}
             onPress={() => {
               setSavedName(null)
               if (!canSaveMore(isPro, saved.list.length)) {

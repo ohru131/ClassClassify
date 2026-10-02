@@ -265,4 +265,5 @@ export const KO_COPY: Record<CopyKey, string> = {
   savedCount: '{n} / {max}개 (무료 버전)',
   manageSaved: '저장한 편성 보기',
   seePro: 'Pro 보기',
+  eraseFailed: '일부 데이터를 지우지 못했습니다. 다시 시도하십시오.',
 }

@@ -290,7 +290,7 @@ export interface ParseMessages {
 export const JA_PARSE_MESSAGES: ParseMessages = {
   rosterMissing: '「生徒名簿」シートが見つからないか、データがありません',
   noStudents: '生徒のデータがありません（3行目から下に NO と名前を入れてください）',
-  noMissing: (row, name) => `生徒名簿 ${row}行目: 「${name}」の NO が空欄だったため、読み込んでいません`,
+  noMissing: (row, name) => `生徒名簿 ${row}行目: 「${name}」の NO が空欄か読み取れないため、読み込んでいません`,
   duplicateNo: (no) => `出席番号 ${no} が2人以上に付いています`,
   unknownNo: (sheet, row, no) => `「${sheet}」${row}行目: 出席番号 ${no} は名簿にありません`,
   classCountUnknown: (k) => `「設定」シートのクラス数が読み取れなかったので、${k} クラスにしました`,

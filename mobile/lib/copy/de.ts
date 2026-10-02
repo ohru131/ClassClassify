@@ -265,4 +265,5 @@ export const DE_COPY: Record<CopyKey, string> = {
   savedCount: '{n} von {max} gespeichert (kostenlose Version)',
   manageSaved: 'Gespeicherte Einteilungen',
   seePro: 'Pro ansehen',
+  eraseFailed: 'Nicht alles konnte gelöscht werden. Bitte versuchen Sie es erneut.',
 }

@@ -265,4 +265,5 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   savedCount: '{n} de {max} salvas (versão gratuita)',
   manageSaved: 'Ver enturmações salvas',
   seePro: 'Ver o Pro',
+  eraseFailed: 'Não foi possível apagar tudo. Tente de novo.',
 }

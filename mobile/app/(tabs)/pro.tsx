@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
 
 import { C } from '@/components/theme'
@@ -21,6 +22,7 @@ export default function ProScreen() {
   const { isPro, isReady, purchaseMessage, priceLabel, isPurchasing, purchasePro, restorePurchases, isNativePurchaseAvailable } = usePro()
   const { problem, clearProject } = useProject()
   const saved = useSavedResults()
+  const [eraseFailed, setEraseFailed] = useState(false)
   const { t, choice, setChoice } = useI18n()
   const router = useRouter()
 
@@ -76,6 +78,11 @@ export default function ProScreen() {
       <Card style={{ gap: 10 }}>
         <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }}>{t('dataTitle')}</Text>
         <Text style={{ fontSize: 13, color: C.sub, lineHeight: 19 }}>{t('dataBody')}</Text>
+        {eraseFailed ? (
+          <Notice tone="error" onClose={() => setEraseFailed(false)}>
+            {t('eraseFailed')}
+          </Notice>
+        ) : null}
         <View style={[styles.row, { flexWrap: 'wrap' }]}>
           <Btn small icon="shield-checkmark-outline" label={t('privacyTitle')} onPress={() => router.push('/privacy')} />
           <Btn
@@ -87,7 +94,9 @@ export default function ProScreen() {
             onPress={async () => {
               if (await confirmAction(t('clearTitle'), t('clearBody'), t('erase'), t('cancel'))) {
                 clearProject()
-                void saved.removeAll().catch(() => undefined)
+                setEraseFailed(false)
+                // 消し損ねたら知らせる（一覧は残るので、もう一度押せばやり直せる）
+                await saved.removeAll().catch(() => setEraseFailed(true))
               }
             }}
           />

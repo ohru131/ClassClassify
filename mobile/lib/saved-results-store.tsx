@@ -29,6 +29,8 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false)
   // 書き込みは最新の一覧から作る（setState の更新関数は後で呼ばれるので、そこから値を取り出さない）
   const listRef = useRef<SavedMeta[]>([])
+  // 一覧を読み終えるまでは保存しない（読む前の空の一覧から書くと、保存済みの一覧を上書きし、件数の上限も数え違える）
+  const loadedRef = useRef(false)
   const setList = (next: SavedMeta[]) => {
     listRef.current = next
     setListState(next)
@@ -44,7 +46,9 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => undefined)
       .finally(() => {
-        if (active) setLoaded(true)
+        if (!active) return
+        loadedRef.current = true
+        setLoaded(true)
       })
     return () => {
       active = false
@@ -54,14 +58,21 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
   const writeIndex = (next: SavedMeta[]) => AsyncStorage.setItem(INDEX_KEY, JSON.stringify(next))
 
   const save = useCallback(async (name: string, problem: Problem, classOf: number[], k: number) => {
+    if (!loadedRef.current) throw new Error('saved results are not loaded yet')
     const now = new Date()
     const item: SavedResult = { version: 1, id: newSavedId(now), name, savedAt: now.toISOString(), problem, classOf, k }
     // 本体を先に書く（一覧だけあって本体が無い状態を作らない）
     await AsyncStorage.setItem(itemKey(item.id), JSON.stringify(item))
     const meta = metaOf(item)
     const next = [meta, ...listRef.current].sort(byNewest)
+    // 画面の一覧は端末に書けてから変える（書けなかった本体は消しておく）
+    try {
+      await writeIndex(next)
+    } catch (e) {
+      await AsyncStorage.removeItem(itemKey(item.id)).catch(() => undefined)
+      throw e
+    }
     setList(next)
-    await writeIndex(next)
     return meta
   }, [])
 
@@ -74,15 +85,16 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
 
   const remove = useCallback(async (id: string) => {
     const next = listRef.current.filter((m) => m.id !== id)
-    setList(next)
     await writeIndex(next)
-    await AsyncStorage.removeItem(itemKey(id))
+    setList(next)
+    // 一覧から外れた本体は読まれない。消し損ねても次の「すべて消去」で消える
+    await AsyncStorage.removeItem(itemKey(id)).catch(() => undefined)
   }, [])
 
   const removeAll = useCallback(async () => {
     const keys = (await AsyncStorage.getAllKeys()).filter((key) => key === INDEX_KEY || key.startsWith('fairclass.saved.v1.'))
-    setList([])
     await AsyncStorage.multiRemove(keys)
+    setList([])
   }, [])
 
   const value = useMemo(() => ({ list, loaded, save, load, remove, removeAll }), [list, loaded, save, load, remove, removeAll])

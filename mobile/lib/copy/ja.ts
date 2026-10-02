@@ -213,7 +213,7 @@ export const JA_COPY: Record<CopyKey, string> = {
 
   parseRosterMissing: '「{sheet}」シートが見つからないか、データがありません',
   parseNoStudents: '生徒のデータがありません（3行目から下に NO と名前を入れてください）',
-  parseNoMissing: '{sheet} {row}行目: 「{name}」の NO が空欄だったため、読み込んでいません',
+  parseNoMissing: '{sheet} {row}行目: 「{name}」の NO が空欄か読み取れないため、読み込んでいません',
   parseDuplicateNo: '出席番号 {no} が2人以上に付いています',
   parseUnknownNo: '「{sheet}」{row}行目: 出席番号 {no} は名簿にありません',
   parseClassCountUnknown: '「{sheet}」シートのクラス数が読み取れなかったので、{k} クラスにしました',
@@ -264,4 +264,5 @@ export const JA_COPY: Record<CopyKey, string> = {
   savedCount: '{n} / {max} 件（無料版）',
   manageSaved: '保存した編成を見る',
   seePro: 'Pro を見る',
+  eraseFailed: '消去できなかったデータがあります。もう一度お試しください。',
 }

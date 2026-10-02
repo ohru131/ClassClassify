@@ -19,6 +19,8 @@ export default function RunScreen() {
   const saved = useSavedResults()
   // 「前回とできるだけ入れ替える」の元にした保存済みの編成と、前回の組が分かった人数
   const [source, setSource] = useState<{ id: string; matched: number } | null>(null)
+  // 保存した編成を読んでいる間は編成を始めない（読み終えて名簿を変えると、編成の結果が捨てられる）
+  const [applying, setApplying] = useState(false)
   // 実行中に別のタブへ移った人を、終わった瞬間に結果画面へ引き戻さない
   const focusedRef = useRef(true)
   useFocusEffect(
@@ -54,7 +56,8 @@ export default function RunScreen() {
   // 保存した編成から各生徒の前回の組を名簿に入れ、その列を均等に散らす（前回同じ組だった子が重ならないように）
   const applyFrom = async (id: string) => {
     // 編成中に名簿を変えると、終わった結果が捨てられる
-    if (running) return
+    if (running || applying) return
+    setApplying(true)
     try {
       const s = await saved.load(id)
       if (!s) {
@@ -71,10 +74,12 @@ export default function RunScreen() {
       setSource({ id, matched })
     } catch {
       setError(t('openFailed'))
+    } finally {
+      setApplying(false)
     }
   }
   const toggleMix = (on: boolean) => {
-    if (running) return
+    if (running || applying) return
     if (!on) modifyProblem((p) => setColumnEnabled(p, prevCol, false))
     else if (prev) modifyProblem((p) => setColumnEnabled(p, prevCol, true))
     else if (saved.list[0]) void applyFrom(saved.list[0].id)
@@ -146,7 +151,7 @@ export default function RunScreen() {
       <Card style={{ gap: 8 }}>
         <View style={[styles.row, { justifyContent: 'space-between' }]}>
           <Text style={{ fontSize: 16, fontWeight: '800', color: C.text, flexShrink: 1 }}>{t('mixTitle')}</Text>
-          <Switch value={mixOn} onValueChange={toggleMix} disabled={running || (!prev && saved.list.length === 0)} accessibilityLabel={t('mixTitle')} />
+          <Switch value={mixOn} onValueChange={toggleMix} disabled={running || applying || (!prev && saved.list.length === 0)} accessibilityLabel={t('mixTitle')} />
         </View>
         <Text style={{ fontSize: 13, color: C.sub, lineHeight: 19 }}>{t('mixHelp')}</Text>
         {!prev && saved.list.length === 0 ? <Text style={{ fontSize: 12, color: C.muted }}>{t('mixNoSaved')}</Text> : null}
@@ -176,7 +181,7 @@ export default function RunScreen() {
           </>
         ) : (
           <>
-            <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} onPress={start} />
+            <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} disabled={applying} onPress={start} />
             {solution ? (
               <Text style={{ fontSize: 12, color: C.muted }}>
                 {t('lastRun', { k: solution.k, starts: solution.starts, m: num(solution.iterations / 1e6, 2) })}
