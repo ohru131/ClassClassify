@@ -19,7 +19,7 @@ type Tab = 'students' | 'columns' | 'wanted' | 'unwanted'
 
 export default function RosterScreen() {
   const { hydrated, problem, fileName, numClasses, modifyProblem, dismissWarnings, error, setError } = useProject()
-  const { exportXlsx, saveToFile, canSaveToFile, busy, isPro } = useProExport()
+  const { exportXlsx, saveToFile, canSaveToFile, busy, isPro, fileSaved, dismissFileSaved } = useProExport()
   const { t, fileLang } = useI18n()
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('students')
@@ -49,6 +49,11 @@ export default function RosterScreen() {
       {error ? (
         <Notice tone="error" onClose={() => setError(null)}>
           {error}
+        </Notice>
+      ) : null}
+      {fileSaved ? (
+        <Notice tone="good" onClose={dismissFileSaved}>
+          {t('fileSavedDone')}
         </Notice>
       ) : null}
 

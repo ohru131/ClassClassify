@@ -21,7 +21,7 @@ type Focus = { kind: 'wanted' | 'unwanted'; group: number } | null
 
 export default function ResultsScreen() {
   const { problem, solution, report, edited, moveStudent, resetMoves, error, setError, fileName } = useProject()
-  const { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, savePdfToFile, busy, isPro } = useProExport()
+  const { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, savePdfToFile, busy, isPro, fileSaved, dismissFileSaved } = useProExport()
   const router = useRouter()
   const { isWide } = useLayout()
   const i18n = useI18n()
@@ -43,7 +43,8 @@ export default function ResultsScreen() {
     setSavedName(null)
     setSaveName(null)
     setLimitHit(false)
-  }, [solution])
+    dismissFileSaved()
+  }, [solution, dismissFileSaved])
 
   if (!problem || !solution || !report)
     return (
@@ -109,6 +110,11 @@ export default function ResultsScreen() {
             tone={report.violations.length ? 'bad' : 'good'}
           />
         </View>
+        {fileSaved ? (
+          <Notice tone="good" onClose={dismissFileSaved}>
+            {t('fileSavedDone')}
+          </Notice>
+        ) : null}
         {savedName ? (
           <Notice tone="good" onClose={() => setSavedName(null)}>
             {t('savedDone', { name: savedName })}

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { WorkBook } from 'xlsx-js-style'
 
 import { useI18n } from './language-provider'
@@ -28,6 +28,10 @@ export function useProExport() {
   const { t } = useI18n()
   const router = useRouter()
   const [busy, setBusy] = useState<null | ExportKind>(null)
+  // ファイルに保存できたら知らせる（OS の保存画面が閉じるだけでは、保存できたか分からない）。
+  // 保存先の画面でファイル名を変えられるので、名前は出さない
+  const [fileSaved, setFileSaved] = useState(false)
+  const dismissFileSaved = useCallback(() => setFileSaved(false), [])
   // busy は再描画後の値なので、同じフレームの2回目のタップはすり抜ける。同期のロックで止める
   const lockRef = useRef(false)
   const messages = { sharingUnavailable: t('sharingUnavailable'), popupBlocked: t('popupBlocked') }
@@ -39,6 +43,7 @@ export function useProExport() {
     }
     if (lockRef.current) return
     lockRef.current = true
+    setFileSaved(false)
     setBusy(kind)
     // task() は同期で呼ぶ（Web の印刷をタップと同じ流れに保つ）。同期的に投げてもロックは必ず外す
     let pending: Promise<void>
@@ -56,10 +61,10 @@ export function useProExport() {
   }
 
   const exportXlsx = (build: () => WorkBook, baseName: string) => run('xlsx', () => shareXlsx(build(), `${baseName}_${today()}.xlsx`, messages.sharingUnavailable))
-  const saveToFile = (build: () => WorkBook, baseName: string) => run('save', async () => void (await saveXlsx(build(), `${baseName}_${today()}.xlsx`)))
+  const saveToFile = (build: () => WorkBook, baseName: string) => run('save', async () => setFileSaved(await saveXlsx(build(), `${baseName}_${today()}.xlsx`)))
   const print = (build: () => string) => run('print', () => printHtml(build(), messages))
   const exportPdf = (build: () => string, baseName: string) => run('pdf', () => sharePdf(build(), `${baseName}_${today()}.pdf`, messages))
-  const savePdfToFile = (build: () => string, baseName: string) => run('savePdf', async () => void (await savePdf(build(), `${baseName}_${today()}.pdf`)))
+  const savePdfToFile = (build: () => string, baseName: string) => run('savePdf', async () => setFileSaved(await savePdf(build(), `${baseName}_${today()}.pdf`)))
 
-  return { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, savePdfToFile, busy, isPro }
+  return { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, savePdfToFile, busy, isPro, fileSaved, dismissFileSaved }
 }
