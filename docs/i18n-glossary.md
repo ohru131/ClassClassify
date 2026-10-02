@@ -27,9 +27,9 @@
 | 理想（1組あたりの目標値） | 理想 | target | 목표 | meta | Soll | meta |
 | バランス | バランス | balance | 균형 | equilibrio | Ausgewogenheit | equilíbrio |
 | 人数差 | 人数差 | size difference | 인원 차 | diferencia de tamaño | Größenunterschied | diferença de tamanho |
-| 条件違反 | 条件違反 | unmet conditions | 충족하지 못한 조건 | condiciones no cumplidas | nicht erfüllte Bedingungen | condições não atendidas |
-| 探索時間（高速/標準/徹底） | 高速 / 標準 / 徹底 | Quick / Standard / Thorough | 빠르게 / 표준 / 꼼꼼하게 | Rápido / Estándar / A fondo | Schnell / Standard / Gründlich | Rápido / Padrão / Completo |
-| 編成を実行 | クラス編成を実行 | Build classes | 반 편성 실행 | Armar grupos | Klassen einteilen | Montar turmas |
+| 条件違反 | 守れなかった指定 | unmet conditions | 충족하지 못한 조건 | condiciones no cumplidas | nicht erfüllte Bedingungen | condições não atendidas |
+| 探索時間（高速/標準/徹底） | 考える時間: さっと / ふつう / じっくり | Quick / Standard / Thorough | 빠르게 / 표준 / 꼼꼼하게 | Rápido / Estándar / A fondo | Schnell / Standard / Gründlich | Rápido / Padrão / Completo |
+| 編成を実行 | クラスを編成する | Build classes | 반 편성 실행 | Armar grupos | Klassen einteilen | Montar turmas |
 | 手動で移動 | 別の組へ移動 | move to another class | 다른 반으로 이동 | mover a otro grupo | in andere Klasse verschieben | mover para outra turma |
 | 該当 / カテゴリ / 数値（項目の種類） | 該当 / カテゴリ / 数値 | Yes/no / Category / Number | 해당 / 범주 / 숫자 | Sí/no / Categoría / Número | Ja/Nein / Kategorie / Zahl | Sim/não / Categoria / Número |
 | 空欄 | 空欄 | blank | 빈칸 | vacío | leer | vazio |
@@ -44,6 +44,9 @@
 
 ### 全言語共通
 - **「別の組（keep apart）」は保証しない。** 同じ組の指定はソルバーが必ず守る（生徒をまとめて1つの塊として動かす）が、別の組の指定は目的関数の重い罰則で、組数・人数によっては満たせない。UI・掲載文とも「できる限り（as far as possible / en la medida de lo posible / so weit wie möglich / 최대한）離し、満たせなかった指定はすぐに表示する」と書き、「確実に」「必ず」「meets」「cumple」「atende」とは書かない。
+
+### ja
+- 先生向けのアプリなので、技術用語（探索・最適化・実行・違反・破棄・無視など）を画面に出さず、やわらかい言い回しにする（「探索中」→「考えています」、「条件違反」→「守れなかった指定」、「中止」→「やめる」、「無視します」→「考えに入れません」）。
 
 ### en
 - 米英豪で共通に通じる語だけを UI に使う（grade / year の区別が要る語は UI に出さない）。綴りは米式（behavior・color）を既定にし、`en-GB`・`en-AU` の掲載文だけ英式（behaviour）にする。
