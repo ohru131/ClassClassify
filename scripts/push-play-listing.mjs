@@ -238,12 +238,25 @@ async function getAccessToken(keyPath) {
   return body.access_token
 }
 
+// Play API はときどき 503（The service is currently unavailable）を返す。数百回の呼び出しの途中で
+// 1回落ちると edit ごと破棄になるので、一時的な 5xx だけは間を空けて呼び直す。
+// 画像の POST を呼び直して二重に入っても、1種類8枚の上限を超えるので commit で弾かれて気づける。
+const RETRY_STATUS = new Set([500, 502, 503, 504])
+const RETRY_WAIT_MS = [2000, 5000, 10000, 20000, 40000]
+
 async function api(token, method, path, { json, body, contentType } = {}) {
-  const res = await fetch(path.startsWith('http') ? path : `${API}${path}`, {
-    method,
-    headers: { authorization: `Bearer ${token}`, ...(json ? { 'content-type': 'application/json' } : {}), ...(contentType ? { 'content-type': contentType } : {}) },
-    body: json ? JSON.stringify(json) : body,
-  })
+  let res
+  for (let attempt = 0; ; attempt++) {
+    res = await fetch(path.startsWith('http') ? path : `${API}${path}`, {
+      method,
+      headers: { authorization: `Bearer ${token}`, ...(json ? { 'content-type': 'application/json' } : {}), ...(contentType ? { 'content-type': contentType } : {}) },
+      body: json ? JSON.stringify(json) : body,
+    })
+    if (!RETRY_STATUS.has(res.status) || attempt >= RETRY_WAIT_MS.length) break
+    await res.text()
+    console.log(`  ${res.status} のため ${RETRY_WAIT_MS[attempt] / 1000} 秒後に呼び直す: ${method} ${path}`)
+    await new Promise((r) => setTimeout(r, RETRY_WAIT_MS[attempt]))
+  }
   const text = await res.text()
   let parsed = null
   try { parsed = text ? JSON.parse(text) : null } catch { /* 画像アップロードは空応答のことがある */ }
