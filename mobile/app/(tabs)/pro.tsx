@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
 
 import { C } from '@/components/theme'
@@ -8,16 +9,21 @@ import { APP_LANGUAGES, LANGUAGE_META } from '@/lib/i18n'
 import { useI18n } from '@/lib/language-provider'
 import { useProject } from '@/lib/project-store'
 import { usePro } from '@/lib/revenuecat-provider'
+import { FREE_SAVE_LIMIT } from '@/lib/saved-results'
+import { useSavedResults } from '@/lib/saved-results-store'
 
 const FEATURES = [
   ['feat1Title', 'feat1Body'],
   ['feat2Title', 'feat2Body'],
+  ['featSaveTitle', 'featSaveBody'],
   ['feat3Title', 'feat3Body'],
 ] as const
 
 export default function ProScreen() {
   const { isPro, isReady, purchaseMessage, priceLabel, isPurchasing, purchasePro, restorePurchases, isNativePurchaseAvailable } = usePro()
   const { problem, clearProject } = useProject()
+  const saved = useSavedResults()
+  const [eraseFailed, setEraseFailed] = useState(false)
   const { t, choice, setChoice } = useI18n()
   const router = useRouter()
 
@@ -35,7 +41,7 @@ export default function ProScreen() {
             <Text style={{ color: C.primary, fontWeight: '900' }}>✓</Text>
             <View style={{ flex: 1 }}>
               <Text style={{ fontWeight: '800', color: C.text }}>{t(title)}</Text>
-              <Text style={{ fontSize: 13, color: C.sub }}>{t(body)}</Text>
+              <Text style={{ fontSize: 13, color: C.sub }}>{t(body, { max: FREE_SAVE_LIMIT })}</Text>
             </View>
           </View>
         ))}
@@ -73,6 +79,11 @@ export default function ProScreen() {
       <Card style={{ gap: 10 }}>
         <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }}>{t('dataTitle')}</Text>
         <Text style={{ fontSize: 13, color: C.sub, lineHeight: 19 }}>{t('dataBody')}</Text>
+        {eraseFailed ? (
+          <Notice tone="error" onClose={() => setEraseFailed(false)}>
+            {t('eraseFailed')}
+          </Notice>
+        ) : null}
         <View style={[styles.row, { flexWrap: 'wrap' }]}>
           <Btn small icon="shield-checkmark-outline" label={t('privacyTitle')} onPress={() => router.push('/privacy')} />
           <Btn
@@ -80,9 +91,14 @@ export default function ProScreen() {
             variant="danger"
             icon="trash-outline"
             label={t('clearData')}
-            disabled={!problem}
+            disabled={!problem && saved.list.length === 0}
             onPress={async () => {
-              if (await confirmAction(t('clearTitle'), t('clearBody'), t('erase'), t('cancel'))) clearProject()
+              if (await confirmAction(t('clearTitle'), t('clearBody'), t('erase'), t('cancel'))) {
+                clearProject()
+                setEraseFailed(false)
+                // 消し損ねたら知らせる（一覧は残るので、もう一度押せばやり直せる）
+                await saved.removeAll().catch(() => setEraseFailed(true))
+              }
             }}
           />
         </View>

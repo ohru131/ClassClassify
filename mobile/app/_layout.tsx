@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { LanguageProvider, useI18n } from '@/lib/language-provider'
 import { ProjectProvider } from '@/lib/project-store'
 import { RevenueCatProvider } from '@/lib/revenuecat-provider'
+import { SavedResultsProvider } from '@/lib/saved-results-store'
 
 export default function RootLayout() {
   return (
@@ -12,7 +13,9 @@ export default function RootLayout() {
       <LanguageProvider>
         <RevenueCatProvider>
           <ProjectProvider>
-            <RootStack />
+            <SavedResultsProvider>
+              <RootStack />
+            </SavedResultsProvider>
           </ProjectProvider>
         </RevenueCatProvider>
       </LanguageProvider>

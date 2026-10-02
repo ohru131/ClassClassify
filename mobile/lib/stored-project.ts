@@ -11,7 +11,7 @@ export interface StoredProject {
   solution: { classOf: number[]; original: number[]; k: number; iterations: number; starts: number } | null
 }
 
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null
+export const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null
 const isIntArray = (v: unknown): v is number[] => Array.isArray(v) && v.every((x) => Number.isInteger(x))
 const isStringArray = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string')
 /** クラス数: 2 以上の整数（0.5 や NaN が入るとソルバーと画面が壊れる） */

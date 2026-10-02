@@ -1,10 +1,11 @@
-import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
 
 import { ColumnEditor } from '@/components/column-editor'
 import { GroupEditor } from '@/components/group-editor'
 import { LoadPanel } from '@/components/load-panel'
+import { SavedList } from '@/components/saved-list'
 import { StudentList } from '@/components/student-list'
 import { C } from '@/components/theme'
 import { Btn, Card, Notice, Screen, Segmented, styles } from '@/components/ui'
@@ -22,6 +23,14 @@ export default function RosterScreen() {
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('students')
   const [showLoad, setShowLoad] = useState(false)
+  // 結果画面の「保存した編成を見る」から来たら、一覧（読み込みパネルの下）を出す
+  const { saved } = useLocalSearchParams<{ saved?: string }>()
+  useEffect(() => {
+    if (saved === '1') {
+      setShowLoad(true)
+      router.setParams({ saved: undefined })
+    }
+  }, [saved, router])
 
   if (!hydrated)
     return (
@@ -50,6 +59,7 @@ export default function RosterScreen() {
               setTab('students')
             }}
           />
+          <SavedList onOpened={() => setShowLoad(false)} />
           {problem ? <Btn label={t('backToRoster')} onPress={() => setShowLoad(false)} /> : null}
         </>
       ) : (

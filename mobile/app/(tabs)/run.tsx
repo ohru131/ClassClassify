@@ -1,19 +1,26 @@
 import { useFocusEffect, useRouter } from 'expo-router'
-import { useCallback, useRef } from 'react'
-import { Text, View } from 'react-native'
+import { useCallback, useRef, useState } from 'react'
+import { Switch, Text, View } from 'react-native'
 
 import { C } from '@/components/theme'
-import { Btn, Card, Notice, Screen, Segmented, Stepper, styles } from '@/components/ui'
+import { Btn, Card, Chip, Notice, Screen, Segmented, Stepper, styles } from '@/components/ui'
 import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { defaultStarts } from '@/lib/runner'
+import { findPreviousClassColumn, previousClassValues, setColumnEnabled, withPreviousClass } from '@/lib/saved-results'
+import { useSavedResults } from '@/lib/saved-results-store'
 
 export default function RunScreen() {
-  const { problem, numClasses, setNumClasses, stepMaxPerClass, timeSec, setTimeSec, run, cancel, running, progress, solution, error, setError } = useProject()
+  const { problem, numClasses, setNumClasses, stepMaxPerClass, timeSec, setTimeSec, run, cancel, running, progress, solution, error, setError, modifyProblem } = useProject()
   const router = useRouter()
   const { isWide } = useLayout()
-  const { t, num } = useI18n()
+  const { t, num, className } = useI18n()
+  const saved = useSavedResults()
+  // 「前回とできるだけ入れ替える」の元にした保存済みの編成と、前回の組が分かった人数
+  const [source, setSource] = useState<{ id: string; name: string; matched: number; students: unknown } | null>(null)
+  // 保存した編成を読んでいる間は編成を始めない（読み終えて名簿を変えると、編成の結果が捨てられる）
+  const [applying, setApplying] = useState(false)
   // 実行中に別のタブへ移った人を、終わった瞬間に結果画面へ引き戻さない
   const focusedRef = useRef(true)
   useFocusEffect(
@@ -41,6 +48,47 @@ export default function RunScreen() {
   const hi = Math.ceil(n / numClasses)
   const enabled = problem.columns.filter((c) => c.enabled && c.weight > 0)
   const starts = defaultStarts(timeSec * 1000)
+
+  // 既にある列はその名前のまま使う（入れたあとで表示の言語を変えても同じ列を扱う）
+  const prev = findPreviousClassColumn(problem)
+  const prevCol = prev?.name ?? t('prevClassColumn')
+  const mixOn = !!prev && prev.enabled && prev.weight > 0
+  // 選んだ編成の表示は、それを入れた名簿のときだけ（別の名簿を開いたら出さない）
+  const shownSource = source && source.students === problem.students ? source : null
+  // 保存した編成から各生徒の前回の組を名簿に入れ、その列を均等に散らす（前回同じ組だった子が重ならないように）
+  const applyFrom = async (id: string) => {
+    // 編成中に名簿を変えると、終わった結果が捨てられる
+    if (running || applying) return
+    setApplying(true)
+    try {
+      const s = await saved.load(id)
+      if (!s) {
+        setError(t('openFailed'))
+        return
+      }
+      const order = Array.from({ length: s.k }, (_, c) => className(c))
+      let matched = 0
+      let students: unknown = null
+      modifyProblem((p) => {
+        const r = previousClassValues(p, s, className)
+        matched = r.matched
+        const next = withPreviousClass(p, prevCol, r.values, order)
+        students = next.students
+        return next
+      })
+      setSource({ id, name: s.name, matched, students })
+    } catch {
+      setError(t('openFailed'))
+    } finally {
+      setApplying(false)
+    }
+  }
+  const toggleMix = (on: boolean) => {
+    if (running || applying) return
+    if (!on) modifyProblem((p) => setColumnEnabled(p, prevCol, false))
+    else if (prev) modifyProblem((p) => setColumnEnabled(p, prevCol, true))
+    else if (saved.list[0]) void applyFrom(saved.list[0].id)
+  }
 
   const start = async () => {
     if ((await run()) && focusedRef.current) router.navigate('/results')
@@ -105,6 +153,30 @@ export default function RunScreen() {
         </Text>
       </Card>
 
+      <Card style={{ gap: 8 }}>
+        <View style={[styles.row, { justifyContent: 'space-between' }]}>
+          <Text style={{ fontSize: 16, fontWeight: '800', color: C.text, flexShrink: 1 }}>{t('mixTitle')}</Text>
+          <Switch value={mixOn} onValueChange={toggleMix} disabled={running || applying || (!prev && saved.list.length === 0)} accessibilityLabel={t('mixTitle')} />
+        </View>
+        <Text style={{ fontSize: 13, color: C.sub, lineHeight: 19 }}>{t('mixHelp')}</Text>
+        {!prev && saved.list.length === 0 ? <Text style={{ fontSize: 12, color: C.muted }}>{t('mixNoSaved')}</Text> : null}
+        {mixOn && saved.list.length > 0 ? (
+          <>
+            <Text style={[styles.label, { marginTop: 4 }]}>{t('mixPick')}</Text>
+            <View style={styles.wrap} accessibilityRole="radiogroup">
+              {saved.list.map((m) => (
+                <Chip key={m.id} label={m.name} selected={shownSource?.id === m.id} onPress={() => void applyFrom(m.id)} />
+              ))}
+            </View>
+          </>
+        ) : null}
+        {mixOn && shownSource ? (
+          <Text style={{ fontSize: 12, color: C.muted }}>
+            {t('mixFrom', { name: shownSource.name })} · {t('mixMatched', { m: shownSource.matched, n })}
+          </Text>
+        ) : null}
+      </Card>
+
       <Card style={{ gap: 12 }}>
         {running ? (
           <>
@@ -118,8 +190,9 @@ export default function RunScreen() {
           </>
         ) : (
           <>
-            <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} onPress={start} />
-            {solution ? (
+            <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} disabled={applying} onPress={start} />
+            {/* 保存した編成を開いただけのときは、編成の記録（案の数など）が無いので出さない */}
+            {solution && solution.starts > 0 ? (
               <Text style={{ fontSize: 12, color: C.muted }}>
                 {t('lastRun', { k: solution.k, starts: solution.starts, m: num(solution.iterations / 1e6, 2) })}
               </Text>

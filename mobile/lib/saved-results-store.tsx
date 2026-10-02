@@ -1,0 +1,117 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+
+import { isSavedResult, metaOf, newSavedId, readSavedMetaList, type SavedMeta, type SavedResult } from './saved-results'
+import type { Problem } from './solver'
+
+// 名前を付けて保存した編成の置き場所（端末内の AsyncStorage。Android では中身が SQLite）。
+// 一覧（名前・日時・人数・組数）は1つのキーにまとめ、名簿と結果の本体は1件ずつ別のキーに置く
+// （一覧を出すたびに全件の名簿を読まないように）。どこにも送信しない。
+const INDEX_KEY = 'fairclass.saved.index.v1'
+const itemKey = (id: string) => `fairclass.saved.v1.${id}`
+
+type SavedContextValue = {
+  /** 新しい順 */
+  list: SavedMeta[]
+  loaded: boolean
+  save: (name: string, problem: Problem, classOf: number[], k: number) => Promise<SavedMeta>
+  load: (id: string) => Promise<SavedResult | null>
+  remove: (id: string) => Promise<void>
+  removeAll: () => Promise<void>
+}
+
+const SavedContext = createContext<SavedContextValue | null>(null)
+
+const byNewest = (a: SavedMeta, b: SavedMeta) => b.savedAt.localeCompare(a.savedAt)
+
+export function SavedResultsProvider({ children }: { children: ReactNode }) {
+  const [list, setListState] = useState<SavedMeta[]>([])
+  const [loaded, setLoaded] = useState(false)
+  // 書き込みは最新の一覧から作る（setState の更新関数は後で呼ばれるので、そこから値を取り出さない）
+  const listRef = useRef<SavedMeta[]>([])
+  // 一覧を読み終えるまでは保存しない（読む前の空の一覧から書くと、保存済みの一覧を上書きし、件数の上限も数え違える）
+  const loadedRef = useRef(false)
+  // 保存・削除は1つずつ順番に（前の書き込みが終わる前に次の一覧を作ると、どちらかの変更が消える）
+  const queueRef = useRef<Promise<unknown>>(Promise.resolve())
+  const serial = <T,>(task: () => Promise<T>): Promise<T> => {
+    const run = queueRef.current.then(task, task)
+    queueRef.current = run.catch(() => undefined)
+    return run
+  }
+  const setList = (next: SavedMeta[]) => {
+    listRef.current = next
+    setListState(next)
+  }
+
+  useEffect(() => {
+    let active = true
+    // 一覧が読めなかったときは「読み込み済み」にしない（空の一覧から書いて、保存済みの一覧を上書きしないように。
+    // 保存はできないままになり、次にアプリを開いたときに読み直す）
+    AsyncStorage.getItem(INDEX_KEY)
+      .then((raw) => {
+        if (!active) return
+        if (raw) {
+          const data = readSavedMetaList(JSON.parse(raw))
+          if (!data) return
+          setList([...data].sort(byNewest))
+        }
+        loadedRef.current = true
+        setLoaded(true)
+      })
+      .catch(() => undefined)
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const writeIndex = (next: SavedMeta[]) => AsyncStorage.setItem(INDEX_KEY, JSON.stringify(next))
+
+  const save = useCallback((name: string, problem: Problem, classOf: number[], k: number) => serial(async () => {
+    if (!loadedRef.current) throw new Error('saved results are not loaded yet')
+    const now = new Date()
+    const item: SavedResult = { version: 1, id: newSavedId(now), name, savedAt: now.toISOString(), problem, classOf, k }
+    // 本体を先に書く（一覧だけあって本体が無い状態を作らない）
+    await AsyncStorage.setItem(itemKey(item.id), JSON.stringify(item))
+    const meta = metaOf(item)
+    const next = [meta, ...listRef.current].sort(byNewest)
+    // 画面の一覧は端末に書けてから変える（書けなかった本体は消しておく）
+    try {
+      await writeIndex(next)
+    } catch (e) {
+      await AsyncStorage.removeItem(itemKey(item.id)).catch(() => undefined)
+      throw e
+    }
+    setList(next)
+    return meta
+  }), [])
+
+  const load = useCallback(async (id: string) => {
+    const raw = await AsyncStorage.getItem(itemKey(id))
+    if (!raw) return null
+    const data: unknown = JSON.parse(raw)
+    return isSavedResult(data) ? data : null
+  }, [])
+
+  const remove = useCallback((id: string) => serial(async () => {
+    const next = listRef.current.filter((m) => m.id !== id)
+    await writeIndex(next)
+    setList(next)
+    // 一覧から外れた本体は読まれない。消し損ねても次の「すべて消去」で消える
+    await AsyncStorage.removeItem(itemKey(id)).catch(() => undefined)
+  }), [])
+
+  const removeAll = useCallback(() => serial(async () => {
+    const keys = (await AsyncStorage.getAllKeys()).filter((key) => key === INDEX_KEY || key.startsWith('fairclass.saved.v1.'))
+    await AsyncStorage.multiRemove(keys)
+    setList([])
+  }), [])
+
+  const value = useMemo(() => ({ list, loaded, save, load, remove, removeAll }), [list, loaded, save, load, remove, removeAll])
+  return <SavedContext.Provider value={value}>{children}</SavedContext.Provider>
+}
+
+export function useSavedResults() {
+  const v = useContext(SavedContext)
+  if (!v) throw new Error('SavedResultsProvider の内部で使用してください。')
+  return v
+}
