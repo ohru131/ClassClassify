@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 import type { WorkBook } from 'xlsx-js-style'
 
 import { useI18n } from './language-provider'
-import { printHtml, sharePdf } from './print'
+import { printHtml, savePdf, sharePdf } from './print'
 import { useProject } from './project-store'
 import { usePro } from './revenuecat-provider'
 import { canSaveToFile, saveXlsx, shareXlsx } from './xlsx-files'
@@ -13,6 +13,8 @@ const today = () => {
   const p = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
+
+type ExportKind = 'xlsx' | 'save' | 'print' | 'pdf' | 'savePdf'
 
 /**
  * Excel・印刷・PDF（Pro 限定）。無料版でもボタンは見せ、押すと Pro の画面へ案内する。
@@ -25,12 +27,12 @@ export function useProExport() {
   const { setError } = useProject()
   const { t } = useI18n()
   const router = useRouter()
-  const [busy, setBusy] = useState<null | 'xlsx' | 'save' | 'print' | 'pdf'>(null)
+  const [busy, setBusy] = useState<null | ExportKind>(null)
   // busy は再描画後の値なので、同じフレームの2回目のタップはすり抜ける。同期のロックで止める
   const lockRef = useRef(false)
   const messages = { sharingUnavailable: t('sharingUnavailable'), popupBlocked: t('popupBlocked') }
 
-  const run = (kind: 'xlsx' | 'save' | 'print' | 'pdf', task: () => Promise<void>) => {
+  const run = (kind: ExportKind, task: () => Promise<void>) => {
     if (!isPro) {
       router.navigate('/pro')
       return
@@ -57,6 +59,7 @@ export function useProExport() {
   const saveToFile = (build: () => WorkBook, baseName: string) => run('save', async () => void (await saveXlsx(build(), `${baseName}_${today()}.xlsx`)))
   const print = (build: () => string) => run('print', () => printHtml(build(), messages))
   const exportPdf = (build: () => string, baseName: string) => run('pdf', () => sharePdf(build(), `${baseName}_${today()}.pdf`, messages))
+  const savePdfToFile = (build: () => string, baseName: string) => run('savePdf', async () => void (await savePdf(build(), `${baseName}_${today()}.pdf`)))
 
-  return { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, busy, isPro }
+  return { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, savePdfToFile, busy, isPro }
 }

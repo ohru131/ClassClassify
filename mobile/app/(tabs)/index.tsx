@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
 
 import { ColumnEditor } from '@/components/column-editor'
+import { ExportButton } from '@/components/export-button'
 import { GroupEditor } from '@/components/group-editor'
 import { LoadPanel } from '@/components/load-panel'
 import { SavedList } from '@/components/saved-list'
@@ -77,22 +78,17 @@ export default function RosterScreen() {
               {/* 長い言語でもカードからはみ出さないよう、行の幅に収めて折り返す */}
               <View style={[styles.row, { flexWrap: 'wrap', flexShrink: 1 }]}>
                 <Btn small icon="folder-open-outline" label={t('otherRoster')} onPress={() => setShowLoad(true)} />
-                <Btn
-                  small
-                  icon={isPro ? 'share-outline' : 'lock-closed-outline'}
+                <ExportButton
+                  icon={isPro ? 'grid-outline' : 'lock-closed-outline'}
                   label={t('saveRosterXlsx')}
-                  busy={busy === 'xlsx'}
-                  onPress={() => exportXlsx(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster'))}
+                  title={t('exportSheetTitle', { format: t('exportExcel') })}
+                  isPro={isPro}
+                  busy={busy === 'xlsx' || busy === 'save'}
+                  choices={[
+                    { icon: 'share-social-outline', label: t('shareVia'), sub: t('shareViaSub'), onPress: () => exportXlsx(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster')) },
+                    ...(canSaveToFile ? [{ icon: 'save-outline' as const, label: t('saveToFile'), sub: t('saveToFileSub'), onPress: () => saveToFile(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster')) }] : []),
+                  ]}
                 />
-                {canSaveToFile ? (
-                  <Btn
-                    small
-                    icon={isPro ? 'save-outline' : 'lock-closed-outline'}
-                    label={t('saveToFile')}
-                    busy={busy === 'save'}
-                    onPress={() => saveToFile(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster'))}
-                  />
-                ) : null}
                 <Btn small variant="primary" icon="arrow-forward" label={t('toRun')} onPress={() => router.navigate('/run')} />
               </View>
             </View>

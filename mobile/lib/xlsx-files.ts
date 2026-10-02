@@ -51,11 +51,14 @@ export async function pickXlsx(): Promise<{ data: ArrayBuffer; name: string } | 
 /** ファイル名に使えない文字を落とす */
 export const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|\s]+/g, '_')
 
-/** ブックを OS の保存ダイアログで好きな場所（Google ドライブ等）へ .xlsx として保存する。キャンセルなら false */
-export async function saveXlsx(wb: WorkBook, fileName: string): Promise<boolean> {
+/** 中身（base64）を OS の保存ダイアログで好きな場所（Google ドライブ等）へ保存する。キャンセルなら false */
+export async function saveBase64As(fileName: string, mimeType: string, base64: string): Promise<boolean> {
   if (!SafFiles) return false
-  return (await SafFiles.createDocumentAsync(fileName, XLSX_MIME, writeXlsx(wb, 'base64'))) !== null
+  return (await SafFiles.createDocumentAsync(fileName, mimeType, base64)) !== null
 }
+
+/** ブックを OS の保存ダイアログで好きな場所（Google ドライブ等）へ .xlsx として保存する。キャンセルなら false */
+export const saveXlsx = (wb: WorkBook, fileName: string): Promise<boolean> => saveBase64As(fileName, XLSX_MIME, writeXlsx(wb, 'base64'))
 
 /** ブックを .xlsx としてキャッシュに書き、OS の共有シートを開く（Excel・Google ドライブ・メール等へ） */
 export async function shareXlsx(wb: WorkBook, fileName: string, unavailableMessage: string): Promise<void> {

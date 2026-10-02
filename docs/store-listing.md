@@ -56,7 +56,7 @@ HOW IT WORKS
 • Look over the balance tables, then move any student to another class with one tap. The totals update instantly, so you can try ideas with your grade-level team.
 
 ALL YEAR LONG
-• Save with a name: keep any placement on your device (it's named with the month and roster by default), then reopen or delete it from Saved placements. Save up to 3 for free, or as many as you like with Pro.
+• Save in app: keep any placement on your device (it's named with the month and roster by default), then reopen or delete it from Saved placements. Save up to 3 for free, or as many as you like with Pro.
 • Mix up from last time: pick a saved placement, and FairClass spreads students who were together last time across the new classes or groups as far as possible. Perfect for fresh table groups every few weeks, or for next year's class lists.
 
 WHY TEACHERS LOVE IT
@@ -111,7 +111,7 @@ HOW IT WORKS
 • Look over the balance tables and move any student to another class with a single tap. The totals update straight away, so you can try ideas with your year-level team.
 
 ALL YEAR ROUND
-• Save with a name: keep any placement on your device (it's named with the month and class list by default), then reopen or delete it from Saved placements. Save up to 3 for free, or as many as you like with Pro.
+• Save in app: keep any placement on your device (it's named with the month and class list by default), then reopen or delete it from Saved placements. Save up to 3 for free, or as many as you like with Pro.
 • Mix up from last time: pick a saved placement, and FairClass spreads students who were together last time across the new classes or groups as far as possible. Ideal for new table groups every few weeks, or for next year's classes.
 
 WHY TEACHERS LOVE IT
@@ -166,7 +166,7 @@ HOW IT WORKS
 • Look over the balance tables and move any pupil to another class with one tap. The totals update instantly, so you can try ideas together.
 
 ALL YEAR ROUND
-• Save with a name: keep any placement on your device (it's named with the month and class list by default), then reopen or delete it from Saved placements. Save up to 3 for free, or as many as you like with Pro.
+• Save in app: keep any placement on your device (it's named with the month and class list by default), then reopen or delete it from Saved placements. Save up to 3 for free, or as many as you like with Pro.
 • Mix up from last time: pick a saved placement, and FairClass spreads pupils who were together last time across the new classes or groups as far as possible. Ideal for new table groups every half term, or for next year's classes.
 
 WHY TEACHERS LOVE IT
@@ -220,7 +220,7 @@ FairClass 반 편성
 • 균형 표를 살펴보고, 필요하면 학생을 눌러 다른 반으로 옮길 수 있습니다. 집계도 바로 바뀝니다.
 
 1년 내내 쓰는 기능
-• 이름을 붙여 저장: 편성 결과를 이 기기에 저장합니다(기본 이름은 연월과 명단 이름). "저장한 편성" 목록에서 다시 열거나 삭제할 수 있습니다. 무료로 3개까지, Pro에서는 무제한으로 저장할 수 있습니다.
+• 앱에 저장: 편성 결과를 이 기기에 저장합니다(기본 이름은 연월과 명단 이름). "저장한 편성" 목록에서 다시 열거나 삭제할 수 있습니다. 무료로 3개까지, Pro에서는 무제한으로 저장할 수 있습니다.
 • 지난번과 최대한 섞기: 저장한 편성을 고르면, 지난번에 같은 반·같은 모둠이었던 학생들을 새 반·모둠에 최대한 흩어 배정합니다. 몇 주마다 모둠을 바꿀 때나 다음 해 반 편성에 편리합니다.
 
 선생님들이 FairClass를 쓰는 이유
@@ -275,7 +275,7 @@ ASÍ DE FÁCIL
 • Revisa cómo quedó cada grupo y, si quieres, mueve a cualquier estudiante a otro grupo con un toque. Los totales se actualizan al instante.
 
 PARA TODO EL AÑO
-• Guardar con nombre: guarda cada distribución en tu dispositivo (por defecto lleva el mes y el nombre de la lista) y ábrela o bórrala desde “Distribuciones guardadas”. Puedes guardar hasta 3 gratis, o todas las que quieras con Pro.
+• Guardar en la app: guarda cada distribución en tu dispositivo (por defecto lleva el mes y el nombre de la lista) y ábrela o bórrala desde “Distribuciones guardadas”. Puedes guardar hasta 3 gratis, o todas las que quieras con Pro.
 • Mezclar respecto a la vez anterior: elige una distribución guardada y FairClass reparte en grupos distintos, en la medida de lo posible, a quienes estuvieron juntos la última vez. Ideal para renovar los equipos cada pocas semanas o para armar los grupos del año siguiente.
 
 POR QUÉ LES GUSTA A LOS DOCENTES
@@ -329,7 +329,7 @@ CÓMO FUNCIONA
 • Revisa cómo ha quedado cada grupo y pasa a quien quieras a otro grupo con un toque. Los totales se actualizan al instante.
 
 DURANTE TODO EL CURSO
-• Guardar con nombre: guarda cada reparto en el dispositivo (por defecto lleva el mes y el nombre de la lista) y ábrelo o bórralo desde “Distribuciones guardadas”. Puedes guardar hasta 3 gratis, o todas las que quieras con Pro.
+• Guardar en la app: guarda cada reparto en el dispositivo (por defecto lleva el mes y el nombre de la lista) y ábrelo o bórralo desde “Distribuciones guardadas”. Puedes guardar hasta 3 gratis, o todas las que quieras con Pro.
 • Mezclar respecto a la vez anterior: elige un reparto guardado y FairClass coloca en grupos distintos, en la medida de lo posible, a quienes coincidieron la última vez. Muy útil para renovar los equipos cada pocas semanas o para los grupos del curso siguiente.
 
 POR QUÉ LO USA EL PROFESORADO
@@ -385,7 +385,7 @@ SO GEHT'S
 • Den Vorschlag in Ruhe prüfen und einzelne Kinder mit einem Tipp in eine andere Klasse verschieben. Die Übersicht passt sich sofort an.
 
 DAS GANZE SCHULJAHR
-• Unter Namen speichern: Jede Einteilung lässt sich auf dem Gerät speichern (als Name werden Monat und Schülerliste vorgeschlagen) und unter „Gespeicherte Einteilungen“ wieder öffnen oder löschen. Kostenlos bis zu 3, mit Pro unbegrenzt.
+• In der App speichern: Jede Einteilung lässt sich auf dem Gerät speichern (als Name werden Monat und Schülerliste vorgeschlagen) und unter „Gespeicherte Einteilungen“ wieder öffnen oder löschen. Kostenlos bis zu 3, mit Pro unbegrenzt.
 • Gegenüber letztem Mal neu mischen: Wählen Sie eine gespeicherte Einteilung, und FairClass verteilt Kinder, die beim letzten Mal zusammen waren, so weit wie möglich auf verschiedene Klassen oder Gruppen – praktisch, wenn Tischgruppen alle paar Wochen neu gebildet werden, oder für die Klassen im nächsten Schuljahr.
 
 WARUM LEHRKRÄFTE FAIRCLASS NUTZEN
@@ -440,7 +440,7 @@ COMO FUNCIONA
 • Confira como ficou cada turma e, se quiser, mova qualquer aluno para outra turma com um toque. Os totais se atualizam na hora.
 
 O ANO TODO
-• Salvar com nome: cada enturmação fica salva no aparelho (o nome sugerido traz o mês e o nome da lista); abra ou apague em “Enturmações salvas”. Salve até 3 de graça, ou quantas quiser com o Pro.
+• Salvar no app: cada enturmação fica salva no aparelho (o nome sugerido traz o mês e o nome da lista); abra ou apague em “Enturmações salvas”. Salve até 3 de graça, ou quantas quiser com o Pro.
 • Misturar em relação à última vez: escolha uma enturmação salva e o FairClass separa, na medida do possível, quem ficou junto da última vez nas novas turmas ou grupos. Ótimo para trocar os grupos a cada poucas semanas ou montar as turmas do ano seguinte.
 
 POR QUE PROFESSORES E COORDENADORES GOSTAM
@@ -494,7 +494,7 @@ FairClass は、条件をそろえたクラス分けの案を数秒でつくり�
 ・バランス表を見ながら、必要なら生徒をタップして別の組へ移動できます。集計もすぐに更新されます。
 
 一年中使える機能
-・名前を付けて保存: 編成結果をこの端末に保存できます（名前には最初から「年月・名簿名」が入ります）。「保存した編成」の一覧から開いたり、削除したりできます。無料版は3件まで、Pro なら無制限に保存できます。
+・アプリに保存: 編成結果をこの端末に保存できます（名前には最初から「年月・名簿名」が入ります）。「保存した編成」の一覧から開いたり、削除したりできます。無料版は3件まで、Pro なら無制限に保存できます。
 ・前回とできるだけ入れ替える: 保存した編成を選ぶと、前回同じ組・同じ班だった子を、新しい組・班にできるだけ散らします。数週間ごとの班替えや、次の年度のクラス編成に便利です。
 
 先生方に選ばれる理由

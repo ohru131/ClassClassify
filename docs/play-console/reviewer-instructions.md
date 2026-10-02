@@ -20,7 +20,7 @@ How to test (about 2 minutes):
 3. Go to "Setup & run" and tap "Build classes". The progress bar runs for about 10 seconds.
 4. The "Results" tab shows the classes, the balance tables and any unmet condition.
    Tap a student, then a class button, to move them; the totals update immediately.
-5. "Share results as Excel", "Print" and "Share as PDF" are Pro features (one-time in-app purchase, not a subscription).
+5. Under "Export as a file", "Excel", "PDF" and "Print" are Pro features (one-time in-app purchase, not a subscription).
    Without Pro they open the Pro screen. License testers can buy Pro without being charged.
 
 Importing an Excel file: use "Choose an Excel file (.xlsx)". Sample files are available at
@@ -30,7 +30,7 @@ The app shows no ads and has no account. Privacy policy: https://ohru131.github.
 ```
 
 > ボタン名は英語 UI（`mobile/lib/copy/en.ts`）のもの。審査員の端末が日本語なら「名簿 > サンプルで試す > クラス分け（80名・4組）」
-> 「設定・実行 > クラス編成を実行」「結果 > 結果を Excel で共有・印刷・PDF で共有」になる（`mobile/lib/copy/ja.ts`）。**文言を変えたらここも直す。**
+> 「設定・実行 > クラス編成を実行」「結果 > ファイルで書き出す > Excel・PDF・印刷」になる（`mobile/lib/copy/ja.ts`）。**文言を変えたらここも直す。**
 
 ## Pro を試す（課金せずに）
 
