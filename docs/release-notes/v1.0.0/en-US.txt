@@ -1,0 +1,1 @@
+First test release of FairClass: class placement for teachers. Try the sample roster, build classes, and send us feedback.

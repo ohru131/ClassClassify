@@ -4,6 +4,9 @@ dist
 .DS_Store
 *.tsbuildinfo
 
+# Play へ出す成果物（AAB は公開リポジトリへ置かない。Play Console が全バージョンを保持する）
+/release/
+
 # Play Developer API のサービスアカウント鍵（scripts/push-play-pricing.mjs）。絶対にコミットしない
 play-service-account*.json
 *service-account*.json

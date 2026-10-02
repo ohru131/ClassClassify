@@ -9,7 +9,13 @@
     "preview": "vite preview",
     "test": "vitest run",
     "samples:generate": "tsx scripts/generate-samples.ts",
-    "play:listing": "node scripts/push-play-listing.mjs"
+    "play:listing": "node scripts/push-play-listing.mjs",
+    "release:check": "node scripts/release.mjs check",
+    "release:notes": "node scripts/release.mjs notes",
+    "release:build": "node scripts/release.mjs build",
+    "release:pack": "node scripts/release.mjs pack",
+    "release:upload": "node scripts/release.mjs upload",
+    "release:ship": "node scripts/release.mjs ship"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
