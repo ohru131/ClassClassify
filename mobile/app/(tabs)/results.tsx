@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import { type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, ScrollView, Switch, Text, View } from 'react-native'
+import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, ScrollView, Switch, Text, TextInput, View } from 'react-native'
 
 import { C, classColor } from '@/components/theme'
 import { Btn, Card, Chip, Notice, Screen, Segmented, Stat, styles } from '@/components/ui'
@@ -11,13 +11,15 @@ import { pairStatus, resultWorkbook, rowColor, violationText, type ColumnReport,
 import { clampPage, offsetForPage, pageFromOffset, pageLayout, resolvePagerScroll, stepPage } from '@/lib/class-pager'
 import { canSharePdf } from '@/lib/print'
 import { buildResultPrintHtml } from '@/lib/print-html'
+import { defaultSaveName } from '@/lib/saved-results'
+import { useSavedResults } from '@/lib/saved-results-store'
 import { useProExport } from '@/lib/use-pro-export'
 
 type Tab = 'classes' | 'balance' | 'checks'
 type Focus = { kind: 'wanted' | 'unwanted'; group: number } | null
 
 export default function ResultsScreen() {
-  const { problem, solution, report, edited, moveStudent, resetMoves, error, setError } = useProject()
+  const { problem, solution, report, edited, moveStudent, resetMoves, error, setError, fileName } = useProject()
   const { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, busy, isPro } = useProExport()
   const router = useRouter()
   const { isWide } = useLayout()
@@ -25,6 +27,11 @@ export default function ResultsScreen() {
   const { t, className, fileLang, num } = i18n
   const [tab, setTab] = useState<Tab>('classes')
   const [selected, setSelected] = useState<number | null>(null)
+  // 名前を付けて保存（null = 入力欄を閉じている）
+  const [saveName, setSaveName] = useState<string | null>(null)
+  const [savedName, setSavedName] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const saved = useSavedResults()
 
   if (!problem || !solution || !report)
     return (
@@ -41,6 +48,19 @@ export default function ResultsScreen() {
   const perfect = report.totalExcess === 0
   const sizeGap = Math.max(...report.sizes) - Math.min(...report.sizes)
   const sel = selected !== null && selected < problem.students.length ? selected : null
+  const doSave = async () => {
+    const name = (saveName ?? '').trim() || defaultSaveName(i18n.lang, new Date(), fileName)
+    setSaving(true)
+    try {
+      await saved.save(name, problem, solution.classOf, k)
+      setSaveName(null)
+      setSavedName(name)
+    } catch {
+      setError(t('saveFailed'))
+    } finally {
+      setSaving(false)
+    }
+  }
   const printHtmlFor = () => buildResultPrintHtml({ problem, classOf: solution.classOf, k, report, createdAt: new Date(), i18n })
 
   return (
@@ -68,8 +88,41 @@ export default function ResultsScreen() {
             tone={report.violations.length ? 'bad' : 'good'}
           />
         </View>
+        {savedName ? (
+          <Notice tone="good" onClose={() => setSavedName(null)}>
+            {t('savedDone', { name: savedName })}
+          </Notice>
+        ) : null}
+        {saveName !== null ? (
+          <Card style={{ gap: 8 }}>
+            <Text style={styles.label}>{t('saveNameLabel')}</Text>
+            <TextInput
+              style={styles.input}
+              value={saveName}
+              onChangeText={setSaveName}
+              onSubmitEditing={doSave}
+              returnKeyType="done"
+              autoFocus
+              selectTextOnFocus
+              accessibilityLabel={t('saveNameLabel')}
+            />
+            <View style={styles.row}>
+              <Btn small variant="primary" icon="bookmark" label={t('save')} busy={saving} onPress={doSave} />
+              <Btn small label={t('cancel')} onPress={() => setSaveName(null)} />
+            </View>
+          </Card>
+        ) : null}
         <View style={[styles.row, { flexWrap: 'wrap' }]}>
           {edited ? <Btn small icon="arrow-undo-outline" label={t('undoMoves')} onPress={resetMoves} /> : null}
+          <Btn
+            small
+            icon="bookmark-outline"
+            label={t('saveNamed')}
+            onPress={() => {
+              setSavedName(null)
+              setSaveName(defaultSaveName(i18n.lang, new Date(), fileName))
+            }}
+          />
           <Btn
             small
             variant="primary"

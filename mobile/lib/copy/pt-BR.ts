@@ -197,7 +197,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   dataBody: 'As listas e os resultados ficam salvos só neste aparelho e nunca são enviados para a internet. Ao exportar um Excel ou PDF, você escolhe para onde enviar.',
   clearData: 'Apagar a lista e o resultado deste aparelho',
   clearTitle: 'Apagar lista e resultado',
-  clearBody: 'A lista e o resultado salvos neste aparelho serão apagados. Não é possível desfazer.',
+  clearBody: 'A lista, o resultado e as enturmações salvas neste aparelho serão apagados. Não é possível desfazer.',
   footer: 'FairClass · ajuda para montar turmas (versão web gratuita: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'As compras estão disponíveis no app para iOS ou Android.',
@@ -239,4 +239,24 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   printColMarks: 'Critérios',
   printSummary: 'Resumo e equilíbrio',
   printUnmet: 'Condições não atendidas',
+
+  // 名前を付けて保存・保存した編成・前回とできるだけ入れ替える
+  savedTitle: 'Enturmações salvas',
+  savedEmpty: 'Ainda não há nada salvo. Em Resultado, toque em “Salvar com nome” para guardar uma enturmação aqui.',
+  savedMeta: '{date} · {n} alunos · {k} turmas',
+  openSaved: 'Abrir',
+  deleteSavedTitle: 'Excluir enturmação salva',
+  deleteSavedBody: 'Excluir “{name}” deste aparelho? Não dá para desfazer.',
+  saveNamed: 'Salvar com nome',
+  saveNameLabel: 'Nome',
+  savedDone: 'Salvo como “{name}”. Você pode abrir quando quiser na aba Lista.',
+  saveFailed: 'Não foi possível salvar. Tente de novo.',
+  openFailed: 'Não foi possível abrir esta enturmação.',
+  mixTitle: 'Misturar em relação à última vez',
+  mixHelp: 'Quem esteve na mesma turma da última vez fica em turmas diferentes, na medida do possível.',
+  mixPick: 'Qual foi a enturmação anterior?',
+  mixMatched: 'Encontramos a turma anterior de {m} de {n} alunos.',
+  mixNoSaved: 'Se você salvar uma enturmação com nome em Resultado, poderá escolhê-la aqui da próxima vez.',
+  prevClassColumn: 'Turma anterior',
+  mixFrom: 'Anterior: {name}',
 }

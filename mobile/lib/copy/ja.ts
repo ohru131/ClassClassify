@@ -196,7 +196,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   dataBody: '名簿と編成結果はこの端末の中だけに保存され、どこにも送信されません。書き出した Excel・PDF をどこへ送るかは、共有先をご自身で選べます。',
   clearData: 'この端末の名簿と結果を消去',
   clearTitle: '名簿と結果を消去',
-  clearBody: 'この端末に保存している名簿と編成結果を削除します。元には戻せません。',
+  clearBody: 'この端末に保存している名簿・編成結果・保存した編成をすべて削除します。元には戻せません。',
   footer: 'FairClass · クラス編成のお手伝い（Web 版は無料・https://ohru131.github.io/ClassClassify/）',
 
   purchaseStoreOnly: '購入は iOS / Android のアプリ版でご利用いただけます。',
@@ -238,4 +238,24 @@ export const JA_COPY: Record<CopyKey, string> = {
   printColMarks: '該当',
   printSummary: '集計・バランス',
   printUnmet: '守れなかった指定',
+
+  // 名前を付けて保存・保存した編成・前回とできるだけ入れ替える
+  savedTitle: '保存した編成',
+  savedEmpty: 'まだ保存した編成はありません。結果画面の「名前を付けて保存」で、ここに残せます。',
+  savedMeta: '{date} · {n} 名 · {k} 組',
+  openSaved: '開く',
+  deleteSavedTitle: '保存した編成を削除',
+  deleteSavedBody: '「{name}」をこの端末から削除します。元には戻せません。',
+  saveNamed: '名前を付けて保存',
+  saveNameLabel: '名前',
+  savedDone: '「{name}」として保存しました。「名簿」タブからいつでも開けます。',
+  saveFailed: '保存できませんでした。もう一度お試しください。',
+  openFailed: 'この編成を開けませんでした。',
+  mixTitle: '前回とできるだけ入れ替える',
+  mixHelp: '前回同じ組だった子が、新しい組ではできるだけ別々になるようにします。',
+  mixPick: '前回の編成を選んでください',
+  mixMatched: '{n} 名中 {m} 名の前回の組が分かりました。',
+  mixNoSaved: '結果画面で「名前を付けて保存」しておくと、次回ここで前回の編成として選べます。',
+  prevClassColumn: '前回の組',
+  mixFrom: '前回: {name}',
 }

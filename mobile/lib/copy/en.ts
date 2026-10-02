@@ -197,7 +197,7 @@ export const EN_COPY = {
   dataBody: 'Your rosters and results are saved only on this device and are never uploaded. When you export an Excel file or PDF, you choose where to send it.',
   clearData: 'Erase roster and results on this device',
   clearTitle: 'Erase roster and results',
-  clearBody: 'This deletes the roster and results saved on this device. It cannot be undone.',
+  clearBody: 'This deletes the roster, results and saved placements on this device. It cannot be undone.',
   footer: 'FairClass · class placement helper (free web version: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'Purchases are available in the iOS or Android app.',
@@ -239,6 +239,26 @@ export const EN_COPY = {
   printColMarks: 'Attributes',
   printSummary: 'Summary & balance',
   printUnmet: 'Pairings not met',
+
+  // 名前を付けて保存・保存した編成・前回とできるだけ入れ替える
+  savedTitle: 'Saved placements',
+  savedEmpty: 'Nothing saved yet. On the Results tab, tap “Save with a name” to keep a placement here.',
+  savedMeta: '{date} · {n} students · {k} classes',
+  openSaved: 'Open',
+  deleteSavedTitle: 'Delete saved placement',
+  deleteSavedBody: 'Delete “{name}” from this device? This can’t be undone.',
+  saveNamed: 'Save with a name',
+  saveNameLabel: 'Name',
+  savedDone: 'Saved as “{name}”. You can open it any time from the Roster tab.',
+  saveFailed: 'Couldn’t save. Please try again.',
+  openFailed: 'Couldn’t open this saved placement.',
+  mixTitle: 'Mix up from last time',
+  mixHelp: 'Students who were in the same class last time are spread across the new classes as far as possible.',
+  mixPick: 'Which placement was last time?',
+  mixMatched: 'Found last time’s class for {m} of {n} students.',
+  mixNoSaved: 'Save a placement with a name on the Results tab, and you can choose it here next time.',
+  prevClassColumn: 'Last class',
+  mixFrom: 'Last time: {name}',
 }
 
 export type CopyKey = keyof typeof EN_COPY

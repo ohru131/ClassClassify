@@ -197,7 +197,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   dataBody: '명단과 편성 결과는 이 기기에만 저장되며 어디에도 전송되지 않습니다. 엑셀이나 PDF로 내보낼 때는 보낼 곳을 직접 선택합니다.',
   clearData: '이 기기의 명단과 결과 지우기',
   clearTitle: '명단과 결과 지우기',
-  clearBody: '이 기기에 저장된 명단과 편성 결과를 삭제합니다. 되돌릴 수 없습니다.',
+  clearBody: '이 기기에 저장된 명단, 편성 결과, 저장한 편성을 모두 삭제합니다. 되돌릴 수 없습니다.',
   footer: 'FairClass · 반 편성 도우미(웹 버전 무료: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: '구매는 iOS / Android 앱에서 이용할 수 있습니다.',
@@ -239,4 +239,24 @@ export const KO_COPY: Record<CopyKey, string> = {
   printColMarks: '해당 항목',
   printSummary: '집계·균형',
   printUnmet: '충족하지 못한 조건',
+
+  // 名前を付けて保存・保存した編成・前回とできるだけ入れ替える
+  savedTitle: '저장한 편성',
+  savedEmpty: '아직 저장한 편성이 없습니다. 결과 화면의 "이름을 붙여 저장"으로 여기에 남길 수 있습니다.',
+  savedMeta: '{date} · {n}명 · {k}개 반',
+  openSaved: '열기',
+  deleteSavedTitle: '저장한 편성 삭제',
+  deleteSavedBody: '"{name}"을(를) 이 기기에서 삭제합니다. 되돌릴 수 없습니다.',
+  saveNamed: '이름을 붙여 저장',
+  saveNameLabel: '이름',
+  savedDone: '"{name}"(으)로 저장했습니다. 명단 탭에서 언제든지 열 수 있습니다.',
+  saveFailed: '저장하지 못했습니다. 다시 시도하십시오.',
+  openFailed: '이 편성을 열지 못했습니다.',
+  mixTitle: '지난번과 최대한 섞기',
+  mixHelp: '지난번에 같은 반이었던 학생들이 새 반에서는 최대한 흩어지도록 합니다.',
+  mixPick: '지난번 편성을 선택하십시오',
+  mixMatched: '{n}명 중 {m}명의 지난번 반을 찾았습니다.',
+  mixNoSaved: '결과 화면에서 이름을 붙여 저장해 두면, 다음에 여기에서 지난번 편성으로 선택할 수 있습니다.',
+  prevClassColumn: '지난번 반',
+  mixFrom: '지난번: {name}',
 }

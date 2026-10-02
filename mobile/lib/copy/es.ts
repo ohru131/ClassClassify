@@ -197,7 +197,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   dataBody: 'Las listas y los resultados se guardan solo en este dispositivo y nunca se suben a internet. Cuando exportas un Excel o un PDF, tú eliges a dónde enviarlo.',
   clearData: 'Borrar la lista y los resultados de este dispositivo',
   clearTitle: 'Borrar lista y resultados',
-  clearBody: 'Se eliminarán la lista y los resultados guardados en este dispositivo. No se puede deshacer.',
+  clearBody: 'Se eliminarán la lista, los resultados y las distribuciones guardadas en este dispositivo. No se puede deshacer.',
   footer: 'FairClass · ayuda para armar grupos (versión web gratuita: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'Las compras están disponibles en la app de iOS o Android.',
@@ -239,4 +239,24 @@ export const ES_COPY: Record<CopyKey, string> = {
   printColMarks: 'Criterios',
   printSummary: 'Resumen y equilibrio',
   printUnmet: 'Condiciones no cumplidas',
+
+  // 名前を付けて保存・保存した編成・前回とできるだけ入れ替える
+  savedTitle: 'Distribuciones guardadas',
+  savedEmpty: 'Todavía no hay nada guardado. En Resultados, toca “Guardar con nombre” para conservar una distribución aquí.',
+  savedMeta: '{date} · {n} estudiantes · {k} grupos',
+  openSaved: 'Abrir',
+  deleteSavedTitle: 'Eliminar distribución guardada',
+  deleteSavedBody: '¿Eliminar “{name}” de este dispositivo? No se puede deshacer.',
+  saveNamed: 'Guardar con nombre',
+  saveNameLabel: 'Nombre',
+  savedDone: 'Se guardó como “{name}”. Puedes abrirla cuando quieras desde la pestaña Lista.',
+  saveFailed: 'No se pudo guardar. Inténtalo de nuevo.',
+  openFailed: 'No se pudo abrir esta distribución.',
+  mixTitle: 'Mezclar respecto a la vez anterior',
+  mixHelp: 'Quienes estuvieron en el mismo grupo la vez anterior quedan en grupos distintos, en la medida de lo posible.',
+  mixPick: '¿Cuál fue la distribución anterior?',
+  mixMatched: 'Se encontró el grupo anterior de {m} de {n} estudiantes.',
+  mixNoSaved: 'Si guardas una distribución con nombre en Resultados, la próxima vez podrás elegirla aquí.',
+  prevClassColumn: 'Grupo anterior',
+  mixFrom: 'Anterior: {name}',
 }

@@ -5,6 +5,7 @@ import { ActivityIndicator, Text, View } from 'react-native'
 import { ColumnEditor } from '@/components/column-editor'
 import { GroupEditor } from '@/components/group-editor'
 import { LoadPanel } from '@/components/load-panel'
+import { SavedList } from '@/components/saved-list'
 import { StudentList } from '@/components/student-list'
 import { C } from '@/components/theme'
 import { Btn, Card, Notice, Screen, Segmented, styles } from '@/components/ui'
@@ -50,6 +51,7 @@ export default function RosterScreen() {
               setTab('students')
             }}
           />
+          <SavedList onOpened={() => setShowLoad(false)} />
           {problem ? <Btn label={t('backToRoster')} onPress={() => setShowLoad(false)} /> : null}
         </>
       ) : (

@@ -8,6 +8,7 @@ import { APP_LANGUAGES, LANGUAGE_META } from '@/lib/i18n'
 import { useI18n } from '@/lib/language-provider'
 import { useProject } from '@/lib/project-store'
 import { usePro } from '@/lib/revenuecat-provider'
+import { useSavedResults } from '@/lib/saved-results-store'
 
 const FEATURES = [
   ['feat1Title', 'feat1Body'],
@@ -18,6 +19,7 @@ const FEATURES = [
 export default function ProScreen() {
   const { isPro, isReady, purchaseMessage, priceLabel, isPurchasing, purchasePro, restorePurchases, isNativePurchaseAvailable } = usePro()
   const { problem, clearProject } = useProject()
+  const saved = useSavedResults()
   const { t, choice, setChoice } = useI18n()
   const router = useRouter()
 
@@ -80,9 +82,12 @@ export default function ProScreen() {
             variant="danger"
             icon="trash-outline"
             label={t('clearData')}
-            disabled={!problem}
+            disabled={!problem && saved.list.length === 0}
             onPress={async () => {
-              if (await confirmAction(t('clearTitle'), t('clearBody'), t('erase'), t('cancel'))) clearProject()
+              if (await confirmAction(t('clearTitle'), t('clearBody'), t('erase'), t('cancel'))) {
+                clearProject()
+                void saved.removeAll().catch(() => undefined)
+              }
             }}
           />
         </View>

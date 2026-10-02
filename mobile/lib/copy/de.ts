@@ -197,7 +197,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   dataBody: 'Schülerlisten und Ergebnisse bleiben auf diesem Gerät und werden nirgendwohin hochgeladen. Beim Export als Excel oder PDF entscheiden Sie selbst, wohin die Datei geht.',
   clearData: 'Liste und Ergebnis auf diesem Gerät löschen',
   clearTitle: 'Liste und Ergebnis löschen',
-  clearBody: 'Die auf diesem Gerät gespeicherte Liste und Einteilung werden gelöscht. Das lässt sich nicht rückgängig machen.',
+  clearBody: 'Die Liste, die Einteilung und die gespeicherten Einteilungen auf diesem Gerät werden gelöscht. Das lässt sich nicht rückgängig machen.',
   footer: 'FairClass · Hilfe bei der Klasseneinteilung (kostenlose Webversion: https://ohru131.github.io/ClassClassify/)',
 
   purchaseStoreOnly: 'Käufe sind in der iOS- oder Android-App möglich.',
@@ -239,4 +239,24 @@ export const DE_COPY: Record<CopyKey, string> = {
   printColMarks: 'Merkmale',
   printSummary: 'Auswertung',
   printUnmet: 'Nicht erfüllte Wünsche',
+
+  // 名前を付けて保存・保存した編成・前回とできるだけ入れ替える
+  savedTitle: 'Gespeicherte Einteilungen',
+  savedEmpty: 'Noch nichts gespeichert. Unter „Ergebnis“ können Sie eine Einteilung mit „Unter Namen speichern“ hier ablegen.',
+  savedMeta: '{date} · {n} Schüler · {k} Klassen',
+  openSaved: 'Öffnen',
+  deleteSavedTitle: 'Gespeicherte Einteilung löschen',
+  deleteSavedBody: '„{name}“ von diesem Gerät löschen? Das lässt sich nicht rückgängig machen.',
+  saveNamed: 'Unter Namen speichern',
+  saveNameLabel: 'Name',
+  savedDone: 'Als „{name}“ gespeichert. Sie können die Einteilung jederzeit unter „Liste“ öffnen.',
+  saveFailed: 'Speichern hat nicht geklappt. Bitte versuchen Sie es erneut.',
+  openFailed: 'Diese Einteilung ließ sich nicht öffnen.',
+  mixTitle: 'Gegenüber letztem Mal neu mischen',
+  mixHelp: 'Wer letztes Mal in derselben Klasse war, wird so weit wie möglich auf verschiedene neue Klassen verteilt.',
+  mixPick: 'Welche Einteilung war die letzte?',
+  mixMatched: 'Für {m} von {n} Schülerinnen und Schülern wurde die letzte Klasse gefunden.',
+  mixNoSaved: 'Wenn Sie unter „Ergebnis“ eine Einteilung unter einem Namen speichern, können Sie sie beim nächsten Mal hier auswählen.',
+  prevClassColumn: 'Letzte Klasse',
+  mixFrom: 'Zuletzt: {name}',
 }
