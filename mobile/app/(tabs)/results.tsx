@@ -207,7 +207,14 @@ export default function ResultsScreen() {
                     ]}
                   />
                 ) : null}
-                <Btn small icon="print-outline" label={canSharePdf ? t('print') : t('printPdf')} busy={busy === 'print'} onPress={() => print(printHtmlFor)} />
+                <Btn
+                  small
+                  icon="print-outline"
+                  label={canSharePdf ? t('print') : t('printPdf')}
+                  accessibilityLabel={isPro ? undefined : `${canSharePdf ? t('print') : t('printPdf')} (Pro)`}
+                  busy={busy === 'print'}
+                  onPress={() => print(printHtmlFor)}
+                />
               </View>
             </View>
             {!isPro ? <Text style={hintText}>{t('exportProNote')}</Text> : null}

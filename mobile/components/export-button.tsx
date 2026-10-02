@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useState } from 'react'
 import { Modal, Pressable, Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
@@ -34,17 +35,29 @@ export function ExportButton({
   const { t } = useI18n()
   const { isWide } = useLayout()
   const [open, setOpen] = useState(false)
+  // Modal は端から端まで描かれる（edge-to-edge）。下のナビゲーションバーにキャンセルが隠れないようにする
+  const insets = useSafeAreaInsets()
   const pick = (c: ExportChoice) => {
     setOpen(false)
     c.onPress()
   }
   return (
     <>
-      <Btn small variant={variant} icon={icon} label={label} busy={busy} onPress={() => (!isPro || choices.length === 1 ? choices[0].onPress() : setOpen(true))} />
+      <Btn
+        small
+        variant={variant}
+        icon={icon}
+        label={label}
+        // Pro でないときは押すと Pro の画面へ移ることを読み上げでも伝える
+        accessibilityLabel={isPro ? undefined : `${label} (Pro)`}
+        busy={busy}
+        onPress={() => (!isPro || choices.length === 1 ? choices[0].onPress() : setOpen(true))}
+      />
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        {/* 背景を押しても閉じる。読み上げでは画面全体のボタンにせず、下のキャンセルと戻る操作で閉じる */}
         <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('cancel')}
+          accessible={false}
+          importantForAccessibility="no"
           onPress={() => setOpen(false)}
           style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.4)', justifyContent: isWide ? 'center' : 'flex-end', alignItems: 'center', padding: isWide ? 24 : 0 }}
         >
@@ -60,7 +73,7 @@ export function ExportButton({
               borderBottomLeftRadius: isWide ? 18 : 0,
               borderBottomRightRadius: isWide ? 18 : 0,
               padding: 16,
-              paddingBottom: isWide ? 16 : 28,
+              paddingBottom: isWide ? 16 : 16 + insets.bottom,
               gap: 10,
             }}
           >
