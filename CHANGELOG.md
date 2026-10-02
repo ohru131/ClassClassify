@@ -6,6 +6,13 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-02
+
+- 編成の結果に名前を付けて端末に保存し、名簿タブの一覧から開く・削除できるようにした。無料版は3件まで、Pro は無制限。
+- 「前回とできるだけ入れ替える」を追加。保存した前回の編成を選ぶと、前回同じ組だった子が新しい組ではできるだけ別々になる。
+- 画面の文言を先生向けのやわらかい言い回しに改め、英・韓・西・独・葡の画面から技術用語を外した。
+- 編成し直したあとも前回の「保存しました」の案内が残り、新しい結果まで保存済みに見えていたのを直した。
+
 ## [1.0.0] - 2026-10-02
 
 - 初回リリース（Google Play クローズドテスト）。教員向けのクラス編成ツール（Android）。サンプル名簿・Excel の読み込み・クラス編成・結果の手直しに対応する。
@@ -13,5 +20,6 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 - 結果の Excel 書き出し・印刷・PDF 共有は Pro（買い切り）で提供する。
 - 日本語・英語・ドイツ語・スペイン語・韓国語・ポルトガル語に対応する。
 
-[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ohru131/ClassClassify/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ohru131/ClassClassify/releases/tag/v1.0.0

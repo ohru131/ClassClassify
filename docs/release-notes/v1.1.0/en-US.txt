@@ -1,0 +1,3 @@
+- Save class placements under a name and reopen them anytime from the Roster tab (up to 3 on the free version, unlimited with Pro).
+- New: "Mix up from last time". Pick a saved placement, and students who were in the same class last time are spread across different classes as much as possible.
+- Clearer, friendlier wording throughout the app.
