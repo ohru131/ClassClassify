@@ -33,12 +33,12 @@ const SAFE_WIDTH = 820
 
 // headline: 何をするアプリか / sub: 誰のための・何が違うか（端末内・広告なし）
 export const LOCALES = {
-  ja: { font: 'ja', headline: 'クラス分けを、<br>偏りなく数秒で。', sub: '男女・学力・支援の必要な子を各クラスに均等に。<br>名簿は端末の中だけ。広告なし。' },
-  en: { headline: 'Balanced class lists<br>in seconds.', sub: 'Gender, academics, support needs — spread evenly.<br>Student data stays on your device. No ads.' },
-  ko: { font: 'ko', headline: '반 편성을<br>몇 초 만에 고르게.', sub: '성별·학업·지원이 필요한 학생을 반마다 고르게.<br>명단은 기기 안에만. 광고 없음.' },
-  es: { headline: 'Grupos equilibrados<br>en segundos.', sub: 'Género, desempeño y apoyos, repartidos por igual.<br>Los datos no salen del dispositivo. Sin anuncios.' },
-  de: { headline: 'Ausgewogene Klassen<br>in Sekunden.', sub: 'Geschlecht, Leistung, Förderbedarf – gleichmäßig verteilt.<br>Alle Daten bleiben auf dem Gerät. Ohne Werbung.' },
-  'pt-BR': { headline: 'Turmas equilibradas<br>em segundos.', sub: 'Gênero, desempenho e apoio distribuídos por igual.<br>Os dados não saem do aparelho. Sem anúncios.' },
+  ja: { font: 'ja', headline: '3月のクラス編成を、<br>もっと気軽に。', sub: '男女・学力・支援の必要な子を各クラスに均等に。<br>名簿は端末の中だけ。登録も広告もなし。' },
+  en: { headline: 'Balanced class lists,<br>without the stress.', sub: 'Academics, support needs, friendships — all in balance.<br>Student data stays with you. No sign-up, no ads.' },
+  ko: { font: 'ko', headline: '2월 반 편성,<br>이제 한결 가볍게.', sub: '성별·학업·지원이 필요한 학생을 반마다 고르게.<br>명단은 기기 안에만. 가입·광고 없음.' },
+  es: { headline: 'Grupos equilibrados<br>para el nuevo ciclo.', sub: 'Desempeño, apoyos y amistades, repartidos con cuidado.<br>Los datos no salen del dispositivo. Sin registro.' },
+  de: { headline: 'Klassen fair<br>einteilen.', sub: 'Leistung, Förderbedarf, Freundschaften – gut verteilt.<br>Alle Daten bleiben auf dem Gerät. Ohne Konto.' },
+  'pt-BR': { headline: 'Turmas equilibradas<br>para o ano letivo.', sub: 'Desempenho, apoio e amizades, distribuídos com cuidado.<br>Os dados não saem do aparelho. Sem cadastro.' },
 }
 
 const FONT_STACK = {
