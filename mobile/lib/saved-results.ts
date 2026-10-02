@@ -1,3 +1,4 @@
+import { COPY } from './copy'
 import type { AppLanguage } from './i18n'
 import { LANGUAGE_META } from './i18n'
 import type { ColumnSpec, Problem } from './solver'
@@ -87,6 +88,13 @@ export function previousClassValues(current: Problem, saved: SavedResult, classN
   })
   return { values, matched }
 }
+
+/**
+ * 名簿にある「前回の組」の列（どの言語で入れたものでも見つける）。表示の言語を切り替えたあとに
+ * 別の名前でもう1本入れたり、古い列を残したまま有効にしたりしないように。
+ */
+const PREVIOUS_CLASS_NAMES = new Set(Object.values(COPY).map((c) => c.prevClassColumn))
+export const findPreviousClassColumn = (p: Problem): ColumnSpec | undefined => p.columns.find((c) => PREVIOUS_CLASS_NAMES.has(c.name))
 
 /** 「前回の組」の重み（他の項目より優先して散らす） */
 export const PREVIOUS_CLASS_WEIGHT = 2

@@ -5,6 +5,7 @@ import { loadSample } from '../lib/samples'
 import {
   canSaveMore,
   defaultSaveName,
+  findPreviousClassColumn,
   FREE_SAVE_LIMIT,
   isSavedMetaList,
   isSavedResult,
@@ -80,6 +81,10 @@ describe('保存した編成', () => {
     expect(p.students[5].values['前回の組']).toBe(ja.className(1))
     // 入れ直しても列は1本のまま
     expect(withPreviousClass(p, '前回の組', values, order).columns.filter((c) => c.name === '前回の組')).toHaveLength(1)
+    // 日本語で入れたあと英語表示に切り替えても、同じ列として見つかる
+    expect(findPreviousClassColumn(p)?.name).toBe('前回の組')
+    expect(findPreviousClassColumn(withPreviousClass(problem, 'Last class', values, order))?.name).toBe('Last class')
+    expect(findPreviousClassColumn(problem)).toBeUndefined()
     expect(setColumnEnabled(p, '前回の組', false).columns.find((c) => c.name === '前回の組')!.enabled).toBe(false)
   })
 

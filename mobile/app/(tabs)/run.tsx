@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { defaultStarts } from '@/lib/runner'
-import { previousClassValues, setColumnEnabled, withPreviousClass } from '@/lib/saved-results'
+import { findPreviousClassColumn, previousClassValues, setColumnEnabled, withPreviousClass } from '@/lib/saved-results'
 import { useSavedResults } from '@/lib/saved-results-store'
 
 export default function RunScreen() {
@@ -47,11 +47,14 @@ export default function RunScreen() {
   const enabled = problem.columns.filter((c) => c.enabled && c.weight > 0)
   const starts = defaultStarts(timeSec * 1000)
 
-  const prevCol = t('prevClassColumn')
-  const prev = problem.columns.find((c) => c.name === prevCol)
+  // 既にある列はその名前のまま使う（入れたあとで表示の言語を変えても同じ列を扱う）
+  const prev = findPreviousClassColumn(problem)
+  const prevCol = prev?.name ?? t('prevClassColumn')
   const mixOn = !!prev && prev.enabled
   // 保存した編成から各生徒の前回の組を名簿に入れ、その列を均等に散らす（前回同じ組だった子が重ならないように）
   const applyFrom = async (id: string) => {
+    // 編成中に名簿を変えると、終わった結果が捨てられる
+    if (running) return
     try {
       const s = await saved.load(id)
       if (!s) {
@@ -71,6 +74,7 @@ export default function RunScreen() {
     }
   }
   const toggleMix = (on: boolean) => {
+    if (running) return
     if (!on) modifyProblem((p) => setColumnEnabled(p, prevCol, false))
     else if (prev) modifyProblem((p) => setColumnEnabled(p, prevCol, true))
     else if (saved.list[0]) void applyFrom(saved.list[0].id)
@@ -142,7 +146,7 @@ export default function RunScreen() {
       <Card style={{ gap: 8 }}>
         <View style={[styles.row, { justifyContent: 'space-between' }]}>
           <Text style={{ fontSize: 16, fontWeight: '800', color: C.text, flexShrink: 1 }}>{t('mixTitle')}</Text>
-          <Switch value={mixOn} onValueChange={toggleMix} disabled={!prev && saved.list.length === 0} accessibilityLabel={t('mixTitle')} />
+          <Switch value={mixOn} onValueChange={toggleMix} disabled={running || (!prev && saved.list.length === 0)} accessibilityLabel={t('mixTitle')} />
         </View>
         <Text style={{ fontSize: 13, color: C.sub, lineHeight: 19 }}>{t('mixHelp')}</Text>
         {!prev && saved.list.length === 0 ? <Text style={{ fontSize: 12, color: C.muted }}>{t('mixNoSaved')}</Text> : null}

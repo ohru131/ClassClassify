@@ -31,6 +31,8 @@ export default function ResultsScreen() {
   const [saveName, setSaveName] = useState<string | null>(null)
   const [savedName, setSavedName] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  // 二度押し対策（Enter と保存ボタンが続けて届いても1件だけ保存する。saving は再描画後にしか効かない）
+  const savingRef = useRef(false)
   // 無料版の保存件数の上限に達したときの案内
   const [limitHit, setLimitHit] = useState(false)
   const saved = useSavedResults()
@@ -51,12 +53,14 @@ export default function ResultsScreen() {
   const sizeGap = Math.max(...report.sizes) - Math.min(...report.sizes)
   const sel = selected !== null && selected < problem.students.length ? selected : null
   const doSave = async () => {
+    if (savingRef.current) return
     if (!canSaveMore(isPro, saved.list.length)) {
       setSaveName(null)
       setLimitHit(true)
       return
     }
     const name = (saveName ?? '').trim() || defaultSaveName(i18n.lang, new Date(), fileName)
+    savingRef.current = true
     setSaving(true)
     try {
       await saved.save(name, problem, solution.classOf, k)
@@ -65,6 +69,7 @@ export default function ResultsScreen() {
     } catch {
       setError(t('saveFailed'))
     } finally {
+      savingRef.current = false
       setSaving(false)
     }
   }
