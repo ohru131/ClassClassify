@@ -11,15 +11,15 @@
 
 | Play のロケール | アプリ名 | 短い説明 | 詳しい説明 |
 |---|---|---|---|
-| en-US | 26 | 79 | 3180 |
-| en-AU | 26 | 80 | 3137 |
-| en-GB | 25 | 80 | 3059 |
-| ko-KR | 14 | 67 | 1565 |
-| es-419 | 23 | 80 | 3332 |
-| es-ES | 28 | 80 | 3443 |
-| de-DE | 27 | 80 | 3783 |
-| pt-BR | 24 | 76 | 3276 |
-| ja-JP | 22 | 60 | 1369 |
+| en-US | 26 | 79 | 3175 |
+| en-AU | 26 | 80 | 3132 |
+| en-GB | 25 | 80 | 3054 |
+| ko-KR | 14 | 67 | 1561 |
+| es-419 | 23 | 80 | 3331 |
+| es-ES | 28 | 80 | 3442 |
+| de-DE | 27 | 80 | 3782 |
+| pt-BR | 24 | 76 | 3274 |
+| ja-JP | 22 | 60 | 1367 |
 
 ## en-US（英語・米国）
 
@@ -41,7 +41,7 @@ FairClass: Class Placement
 Balanced classes and groups in seconds, all year. Free, no sign-up, no uploads.
 ```
 
-### 詳しい説明（3180字 / 4000）
+### 詳しい説明（3175字 / 4000）
 
 ```
 Every spring, the same puzzle: next year's class lists. You want a fair mix of boys and girls and of reading and math levels in every room, students with IEPs, 504 plans and English learners spread thoughtfully, and the parent requests and "please don't put these two together" notes all remembered. FairClass gives you a balanced first draft in seconds, so your team can spend the meeting talking about kids instead of shuffling sticky notes. Every final decision stays with you.
@@ -96,7 +96,7 @@ FairClass: Class Placement
 Classes and groups, balanced in seconds, all year. Free, no sign-up, data local.
 ```
 
-### 詳しい説明（3137字 / 4000）
+### 詳しい説明（3132字 / 4000）
 
 ```
 Term 4 means class placements. Before the new school year starts in late January or February, you're juggling an even spread of girls and boys, learning levels and behaviour, students on the NCCD or with adjustments in place, EAL/D learners, and the friendship requests from families. FairClass gives you a balanced first draft of next year's classes in seconds, so the planning meeting can focus on the kids, not the sticky notes. Every final decision stays with you.
@@ -151,7 +151,7 @@ FairClass: Mixing Classes
 Mix classes and groups fairly, all year. Free, no sign-up, data stays on device.
 ```
 
-### 詳しい説明（3059字 / 4000）
+### 詳しい説明（3054字 / 4000）
 
 ```
 Mixing classes is one of the trickiest jobs of the summer term, especially in a two- or three-form entry school. Before transition you're weighing up girls and boys, attainment, behaviour, pupils with SEND or an EHCP, EAL learners, and the friendship groups parents ask about. FairClass gives you a balanced first draft of the new class lists in seconds, so your Year group team can spend the meeting talking about the children, not shuffling sticky notes. Every final decision stays with you.
@@ -205,7 +205,7 @@ FairClass 반 편성
 2월 반 편성부터 수업 모둠 편성까지. 남녀·학업·지원 필요 학생을 고르게, 분리 배정도 최대한 반영합니다. 가입 없음.
 ```
 
-### 詳しい説明（1565字 / 4000）
+### 詳しい説明（1561字 / 4000）
 
 ```
 매년 2월이면 담임 선생님들이 모여 다음 학년 반 편성을 준비합니다. 남녀 비율, 학업 성취도, 도움이 필요한 학생, 출신 학교, 같은 반이 되면 안 되는 학생까지 하나하나 맞추다 보면 며칠이 금방 지나갑니다. FairClass는 고르게 나눈 반 편성안을 몇 초 만에 만들어 드립니다. 최종 결정은 언제나 선생님께서 내리십니다.
@@ -260,7 +260,7 @@ FairClass: armar grupos
 Arma grupos y equipos equilibrados todo el ciclo escolar. Gratis y sin registro.
 ```
 
-### 詳しい説明（3332字 / 4000）
+### 詳しい説明（3331字 / 4000）
 
 ```
 Sea en febrero, en marzo o en agosto, antes del inicio del ciclo escolar hay que armar los grupos: que queden parejos en niñas y niños y en desempeño, que los estudiantes con NEE estén bien repartidos, que los amigos que se apoyan sigan juntos y que algunos compañeros no coincidan. Hacerlo a mano, con listas y papelitos, puede llevar días. FairClass te propone una distribución de estudiantes en grupos en segundos, y la última palabra siempre es tuya.
@@ -314,7 +314,7 @@ FairClass: reparto en grupos
 Reparte al alumnado en grupos equilibrados todo el curso. Gratis y sin registro.
 ```
 
-### 詳しい説明（3443字 / 4000）
+### 詳しい説明（3442字 / 4000）
 
 ```
 Al terminar el curso, o justo antes de que empiece el siguiente en septiembre, toca hacer los grupos siguiendo los criterios de agrupamiento del alumnado del centro: equilibrio entre niñas y niños, un desempeño equilibrado entre los grupos, el alumnado con NEAE repartido de forma justa y las incompatibilidades que conoce el equipo docente. Con papel, pósits y hojas de cálculo se van tardes enteras. FairClass hace ese reparto en grupos en segundos, y la última palabra la tiene siempre el profesorado.
@@ -368,7 +368,7 @@ FairClass Klasseneinteilung
 Klassen und Gruppen fair einteilen, das ganze Jahr. Daten bleiben auf dem Gerät.
 ```
 
-### 詳しい説明（3783字 / 4000）
+### 詳しい説明（3782字 / 4000）
 
 ```
 Alle Daten bleiben auf dem Gerät. Keine Cloud, kein Konto, keine Registrierung: Die Schülerliste verlässt Ihr Smartphone, Tablet oder Chromebook nicht – auch die Klasseneinteilung selbst entsteht direkt dort.
@@ -425,7 +425,7 @@ FairClass: montar turmas
 Monte turmas e grupos equilibrados o ano letivo todo. Grátis e sem cadastro.
 ```
 
-### 詳しい説明（3276字 / 4000）
+### 詳しい説明（3274字 / 4000）
 
 ```
 Todo ano é a mesma coisa: antes do início do ano letivo, em fevereiro, é preciso montar as turmas. Equilibrar meninas e meninos, desempenho e comportamento, distribuir com cuidado os alunos com deficiência ou atendidos pelo AEE, manter juntos os amigos que se apoiam e separar quem não deve ficar junto. Fazer a enturmação à mão, com listas e papeizinhos, leva dias. O FairClass faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
@@ -479,7 +479,7 @@ FairClass（フェアクラス）クラス編成
 クラス編成にも、授業の班分けにも。男女・学力・支援の必要な子を均等に。一年中使えて、名簿は端末の中だけ、登録も不要です。
 ```
 
-### 詳しい説明（1369字 / 4000）
+### 詳しい説明（1367字 / 4000）
 
 ```
 3月、新年度に向けたクラス編成、本当におつかれさまです。男女比、学力、支援の必要な子、同じクラスにしたい子・離したい子……いくつもの条件を見比べながら、名前カードや付箋を何度も並べ替える。学年会で何日もかかることも珍しくありません。

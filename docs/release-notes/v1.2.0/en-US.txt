@@ -1,0 +1,3 @@
+- The results screen is now split into "Keep this placement" (free "Save in app") and "Export as a file" (Excel, PDF and Print with Pro).
+- After tapping Excel or PDF, choose "Share" or "Save as a file". PDFs can now be saved to Google Drive or a folder on your device, too.
+- You now see a confirmation when a file has been saved.

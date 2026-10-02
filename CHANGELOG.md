@@ -6,6 +6,8 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-02
+
 - 結果画面の保存と書き出しを分けた。「この編成を残す」（無料の「アプリに保存」）と「ファイルで書き出す」（Pro の Excel・PDF・印刷）を別のまとまりにし、共有するかファイルに保存するかは Excel・PDF を押したあとに選ぶ。PDF もドライブ等へ保存できるようにした。
 - Excel・PDF をファイルに保存したとき、保存先の画面が閉じるだけで保存できたか分からなかったので「ファイルを保存しました。」と知らせるようにした。PDF の送り先に「Excel などのアプリに送ります」と出ていたのを直した。
 
@@ -23,6 +25,7 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 - 結果の Excel 書き出し・印刷・PDF 共有は Pro（買い切り）で提供する。
 - 日本語・英語・ドイツ語・スペイン語・韓国語・ポルトガル語に対応する。
 
-[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ohru131/ClassClassify/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/ohru131/ClassClassify/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ohru131/ClassClassify/releases/tag/v1.0.0
