@@ -17,7 +17,7 @@ export const PT_BR_COPY: Record<WebCopyKey, string> = {
   heroTitle2a: 'turmas equilibradas',
   heroTitle2b: 'em segundos.',
   heroDesc:
-    'O FairClass distribui gênero, desempenho, necessidades de apoio e outros critérios de forma equilibrada entre as turmas. Também leva em conta quem manter juntos ou separar, e você pode ajustar o resultado na hora.',
+    'O FairClass distribui gênero, desempenho, necessidades de apoio e outros critérios de forma equilibrada entre as turmas. Também leva em conta quem manter juntos ou separar, e você pode ajustar o resultado na hora. E não é só no começo do ano: use o ano todo para montar grupos de trabalho, grupos de mesa ou grupos para passeios.',
   heroLocal: 'Os dados ficam só no seu navegador',
   heroFree: 'Sem cadastro nem conta, totalmente grátis',
   warningsTitle: 'Avisos ao carregar',

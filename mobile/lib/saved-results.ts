@@ -108,4 +108,9 @@ export function setColumnEnabled(p: Problem, column: string, enabled: boolean): 
   return { ...p, columns: p.columns.map((c) => (c.name === column ? { ...c, enabled } : c)) }
 }
 
+/** 無料版で保存しておける件数（Pro は無制限）。開く・削除・「前回の組」に使うのは件数に関係なく無料 */
+export const FREE_SAVE_LIMIT = 3
+
+export const canSaveMore = (isPro: boolean, count: number) => isPro || count < FREE_SAVE_LIMIT
+
 export const newSavedId = (d: Date) => `${d.getTime().toString(36)}${Math.random().toString(36).slice(2, 8)}`

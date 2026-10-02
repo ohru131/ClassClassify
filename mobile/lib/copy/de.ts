@@ -259,4 +259,10 @@ export const DE_COPY: Record<CopyKey, string> = {
   mixNoSaved: 'Wenn Sie unter „Ergebnis“ eine Einteilung unter einem Namen speichern, können Sie sie beim nächsten Mal hier auswählen.',
   prevClassColumn: 'Letzte Klasse',
   mixFrom: 'Zuletzt: {name}',
+  featSaveTitle: 'Unbegrenzt Einteilungen speichern',
+  featSaveBody: 'In der kostenlosen Version sind bis zu 3 möglich. Mit Pro bewahren Sie alle Klassen- und Gruppeneinteilungen auf, öffnen sie jederzeit und nutzen sie zum Neu-Mischen gegenüber dem letzten Mal.',
+  saveLimitReached: 'In der kostenlosen Version können Sie bis zu {max} Einteilungen speichern. Löschen Sie eine ältere oder speichern Sie mit Pro unbegrenzt.',
+  savedCount: '{n} von {max} gespeichert (kostenlose Version)',
+  manageSaved: 'Gespeicherte Einteilungen',
+  seePro: 'Pro ansehen',
 }

@@ -5,6 +5,8 @@ import { Text, View } from 'react-native'
 import { confirmAction } from '@/lib/confirm'
 import { useI18n } from '@/lib/language-provider'
 import { useProject } from '@/lib/project-store'
+import { usePro } from '@/lib/revenuecat-provider'
+import { FREE_SAVE_LIMIT } from '@/lib/saved-results'
 import { useSavedResults } from '@/lib/saved-results-store'
 import { C } from './theme'
 import { Btn, Card, styles, Title } from './ui'
@@ -14,6 +16,7 @@ export function SavedList({ onOpened }: { onOpened?: () => void }) {
   const { list, load, remove } = useSavedResults()
   const { openSaved, setError } = useProject()
   const { t, date } = useI18n()
+  const { isPro } = usePro()
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
 
@@ -38,7 +41,7 @@ export function SavedList({ onOpened }: { onOpened?: () => void }) {
 
   return (
     <Card style={{ gap: 10 }}>
-      <Title>{t('savedTitle')}</Title>
+      <Title sub={isPro ? undefined : t('savedCount', { n: list.length, max: FREE_SAVE_LIMIT })}>{t('savedTitle')}</Title>
       {list.length === 0 ? <Text style={{ fontSize: 13, color: C.muted, lineHeight: 19 }}>{t('savedEmpty')}</Text> : null}
       {list.map((m) => (
         <View key={m.id} style={[styles.row, { justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: C.border, paddingTop: 10 }]}>

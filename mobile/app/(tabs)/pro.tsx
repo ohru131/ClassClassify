@@ -13,6 +13,7 @@ import { useSavedResults } from '@/lib/saved-results-store'
 const FEATURES = [
   ['feat1Title', 'feat1Body'],
   ['feat2Title', 'feat2Body'],
+  ['featSaveTitle', 'featSaveBody'],
   ['feat3Title', 'feat3Body'],
 ] as const
 

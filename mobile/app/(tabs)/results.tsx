@@ -11,7 +11,7 @@ import { pairStatus, resultWorkbook, rowColor, violationText, type ColumnReport,
 import { clampPage, offsetForPage, pageFromOffset, pageLayout, resolvePagerScroll, stepPage } from '@/lib/class-pager'
 import { canSharePdf } from '@/lib/print'
 import { buildResultPrintHtml } from '@/lib/print-html'
-import { defaultSaveName } from '@/lib/saved-results'
+import { canSaveMore, defaultSaveName, FREE_SAVE_LIMIT } from '@/lib/saved-results'
 import { useSavedResults } from '@/lib/saved-results-store'
 import { useProExport } from '@/lib/use-pro-export'
 
@@ -31,6 +31,8 @@ export default function ResultsScreen() {
   const [saveName, setSaveName] = useState<string | null>(null)
   const [savedName, setSavedName] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  // 無料版の保存件数の上限に達したときの案内
+  const [limitHit, setLimitHit] = useState(false)
   const saved = useSavedResults()
 
   if (!problem || !solution || !report)
@@ -49,6 +51,11 @@ export default function ResultsScreen() {
   const sizeGap = Math.max(...report.sizes) - Math.min(...report.sizes)
   const sel = selected !== null && selected < problem.students.length ? selected : null
   const doSave = async () => {
+    if (!canSaveMore(isPro, saved.list.length)) {
+      setSaveName(null)
+      setLimitHit(true)
+      return
+    }
     const name = (saveName ?? '').trim() || defaultSaveName(i18n.lang, new Date(), fileName)
     setSaving(true)
     try {
@@ -93,6 +100,17 @@ export default function ResultsScreen() {
             {t('savedDone', { name: savedName })}
           </Notice>
         ) : null}
+        {limitHit ? (
+          <Notice tone="info" onClose={() => setLimitHit(false)}>
+            <View style={{ gap: 8, flexShrink: 1 }}>
+              <Text style={{ color: C.text, fontSize: 13, lineHeight: 19 }}>{t('saveLimitReached', { max: FREE_SAVE_LIMIT })}</Text>
+              <View style={[styles.row, { flexWrap: 'wrap' }]}>
+                <Btn small icon="folder-open-outline" label={t('manageSaved')} onPress={() => router.navigate({ pathname: '/', params: { saved: '1' } })} />
+                <Btn small variant="primary" icon="star" label={t('seePro')} onPress={() => router.navigate('/pro')} />
+              </View>
+            </View>
+          </Notice>
+        ) : null}
         {saveName !== null ? (
           <Card style={{ gap: 8 }}>
             <Text style={styles.label}>{t('saveNameLabel')}</Text>
@@ -120,6 +138,10 @@ export default function ResultsScreen() {
             label={t('saveNamed')}
             onPress={() => {
               setSavedName(null)
+              if (!canSaveMore(isPro, saved.list.length)) {
+                setLimitHit(true)
+                return
+              }
               setSaveName(defaultSaveName(i18n.lang, new Date(), fileName))
             }}
           />

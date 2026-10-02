@@ -17,7 +17,7 @@ export const DE_COPY: Record<WebCopyKey, string> = {
   heroTitle2a: 'ausgewogene Klassen',
   heroTitle2b: 'in Sekunden.',
   heroDesc:
-    'FairClass verteilt Geschlecht, Leistung, Förderbedarf und weitere Merkmale gleichmäßig auf die Klassen. Freundschaftswünsche und Trennungen werden berücksichtigt, und Sie können das Ergebnis sofort nachbessern.',
+    'FairClass verteilt Geschlecht, Leistung, Förderbedarf und weitere Merkmale gleichmäßig auf die Klassen. Freundschaftswünsche und Trennungen werden berücksichtigt, und Sie können das Ergebnis sofort nachbessern. Nicht nur für neue Klassen: Auch Tischgruppen, Projektteams oder Gruppen für den Ausflug teilen Sie damit das ganze Schuljahr über ein.',
   heroLocal: 'Die Daten bleiben in Ihrem Browser',
   heroFree: 'Ohne Konto und Anmeldung, völlig kostenlos',
   warningsTitle: 'Hinweise beim Laden',

@@ -17,7 +17,7 @@ export const ES_COPY: Record<WebCopyKey, string> = {
   heroTitle2a: 'grupos equilibrados',
   heroTitle2b: 'en segundos.',
   heroDesc:
-    'FairClass reparte de forma pareja entre los grupos el género, el desempeño, las necesidades de apoyo y otros criterios. También tiene en cuenta a quiénes mantener juntos o separar, y puedes ajustar el resultado al momento.',
+    'FairClass reparte de forma pareja entre los grupos el género, el desempeño, las necesidades de apoyo y otros criterios. También tiene en cuenta a quiénes mantener juntos o separar, y puedes ajustar el resultado al momento. Y no solo al inicio del ciclo: te sirve todo el año para armar equipos de trabajo, grupos por mesa o grupos para salidas.',
   heroLocal: 'Los datos se quedan solo en tu navegador',
   heroFree: 'Sin registro ni cuenta, totalmente gratis',
   warningsTitle: 'Avisos al cargar',

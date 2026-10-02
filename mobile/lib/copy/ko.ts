@@ -259,4 +259,10 @@ export const KO_COPY: Record<CopyKey, string> = {
   mixNoSaved: '결과 화면에서 이름을 붙여 저장해 두면, 다음에 여기에서 지난번 편성으로 선택할 수 있습니다.',
   prevClassColumn: '지난번 반',
   mixFrom: '지난번: {name}',
+  featSaveTitle: '저장한 편성 무제한',
+  featSaveBody: '무료 버전은 3개까지 저장할 수 있습니다. Pro에서는 지난 반 편성과 모둠 편성을 모두 남겨 두고, 언제든지 열거나 "지난번과 최대한 섞기"에 사용할 수 있습니다.',
+  saveLimitReached: '무료 버전은 {max}개까지 저장할 수 있습니다. 오래된 편성을 삭제하거나 Pro에서 무제한으로 저장하십시오.',
+  savedCount: '{n} / {max}개 (무료 버전)',
+  manageSaved: '저장한 편성 보기',
+  seePro: 'Pro 보기',
 }

@@ -259,6 +259,12 @@ export const EN_COPY = {
   mixNoSaved: 'Save a placement with a name on the Results tab, and you can choose it here next time.',
   prevClassColumn: 'Last class',
   mixFrom: 'Last time: {name}',
+  featSaveTitle: 'Unlimited saved placements',
+  featSaveBody: 'The free version keeps up to 3. With Pro, keep every class placement and group arrangement, open them any time and use them to mix up from last time.',
+  saveLimitReached: 'The free version keeps up to {max} saved placements. Delete an older one, or get Pro to save as many as you like.',
+  savedCount: '{n} of {max} saved (free version)',
+  manageSaved: 'See saved placements',
+  seePro: 'See Pro',
 }
 
 export type CopyKey = keyof typeof EN_COPY

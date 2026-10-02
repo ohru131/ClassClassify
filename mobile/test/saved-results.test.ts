@@ -3,7 +3,9 @@ import { makeI18n } from '../lib/i18n-core'
 import { runSliced } from '../lib/runner'
 import { loadSample } from '../lib/samples'
 import {
+  canSaveMore,
   defaultSaveName,
+  FREE_SAVE_LIMIT,
   isSavedMetaList,
   isSavedResult,
   metaOf,
@@ -39,6 +41,13 @@ describe('保存した編成', () => {
     expect(isSavedMetaList([metaOf(s)])).toBe(true)
     expect(metaOf(s)).toEqual({ id: 'x', name: 'テスト', savedAt: s.savedAt, n: problem.students.length, k: 4 })
     expect(isSavedMetaList([{ id: 1 }])).toBe(false)
+  })
+
+  it('無料版は3件まで、Pro は無制限に保存できる', () => {
+    expect(FREE_SAVE_LIMIT).toBe(3)
+    expect(canSaveMore(false, 2)).toBe(true)
+    expect(canSaveMore(false, 3)).toBe(false)
+    expect(canSaveMore(true, 300)).toBe(true)
   })
 
   it('保存名の既定値は「年月 · 名簿の名前」。開き直して保存しても年月を重ねない', () => {

@@ -16,7 +16,7 @@ export const EN_COPY = {
   heroTitle2a: 'balanced classes',
   heroTitle2b: 'in seconds.',
   heroDesc:
-    'FairClass spreads student attributes — gender, academics, support needs and more — evenly across classes. It also takes into account who you’d like to keep together or apart, and you can fine-tune the result right away.',
+    'FairClass spreads student attributes — gender, academics, support needs and more — evenly across classes. It also takes into account who you’d like to keep together or apart, and you can fine-tune the result right away. And it’s not just for next year’s classes: use it all year for table groups, project teams, field-trip groups and more.',
   heroLocal: 'Your data stays in your browser',
   heroFree: 'No sign-up, no account, completely free',
   warningsTitle: 'Notes from loading',
