@@ -1,7 +1,8 @@
 import type { ExpoConfig } from 'expo/config'
 
 // ストアに出すアプリの識別子。**公開後は変えないこと**（別アプリ扱いになり、購入の復元もできなくなる）。
-const APP_ID = 'com.ohru131.fairclass'
+// 製品名は FairClass に改名したが、Play のアプリは改名前のこの ID で登録済みで変えられない。
+const APP_ID = 'com.ohru131.mosaic'
 
 const config: ExpoConfig = {
   // 端末の言語に合わせてホーム画面の名前を変える（locales/*.json）。既定は短い製品名

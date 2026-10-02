@@ -31,7 +31,7 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
 export const CSV_PATH = join(ROOT, 'docs', 'play-console', 'pricing.csv')
 const API = 'https://androidpublisher.googleapis.com/androidpublisher/v3'
 // mobile/app.config.ts の APP_ID と同じ値（**初回アップロード前に確定させること**。公開後は変えられない）
-const DEFAULT_PACKAGE = 'com.ohru131.fairclass'
+const DEFAULT_PACKAGE = 'com.ohru131.mosaic'
 const DEFAULT_SKU = 'fairclass_pro'
 const DEFAULT_KEY = join(ROOT, 'play-service-account.json')
 const HEADER = 'region,currency,price_display,price_micros,status,basis'
