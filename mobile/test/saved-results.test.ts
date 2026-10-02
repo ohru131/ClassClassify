@@ -9,6 +9,7 @@ import {
   FREE_SAVE_LIMIT,
   isSavedMetaList,
   isSavedResult,
+  readSavedMetaList,
   metaOf,
   previousClassValues,
   PREVIOUS_CLASS_WEIGHT,
@@ -42,6 +43,9 @@ describe('保存した編成', () => {
     expect(isSavedMetaList([metaOf(s)])).toBe(true)
     expect(metaOf(s)).toEqual({ id: 'x', name: 'テスト', savedAt: s.savedAt, n: problem.students.length, k: 4 })
     expect(isSavedMetaList([{ id: 1 }])).toBe(false)
+    // 1件壊れていても、ほかの保存は一覧に残す。配列でなければ読めなかった扱い
+    expect(readSavedMetaList([metaOf(s), { id: 1 }])).toEqual([metaOf(s)])
+    expect(readSavedMetaList({})).toBeNull()
   })
 
   it('無料版は3件まで、Pro は無制限に保存できる', () => {
@@ -56,6 +60,9 @@ describe('保存した編成', () => {
     expect(defaultSaveName('ja', d, '3年生.xlsx')).toBe('2026年10月 · 3年生')
     expect(defaultSaveName('ja', d, '2026年3月 · 3年生')).toBe('2026年10月 · 3年生')
     expect(defaultSaveName('ja', d, null)).toBe('2026年10月')
+    // 名簿の名前にある年（年度など）は外さない
+    expect(defaultSaveName('ja', d, '2026年度 · 6年1組.xlsx')).toBe('2026年10月 · 2026年度 · 6年1組')
+    expect(defaultSaveName('en', d, 'March 2026 · Grade 3')).toBe('October 2026 · Grade 3')
     expect(defaultSaveName('en', d, 'Grade 3')).toBe('October 2026 · Grade 3')
   })
 
@@ -78,6 +85,14 @@ describe('保存した編成', () => {
     const { values, matched } = previousClassValues({ ...problem, students }, s, ja.className)
     expect(values[0]).toBe('')
     expect(matched).toBe(students.length - 1)
+  })
+
+  it('名前で一致したのが1〜2人だけなら、名簿が続いているとはみなさない', () => {
+    const s = saved(problem, classOf, 4)
+    // NO はそのままだが、名前が一致するのは1人だけ → 残りの子を NO で照らさない
+    const students = problem.students.map((st, i) => (i === 0 ? st : { ...st, name: `新入生${i}` }))
+    const { matched } = previousClassValues({ ...problem, students }, s, ja.className)
+    expect(matched).toBe(1)
   })
 
   it('今の名簿で同じ名前が2人いるときは、名前では照らさない', () => {
@@ -105,6 +120,9 @@ describe('保存した編成', () => {
     expect(findPreviousClassColumn(p)?.name).toBe('前回の組')
     expect(findPreviousClassColumn(withPreviousClass(problem, 'Last class', values, order))?.name).toBe('Last class')
     expect(findPreviousClassColumn(problem)).toBeUndefined()
+    // 重み 0 のまま有効にしても使われないので、有効にするときは既定の重みに戻す
+    const zero = { ...p, columns: p.columns.map((c) => (c.name === '前回の組' ? { ...c, weight: 0, enabled: false } : c)) }
+    expect(setColumnEnabled(zero, '前回の組', true).columns.find((c) => c.name === '前回の組')).toMatchObject({ enabled: true, weight: PREVIOUS_CLASS_WEIGHT })
     expect(setColumnEnabled(p, '前回の組', false).columns.find((c) => c.name === '前回の組')!.enabled).toBe(false)
   })
 

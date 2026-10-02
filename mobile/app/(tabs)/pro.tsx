@@ -9,6 +9,7 @@ import { APP_LANGUAGES, LANGUAGE_META } from '@/lib/i18n'
 import { useI18n } from '@/lib/language-provider'
 import { useProject } from '@/lib/project-store'
 import { usePro } from '@/lib/revenuecat-provider'
+import { FREE_SAVE_LIMIT } from '@/lib/saved-results'
 import { useSavedResults } from '@/lib/saved-results-store'
 
 const FEATURES = [
@@ -40,7 +41,7 @@ export default function ProScreen() {
             <Text style={{ color: C.primary, fontWeight: '900' }}>✓</Text>
             <View style={{ flex: 1 }}>
               <Text style={{ fontWeight: '800', color: C.text }}>{t(title)}</Text>
-              <Text style={{ fontSize: 13, color: C.sub }}>{t(body)}</Text>
+              <Text style={{ fontSize: 13, color: C.sub }}>{t(body, { max: FREE_SAVE_LIMIT })}</Text>
             </View>
           </View>
         ))}

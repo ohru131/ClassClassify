@@ -259,7 +259,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   prevClassColumn: '前回の組',
   mixFrom: '前回: {name}',
   featSaveTitle: '保存した編成を無制限に',
-  featSaveBody: '無料版は3件まで。Pro なら過去のクラス編成や班分けをいくつでも残して、いつでも開いたり「前回とできるだけ入れ替える」に使ったりできます。',
+  featSaveBody: '無料版は{max} 件まで。Pro なら過去のクラス編成や班分けをいくつでも残して、いつでも開いたり「前回とできるだけ入れ替える」に使ったりできます。',
   saveLimitReached: '無料版で保存できるのは {max} 件までです。古い編成を削除するか、Pro にすると無制限に保存できます。',
   savedCount: '{n} / {max} 件（無料版）',
   manageSaved: '保存した編成を見る',

@@ -2,7 +2,7 @@ import { COPY } from './copy'
 import type { AppLanguage } from './i18n'
 import { LANGUAGE_META } from './i18n'
 import type { ColumnSpec, Problem } from './solver'
-import { isProblem } from './stored-project'
+import { isObj, isProblem } from './stored-project'
 
 // 名前を付けて端末に保存した編成結果（あとで一覧から開く・削除する・「前回の組」の元にする）。
 // React・AsyncStorage に依存しない純関数だけを置く（テストから使う）。保存先は saved-results-store.tsx。
@@ -27,8 +27,6 @@ export interface SavedMeta {
   k: number
 }
 
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null
-
 export function isSavedResult(v: unknown): v is SavedResult {
   if (!isObj(v) || v.version !== 1) return false
   if (typeof v.id !== 'string' || typeof v.name !== 'string' || typeof v.savedAt !== 'string') return false
@@ -38,12 +36,15 @@ export function isSavedResult(v: unknown): v is SavedResult {
   return Array.isArray(classOf) && classOf.length === v.problem.students.length && classOf.every((c) => Number.isInteger(c) && c >= 0 && c < k)
 }
 
+export const isSavedMeta = (m: unknown): m is SavedMeta =>
+  isObj(m) && typeof m.id === 'string' && typeof m.name === 'string' && typeof m.savedAt === 'string' && Number.isInteger(m.n) && Number.isInteger(m.k)
+
 export function isSavedMetaList(v: unknown): v is SavedMeta[] {
-  return (
-    Array.isArray(v) &&
-    v.every((m) => isObj(m) && typeof m.id === 'string' && typeof m.name === 'string' && typeof m.savedAt === 'string' && Number.isInteger(m.n) && Number.isInteger(m.k))
-  )
+  return Array.isArray(v) && v.every(isSavedMeta)
 }
+
+/** 端末の一覧から読めるものだけを残す（1件壊れていても、ほかの保存を一覧から消さない）。配列でなければ null */
+export const readSavedMetaList = (v: unknown): SavedMeta[] | null => (Array.isArray(v) ? v.filter(isSavedMeta) : null)
 
 export const metaOf = (s: SavedResult): SavedMeta => ({ id: s.id, name: s.name, savedAt: s.savedAt, n: s.problem.students.length, k: s.k })
 
@@ -59,8 +60,12 @@ export function yearMonth(lang: AppLanguage, d: Date): string {
 /** 保存名の既定値: 年月 · 名簿の名前（一覧で「いつの・どの名簿か」が分かるように） */
 export function defaultSaveName(lang: AppLanguage, d: Date, rosterName: string | null): string {
   const ym = yearMonth(lang, d)
-  // 保存した編成を開いて保存し直すとき、前の年月を重ねない（「2026年3月 · 2026年3月 · …」にしない）
-  const name = rosterName?.replace(/\.xlsx$/i, '').replace(/^[^·]*\d{4}[^·]*·\s*/, '').trim()
+  let name = rosterName?.replace(/\.xlsx$/i, '').trim() ?? ''
+  // 保存した編成を開いて保存し直すとき、前の年月を重ねない（「2026年3月 · 2026年3月 · …」にしない）。
+  // 外すのはこのアプリが付けた年月だけ（「2026年度 · 6年1組」のような名簿の名前はそのまま）
+  const head = /^(.*?)\s*·\s*(.+)$/.exec(name)
+  const year = head ? /\d{4}/.exec(head[1]) : null
+  if (head && year && Array.from({ length: 12 }, (_, m) => yearMonth(lang, new Date(Number(year[0]), m, 1))).includes(head[1])) name = head[2]
   return name ? `${ym} · ${name}` : ym
 }
 
@@ -89,7 +94,8 @@ export function previousClassValues(current: Problem, saved: SavedResult, classN
   })
   const byName = found.flatMap((i, j) => (i === null ? [] : [[i, j] as const]))
   const sameNo = byName.filter(([i, j]) => saved.problem.students[i].no === current.students[j].no).length
-  const continuous = byName.length > 0 && sameNo >= byName.length * 0.8
+  // 1〜2人の一致では「同じ名簿」と言えない（NO を振り直した名簿で、たまたま同じ NO の子がいるだけのことがある）
+  const continuous = byName.length >= 3 && sameNo >= byName.length * 0.8
   if (continuous) {
     const used = new Set(found.filter((i): i is number => i !== null))
     current.students.forEach((s, j) => {
@@ -132,8 +138,9 @@ export function withPreviousClass(p: Problem, column: string, values: string[], 
   return { ...p, columns, students: p.students.map((s, i) => ({ ...s, values: { ...s.values, [column]: values[i] ?? '' } })) }
 }
 
-export function setColumnEnabled(p: Problem, column: string, enabled: boolean): Problem {
-  return { ...p, columns: p.columns.map((c) => (c.name === column ? { ...c, enabled } : c)) }
+/** 列を有効／無効にする。有効にするとき重みが 0 なら既定の重みに戻す（重み 0 の列はソルバーが使わない） */
+export function setColumnEnabled(p: Problem, column: string, enabled: boolean, defaultWeight = PREVIOUS_CLASS_WEIGHT): Problem {
+  return { ...p, columns: p.columns.map((c) => (c.name === column ? { ...c, enabled, weight: enabled && c.weight <= 0 ? defaultWeight : c.weight } : c)) }
 }
 
 /** 無料版で保存しておける件数（Pro は無制限）。開く・削除・「前回の組」に使うのは件数に関係なく無料 */

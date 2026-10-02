@@ -260,7 +260,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   prevClassColumn: 'Grupo anterior',
   mixFrom: 'Anterior: {name}',
   featSaveTitle: 'Distribuciones guardadas sin límite',
-  featSaveBody: 'La versión gratuita guarda hasta 3. Con Pro guardas todas las distribuciones de grupos y equipos, y puedes abrirlas cuando quieras o usarlas para mezclar respecto a la vez anterior.',
+  featSaveBody: 'La versión gratuita guarda hasta {max}. Con Pro guardas todas las distribuciones de grupos y equipos, y puedes abrirlas cuando quieras o usarlas para mezclar respecto a la vez anterior.',
   saveLimitReached: 'La versión gratuita guarda hasta {max} distribuciones. Borra una anterior o consigue Pro para guardar todas las que quieras.',
   savedCount: '{n} de {max} guardadas (versión gratuita)',
   manageSaved: 'Ver distribuciones guardadas',

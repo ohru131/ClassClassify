@@ -260,7 +260,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   prevClassColumn: 'Turma anterior',
   mixFrom: 'Anterior: {name}',
   featSaveTitle: 'Enturmações salvas sem limite',
-  featSaveBody: 'A versão gratuita guarda até 3. Com o Pro, você guarda todas as enturmações e divisões em grupos, abre quando quiser e usa para misturar em relação à última vez.',
+  featSaveBody: 'A versão gratuita guarda até {max}. Com o Pro, você guarda todas as enturmações e divisões em grupos, abre quando quiser e usa para misturar em relação à última vez.',
   saveLimitReached: 'A versão gratuita guarda até {max} enturmações. Apague uma mais antiga ou use o Pro para salvar quantas quiser.',
   savedCount: '{n} de {max} salvas (versão gratuita)',
   manageSaved: 'Ver enturmações salvas',

@@ -260,7 +260,7 @@ export const EN_COPY = {
   prevClassColumn: 'Last class',
   mixFrom: 'Last time: {name}',
   featSaveTitle: 'Unlimited saved placements',
-  featSaveBody: 'The free version keeps up to 3. With Pro, keep every class placement and group arrangement, open them any time and use them to mix up from last time.',
+  featSaveBody: 'The free version keeps up to {max}. With Pro, keep every class placement and group arrangement, open them any time and use them to mix up from last time.',
   saveLimitReached: 'The free version keeps up to {max} saved placements. Delete an older one, or get Pro to save as many as you like.',
   savedCount: '{n} of {max} saved (free version)',
   manageSaved: 'See saved placements',

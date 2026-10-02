@@ -18,7 +18,7 @@ export default function RunScreen() {
   const { t, num, className } = useI18n()
   const saved = useSavedResults()
   // 「前回とできるだけ入れ替える」の元にした保存済みの編成と、前回の組が分かった人数
-  const [source, setSource] = useState<{ id: string; matched: number } | null>(null)
+  const [source, setSource] = useState<{ id: string; name: string; matched: number; students: unknown } | null>(null)
   // 保存した編成を読んでいる間は編成を始めない（読み終えて名簿を変えると、編成の結果が捨てられる）
   const [applying, setApplying] = useState(false)
   // 実行中に別のタブへ移った人を、終わった瞬間に結果画面へ引き戻さない
@@ -52,7 +52,9 @@ export default function RunScreen() {
   // 既にある列はその名前のまま使う（入れたあとで表示の言語を変えても同じ列を扱う）
   const prev = findPreviousClassColumn(problem)
   const prevCol = prev?.name ?? t('prevClassColumn')
-  const mixOn = !!prev && prev.enabled
+  const mixOn = !!prev && prev.enabled && prev.weight > 0
+  // 選んだ編成の表示は、それを入れた名簿のときだけ（別の名簿を開いたら出さない）
+  const shownSource = source && source.students === problem.students ? source : null
   // 保存した編成から各生徒の前回の組を名簿に入れ、その列を均等に散らす（前回同じ組だった子が重ならないように）
   const applyFrom = async (id: string) => {
     // 編成中に名簿を変えると、終わった結果が捨てられる
@@ -66,12 +68,15 @@ export default function RunScreen() {
       }
       const order = Array.from({ length: s.k }, (_, c) => className(c))
       let matched = 0
+      let students: unknown = null
       modifyProblem((p) => {
         const r = previousClassValues(p, s, className)
         matched = r.matched
-        return withPreviousClass(p, prevCol, r.values, order)
+        const next = withPreviousClass(p, prevCol, r.values, order)
+        students = next.students
+        return next
       })
-      setSource({ id, matched })
+      setSource({ id, name: s.name, matched, students })
     } catch {
       setError(t('openFailed'))
     } finally {
@@ -160,12 +165,16 @@ export default function RunScreen() {
             <Text style={[styles.label, { marginTop: 4 }]}>{t('mixPick')}</Text>
             <View style={styles.wrap} accessibilityRole="radiogroup">
               {saved.list.map((m) => (
-                <Chip key={m.id} label={m.name} selected={source?.id === m.id} onPress={() => void applyFrom(m.id)} />
+                <Chip key={m.id} label={m.name} selected={shownSource?.id === m.id} onPress={() => void applyFrom(m.id)} />
               ))}
             </View>
           </>
         ) : null}
-        {mixOn && source ? <Text style={{ fontSize: 12, color: C.muted }}>{t('mixMatched', { m: source.matched, n })}</Text> : null}
+        {mixOn && shownSource ? (
+          <Text style={{ fontSize: 12, color: C.muted }}>
+            {t('mixFrom', { name: shownSource.name })} · {t('mixMatched', { m: shownSource.matched, n })}
+          </Text>
+        ) : null}
       </Card>
 
       <Card style={{ gap: 12 }}>
@@ -182,7 +191,8 @@ export default function RunScreen() {
         ) : (
           <>
             <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} disabled={applying} onPress={start} />
-            {solution ? (
+            {/* 保存した編成を開いただけのときは、編成の記録（案の数など）が無いので出さない */}
+            {solution && solution.starts > 0 ? (
               <Text style={{ fontSize: 12, color: C.muted }}>
                 {t('lastRun', { k: solution.k, starts: solution.starts, m: num(solution.iterations / 1e6, 2) })}
               </Text>

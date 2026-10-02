@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
-import { isSavedMetaList, isSavedResult, metaOf, newSavedId, type SavedMeta, type SavedResult } from './saved-results'
+import { isSavedResult, metaOf, newSavedId, readSavedMetaList, type SavedMeta, type SavedResult } from './saved-results'
 import type { Problem } from './solver'
 
 // 名前を付けて保存した編成の置き場所（端末内の AsyncStorage。Android では中身が SQLite）。
@@ -31,6 +31,13 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
   const listRef = useRef<SavedMeta[]>([])
   // 一覧を読み終えるまでは保存しない（読む前の空の一覧から書くと、保存済みの一覧を上書きし、件数の上限も数え違える）
   const loadedRef = useRef(false)
+  // 保存・削除は1つずつ順番に（前の書き込みが終わる前に次の一覧を作ると、どちらかの変更が消える）
+  const queueRef = useRef<Promise<unknown>>(Promise.resolve())
+  const serial = <T,>(task: () => Promise<T>): Promise<T> => {
+    const run = queueRef.current.then(task, task)
+    queueRef.current = run.catch(() => undefined)
+    return run
+  }
   const setList = (next: SavedMeta[]) => {
     listRef.current = next
     setListState(next)
@@ -38,18 +45,20 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true
+    // 一覧が読めなかったときは「読み込み済み」にしない（空の一覧から書いて、保存済みの一覧を上書きしないように。
+    // 保存はできないままになり、次にアプリを開いたときに読み直す）
     AsyncStorage.getItem(INDEX_KEY)
       .then((raw) => {
-        if (!active || !raw) return
-        const data: unknown = JSON.parse(raw)
-        if (isSavedMetaList(data)) setList([...data].sort(byNewest))
-      })
-      .catch(() => undefined)
-      .finally(() => {
         if (!active) return
+        if (raw) {
+          const data = readSavedMetaList(JSON.parse(raw))
+          if (!data) return
+          setList([...data].sort(byNewest))
+        }
         loadedRef.current = true
         setLoaded(true)
       })
+      .catch(() => undefined)
     return () => {
       active = false
     }
@@ -57,7 +66,7 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
 
   const writeIndex = (next: SavedMeta[]) => AsyncStorage.setItem(INDEX_KEY, JSON.stringify(next))
 
-  const save = useCallback(async (name: string, problem: Problem, classOf: number[], k: number) => {
+  const save = useCallback((name: string, problem: Problem, classOf: number[], k: number) => serial(async () => {
     if (!loadedRef.current) throw new Error('saved results are not loaded yet')
     const now = new Date()
     const item: SavedResult = { version: 1, id: newSavedId(now), name, savedAt: now.toISOString(), problem, classOf, k }
@@ -74,7 +83,7 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
     }
     setList(next)
     return meta
-  }, [])
+  }), [])
 
   const load = useCallback(async (id: string) => {
     const raw = await AsyncStorage.getItem(itemKey(id))
@@ -83,19 +92,19 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
     return isSavedResult(data) ? data : null
   }, [])
 
-  const remove = useCallback(async (id: string) => {
+  const remove = useCallback((id: string) => serial(async () => {
     const next = listRef.current.filter((m) => m.id !== id)
     await writeIndex(next)
     setList(next)
     // 一覧から外れた本体は読まれない。消し損ねても次の「すべて消去」で消える
     await AsyncStorage.removeItem(itemKey(id)).catch(() => undefined)
-  }, [])
+  }), [])
 
-  const removeAll = useCallback(async () => {
+  const removeAll = useCallback(() => serial(async () => {
     const keys = (await AsyncStorage.getAllKeys()).filter((key) => key === INDEX_KEY || key.startsWith('fairclass.saved.v1.'))
     await AsyncStorage.multiRemove(keys)
     setList([])
-  }, [])
+  }), [])
 
   const value = useMemo(() => ({ list, loaded, save, load, remove, removeAll }), [list, loaded, save, load, remove, removeAll])
   return <SavedContext.Provider value={value}>{children}</SavedContext.Provider>
