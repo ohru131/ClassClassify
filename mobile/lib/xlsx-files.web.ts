@@ -15,6 +15,7 @@ export async function pickXlsx(): Promise<{ data: ArrayBuffer; name: string } | 
 
 export const canSaveToFile = false
 export const saveXlsx = async (_wb: WorkBook, _fileName: string): Promise<boolean> => false
+export const saveBase64As = async (_fileName: string, _mimeType: string, _base64: string): Promise<boolean> => false
 
 export const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|\s]+/g, '_')
 

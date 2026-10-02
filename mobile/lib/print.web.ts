@@ -14,4 +14,7 @@ export async function sharePdf(html: string, _fileName?: string, messages?: { po
   await printHtml(html, messages)
 }
 
+/** Web（動作確認用）は保存ダイアログを持たない。PDF はブラウザの印刷画面から保存する */
+export const savePdf = async (_html: string, _fileName: string): Promise<boolean> => false
+
 export const canSharePdf = false

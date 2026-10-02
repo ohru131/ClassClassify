@@ -149,7 +149,7 @@ cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 ## 印刷・PDF（Pro）
 
 - HTML は `lib/print-html.ts` の純関数 `buildResultPrintHtml` で組む（`@page { size: A4 portrait }`、クラスのカードは `break-inside: avoid` で途中で切らず、集計・バランスは改ページして次のページから）。
-- ネイティブ: 「印刷」は `Print.printAsync`、「PDF で共有」は `Print.printToFileAsync` → `クラス編成結果_日付.pdf` に名前を変えて `expo-sharing`。
+- ネイティブ: 「印刷」は `Print.printAsync`。「PDF」は押したあとに送り先を選ぶ。「共有する」は `Print.printToFileAsync` → `クラス編成結果_日付.pdf` に名前を変えて `expo-sharing`、「ファイルに保存」（Android）は同じ PDF を OS の保存ダイアログ（`modules/saf-files`）で Google ドライブ等へ。
 - Web: `expo-print` の Web 実装は渡した HTML ではなく今の画面を印刷してしまうので使わず、新しいウィンドウに HTML を書いて `window.print()`（PDF はブラウザの印刷画面から保存）。
 
 ## 大画面・Chromebook 対応

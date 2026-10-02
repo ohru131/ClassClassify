@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router'
 import { type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, ScrollView, Switch, Text, TextInput, View } from 'react-native'
 
+import { ExportButton, ProBadge } from '@/components/export-button'
 import { C, classColor } from '@/components/theme'
 import { Btn, Card, Chip, Notice, Screen, Segmented, Stat, styles } from '@/components/ui'
 import { useI18n } from '@/lib/language-provider'
@@ -20,14 +21,14 @@ type Focus = { kind: 'wanted' | 'unwanted'; group: number } | null
 
 export default function ResultsScreen() {
   const { problem, solution, report, edited, moveStudent, resetMoves, error, setError, fileName } = useProject()
-  const { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, busy, isPro } = useProExport()
+  const { exportXlsx, saveToFile, canSaveToFile, print, exportPdf, savePdfToFile, busy, isPro } = useProExport()
   const router = useRouter()
   const { isWide } = useLayout()
   const i18n = useI18n()
   const { t, className, fileLang, num } = i18n
   const [tab, setTab] = useState<Tab>('classes')
   const [selected, setSelected] = useState<number | null>(null)
-  // 名前を付けて保存（null = 入力欄を閉じている）
+  // アプリに保存（null = 名前の入力欄を閉じている）
   const [saveName, setSaveName] = useState<string | null>(null)
   const [savedName, setSavedName] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -80,6 +81,7 @@ export default function ResultsScreen() {
       setSaving(false)
     }
   }
+  const buildXlsx = () => resultWorkbook(problem, solution.classOf, k, report, fileLang)
   const printHtmlFor = () => buildResultPrintHtml({ problem, classOf: solution.classOf, k, report, createdAt: new Date(), i18n })
 
   return (
@@ -142,51 +144,82 @@ export default function ResultsScreen() {
             </View>
           </Card>
         ) : null}
-        <View style={[styles.row, { flexWrap: 'wrap' }]}>
-          {edited ? <Btn small icon="arrow-undo-outline" label={t('undoMoves')} onPress={resetMoves} /> : null}
-          <Btn
-            small
-            icon="bookmark-outline"
-            label={t('saveNamed')}
-            disabled={!saved.loaded}
-            onPress={() => {
-              setSavedName(null)
-              if (!canSaveMore(isPro, saved.list.length)) {
-                setLimitHit(true)
-                return
-              }
-              setSaveName(defaultSaveName(i18n.lang, new Date(), fileName))
-            }}
-          />
-          <Btn
-            small
-            variant="primary"
-            icon={isPro ? 'share-outline' : 'lock-closed-outline'}
-            label={t('shareXlsx')}
-            busy={busy === 'xlsx'}
-            onPress={() => exportXlsx(() => resultWorkbook(problem, solution.classOf, k, report, fileLang), t('fileResults'))}
-          />
-          {canSaveToFile ? (
-            <Btn
-              small
-              icon={isPro ? 'save-outline' : 'lock-closed-outline'}
-              label={t('saveToFile')}
-              busy={busy === 'save'}
-              onPress={() => saveToFile(() => resultWorkbook(problem, solution.classOf, k, report, fileLang), t('fileResults'))}
-            />
-          ) : null}
-          <Btn
-            small
-            icon={isPro ? 'print-outline' : 'lock-closed-outline'}
-            label={canSharePdf ? t('print') : t('printPdf')}
-            busy={busy === 'print'}
-            onPress={() => print(printHtmlFor)}
-          />
-          {canSharePdf ? (
-            <Btn small icon={isPro ? 'document-outline' : 'lock-closed-outline'} label={t('sharePdf')} busy={busy === 'pdf'} onPress={() => exportPdf(printHtmlFor, t('fileResults'))} />
-          ) : null}
-          {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>{t('proFeaturesNote')}</Text> : null}
-        </View>
+        {edited ? (
+          <View style={styles.row}>
+            <Btn small icon="arrow-undo-outline" label={t('undoMoves')} onPress={resetMoves} />
+          </View>
+        ) : null}
+        {/* 「アプリの中に残す（無料）」と「ファイルで書き出す（Pro）」は用途が違うので分けて見せる */}
+        <Card style={{ flexDirection: isWide ? 'row' : 'column', gap: isWide ? 20 : 14, padding: 14 }}>
+          <View style={{ flex: isWide ? 1 : undefined, gap: 6 }}>
+            <View style={sectionHead}>
+              <Text style={sectionTitle}>{t('keepTitle')}</Text>
+              <Btn
+                small
+                variant="primary"
+                icon="bookmark-outline"
+                label={t('saveNamed')}
+                disabled={!saved.loaded}
+                onPress={() => {
+                  setSavedName(null)
+                  if (!canSaveMore(isPro, saved.list.length)) {
+                    setLimitHit(true)
+                    return
+                  }
+                  setSaveName(defaultSaveName(i18n.lang, new Date(), fileName))
+                }}
+              />
+            </View>
+            <Text style={hintText}>
+              {t('saveNamedHint')}
+              {!isPro && saved.loaded ? `${i18n.lang === 'ja' ? '' : ' '}${t('saveNamedLeft', { n: Math.max(0, FREE_SAVE_LIMIT - saved.list.length), max: FREE_SAVE_LIMIT })}` : ''}
+            </Text>
+          </View>
+          <View style={isWide ? { width: 1, backgroundColor: C.border } : { height: 1, backgroundColor: C.border }} />
+          <View style={{ flex: isWide ? 1 : undefined, gap: 6 }}>
+            <View style={sectionHead}>
+              <View style={styles.row}>
+                <Text style={sectionTitle}>{t('exportTitle')}</Text>
+                {!isPro ? <ProBadge /> : null}
+              </View>
+              <View style={[styles.row, { flexWrap: 'wrap' }]}>
+                <ExportButton
+                  icon="grid-outline"
+                  label={t('exportExcel')}
+                  title={t('exportSheetTitle', { format: t('exportExcel') })}
+                  isPro={isPro}
+                  busy={busy === 'xlsx' || busy === 'save'}
+                  choices={[
+                    { icon: 'share-social-outline', label: t('shareVia'), sub: t('shareViaSub'), onPress: () => exportXlsx(buildXlsx, t('fileResults')) },
+                    ...(canSaveToFile ? [{ icon: 'save-outline' as const, label: t('saveToFile'), sub: t('saveToFileSub'), onPress: () => saveToFile(buildXlsx, t('fileResults')) }] : []),
+                  ]}
+                />
+                {canSharePdf ? (
+                  <ExportButton
+                    icon="document-outline"
+                    label={t('exportPdf')}
+                    title={t('exportSheetTitle', { format: t('exportPdf') })}
+                    isPro={isPro}
+                    busy={busy === 'pdf' || busy === 'savePdf'}
+                    choices={[
+                      { icon: 'share-social-outline', label: t('shareVia'), sub: t('shareViaSub'), onPress: () => exportPdf(printHtmlFor, t('fileResults')) },
+                      ...(canSaveToFile ? [{ icon: 'save-outline' as const, label: t('saveToFile'), sub: t('saveToFileSub'), onPress: () => savePdfToFile(printHtmlFor, t('fileResults')) }] : []),
+                    ]}
+                  />
+                ) : null}
+                <Btn
+                  small
+                  icon="print-outline"
+                  label={canSharePdf ? t('print') : t('printPdf')}
+                  accessibilityLabel={isPro ? undefined : `${canSharePdf ? t('print') : t('printPdf')} (Pro)`}
+                  busy={busy === 'print'}
+                  onPress={() => print(printHtmlFor)}
+                />
+              </View>
+            </View>
+            {!isPro ? <Text style={hintText}>{t('exportProNote')}</Text> : null}
+          </View>
+        </Card>
         <Segmented
           value={tab}
           onChange={setTab}
@@ -243,6 +276,11 @@ export default function ResultsScreen() {
     </View>
   )
 }
+
+const sectionTitle = { fontSize: 14, fontWeight: '800', color: C.text } as const
+// 見出しを左、ボタンを右に。狭い画面で入りきらなければボタンが次の行へ回る
+const sectionHead = { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 } as const
+const hintText = { fontSize: 12, color: C.sub, lineHeight: 17 } as const
 
 const moveBar = {
   position: 'absolute' as const,
