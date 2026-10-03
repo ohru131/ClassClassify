@@ -57,6 +57,7 @@ export const EN_COPY = {
   noTaken: 'No. {no} is already used by another student',
   kindFlag: 'Checkbox',
   kindCategory: 'List',
+  kindDegree: 'Scale (1–5)',
   kindNumeric: 'Number',
   blank: 'Blank',
   newValuePlaceholder: 'Type a new option and press Enter',
@@ -69,7 +70,7 @@ export const EN_COPY = {
   deleteStudentBody: '{who} will be removed from the roster and from any pairings.',
 
   columnsHelp:
-    'Attributes with a higher weight are spread across classes first. At weight 0, an attribute is not taken into account. A checkbox balances how many students are checked, a list balances each option, and a number (7 or more different values) balances the class averages.',
+    'Attributes with a higher weight are spread across classes first. At weight 0, an attribute is not taken into account. A checkbox balances how many students are checked, a list or a 1–5 scale balances each option or step, and a number (7 or more different values) balances the class averages.',
   deleteColumnA11y: 'Delete attribute "{name}"',
   deleteColumnTitle: 'Delete attribute',
   deleteColumnBody: '"{name}" will be removed for every student.',

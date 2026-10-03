@@ -56,6 +56,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   noTaken: 'NO {no} は他の生徒が使っています',
   kindFlag: 'チェック',
   kindCategory: 'リスト',
+  kindDegree: '程度',
   kindNumeric: '数値',
   blank: '空欄',
   newValuePlaceholder: '新しい選択肢を入れて決定',
@@ -68,7 +69,7 @@ export const JA_COPY: Record<CopyKey, string> = {
   deleteStudentBody: '{who} を名簿から削除します。ペア指定からも外れます。',
 
   columnsHelp:
-    '重みが大きい項目ほど、各クラスに均等に分かれるよう優先します。0 にするとその項目は考えに入れません。「チェック」は付いた生徒の人数を、「リスト」は選択肢ごとの人数を、「数値」（7種類以上の数）は平均を、各クラスでそろえます。',
+    '重みが大きい項目ほど、各クラスに均等に分かれるよう優先します。0 にするとその項目は考えに入れません。「チェック」は付いた生徒の人数を、「リスト」「程度」（1〜5）は選択肢・段階ごとの人数を、「数値」（7種類以上の数）は平均を、各クラスでそろえます。',
   deleteColumnA11y: '項目「{name}」を削除',
   deleteColumnTitle: '項目を削除',
   deleteColumnBody: '「{name}」を全員の名簿から削除します。',

@@ -27,7 +27,7 @@ export function isProblem(v: unknown): v is Problem {
   const okValues = (v: unknown) => isObj(v) && Object.values(v).every((x) => typeof x === 'string')
   const okStudent = (s: unknown) => isObj(s) && typeof s.no === 'number' && typeof s.name === 'string' && okValues(s.values)
   const okColumn = (c: unknown) =>
-    isObj(c) && typeof c.name === 'string' && typeof c.weight === 'number' && typeof c.enabled === 'boolean' && isStringArray(c.levels) && ['flag', 'category', 'numeric'].includes(c.kind as string)
+    isObj(c) && typeof c.name === 'string' && typeof c.weight === 'number' && typeof c.enabled === 'boolean' && isStringArray(c.levels) && ['flag', 'category', 'degree', 'numeric'].includes(c.kind as string)
   const okGroups = (g: unknown) => Array.isArray(g) && g.every((x) => isIntArray(x) && x.every((i) => i >= 0 && i < n))
   return students.every(okStudent) && columns.every(okColumn) && okGroups(wantedGroups) && okGroups(unwantedGroups)
 }

@@ -2,13 +2,18 @@ import type { ColumnKind } from './types'
 
 const isNum = (v: string) => v.trim() !== '' && Number.isFinite(Number(v))
 
-/** 列の値から種類（該当/カテゴリ/数値）と水準を判定する */
+/** 「程度」の段階（1〜5の整数） */
+export const DEGREE_LEVELS = ['1', '2', '3', '4', '5'] as const
+export const isDegreeValue = (v: string) => (DEGREE_LEVELS as readonly string[]).includes(v)
+
+/** 列の値から種類（チェック/リスト/程度/数値）と水準を判定する */
 export function detectKind(values: string[]): { kind: ColumnKind; levels: string[] } {
   const levels = [...new Set(values.filter((v) => v !== ''))]
   const allNumeric = levels.length > 0 && levels.every((v) => isNum(v))
   if (allNumeric) levels.sort((a, b) => Number(a) - Number(b))
   else levels.sort((a, b) => a.localeCompare(b, 'ja'))
   if (levels.length <= 1) return { kind: 'flag', levels }
+  if (levels.every(isDegreeValue)) return { kind: 'degree', levels }
   if (allNumeric && levels.length > 6) return { kind: 'numeric', levels }
   return { kind: 'category', levels }
 }

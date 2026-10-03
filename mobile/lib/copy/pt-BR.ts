@@ -57,6 +57,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   noTaken: 'O nº {no} já é de outro aluno',
   kindFlag: 'Caixa de seleção',
   kindCategory: 'Lista',
+  kindDegree: 'Nível (1–5)',
   kindNumeric: 'Número',
   blank: 'Vazio',
   newValuePlaceholder: 'Digite uma nova opção e tecle Enter',
@@ -69,7 +70,7 @@ export const PT_BR_COPY: Record<CopyKey, string> = {
   deleteStudentBody: '{who} será removido da lista e de todas as condições.',
 
   columnsHelp:
-    'Critérios com peso maior são distribuídos primeiro de forma equilibrada entre as turmas. Com peso 0, o critério não é levado em conta. A caixa de seleção equilibra quantos alunos estão marcados, a lista equilibra cada opção e o número (7 ou mais valores diferentes) equilibra as médias das turmas.',
+    'Critérios com peso maior são distribuídos primeiro de forma equilibrada entre as turmas. Com peso 0, o critério não é levado em conta. A caixa de seleção equilibra quantos alunos estão marcados, a lista ou o nível (1–5) equilibra cada opção ou nível, e o número (7 ou mais valores diferentes) equilibra as médias das turmas.',
   deleteColumnA11y: 'Excluir o critério “{name}”',
   deleteColumnTitle: 'Excluir critério',
   deleteColumnBody: '“{name}” será removido de todos os alunos.',

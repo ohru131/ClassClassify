@@ -7,10 +7,10 @@ import { roster, type ColumnKind, type ColumnSpec, type Problem } from '@/lib/so
 import { C } from './theme'
 import { Btn, Card, Segmented, Stepper, styles } from './ui'
 
-const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', numeric: 'kindNumeric' } as const
+const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', degree: 'kindDegree', numeric: 'kindNumeric' } as const
 
 const levelsText = (c: ColumnSpec, blankOnly: string) =>
-  c.levels.length === 0 ? blankOnly : c.kind === 'numeric' ? `${c.levels[0]}–${c.levels[c.levels.length - 1]}` : c.levels.join(' / ')
+  c.kind === 'degree' ? '1–5' : c.levels.length === 0 ? blankOnly : c.kind === 'numeric' ? `${c.levels[0]}–${c.levels[c.levels.length - 1]}` : c.levels.join(' / ')
 
 /** 項目（特性）の一覧・重み・追加・削除 */
 export function ColumnEditor({ problem, onChange }: { problem: Problem; onChange: (f: (p: Problem) => Problem) => void }) {
@@ -76,7 +76,7 @@ export function ColumnEditor({ problem, onChange }: { problem: Problem; onChange
           placeholder={t('addColumnPlaceholder')}
           accessibilityLabel={t('addColumnTitle')}
         />
-        <Segmented value={kind} onChange={setKind} options={(['flag', 'category', 'numeric'] as const).map((k) => ({ value: k, label: t(KIND_KEY[k]) }))} />
+        <Segmented value={kind} onChange={setKind} options={(['flag', 'category', 'degree', 'numeric'] as const).map((k) => ({ value: k, label: t(KIND_KEY[k]) }))} />
         {duplicate && trimmed ? <Text style={{ color: C.danger, fontSize: 12 }}>{t('duplicateColumn')}</Text> : null}
         <Btn variant="soft" icon="add" label={t('add')} disabled={!trimmed || duplicate} onPress={add} />
       </Card>

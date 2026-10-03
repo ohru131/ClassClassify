@@ -1,10 +1,11 @@
-export type ColumnKind = 'flag' | 'category' | 'numeric'
+/** チェック（○/空欄）・リスト（選択肢から1つ）・程度（1〜5の整数）・数値（平均をそろえる） */
+export type ColumnKind = 'flag' | 'category' | 'degree' | 'numeric'
 
 export interface ColumnSpec {
   name: string
   weight: number
   kind: ColumnKind
-  /** flag/category の水準（空欄以外の値） */
+  /** flag/category/degree の水準（空欄以外の値） */
   levels: string[]
   enabled: boolean
 }

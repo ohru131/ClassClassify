@@ -24,12 +24,12 @@ export function loadSample(lang: AppLanguage, id: string): { problem: Problem; l
 // 性別はリストの選択肢を最初から入れておく（♂ ♀ ？）
 const G = (name: string, unknown = '?') => ({ name, kind: 'category' as const, levels: ['♂', '♀', unknown] })
 const STARTER_COLUMNS: Record<AppLanguage, { name: string; kind: ColumnKind; levels?: string[] }[]> = {
-  ja: [G('性別', '？'), { name: '学力', kind: 'category' }, { name: '学習支援', kind: 'flag' }],
-  en: [G('Gender'), { name: 'Academics', kind: 'category' }, { name: 'Learning support', kind: 'flag' }],
-  ko: [G('성별'), { name: '학업', kind: 'category' }, { name: '학습 지원', kind: 'flag' }],
-  es: [G('Género'), { name: 'Desempeño académico', kind: 'category' }, { name: 'Apoyo en el aprendizaje', kind: 'flag' }],
-  de: [G('Geschlecht'), { name: 'Leistung', kind: 'category' }, { name: 'Lernförderung', kind: 'flag' }],
-  'pt-BR': [G('Gênero'), { name: 'Desempenho', kind: 'category' }, { name: 'Apoio à aprendizagem', kind: 'flag' }],
+  ja: [G('性別', '？'), { name: '学力', kind: 'degree' }, { name: '学習支援', kind: 'flag' }],
+  en: [G('Gender'), { name: 'Academics', kind: 'degree' }, { name: 'Learning support', kind: 'flag' }],
+  ko: [G('성별'), { name: '학업', kind: 'degree' }, { name: '학습 지원', kind: 'flag' }],
+  es: [G('Género'), { name: 'Desempeño académico', kind: 'degree' }, { name: 'Apoyo en el aprendizaje', kind: 'flag' }],
+  de: [G('Geschlecht'), { name: 'Leistung', kind: 'degree' }, { name: 'Lernförderung', kind: 'flag' }],
+  'pt-BR': [G('Gênero'), { name: 'Desempenho', kind: 'degree' }, { name: 'Apoio à aprendizagem', kind: 'flag' }],
 }
 
 /** 新しい名簿（空）。項目の例と、生徒 count 名（NO だけ）から始める */

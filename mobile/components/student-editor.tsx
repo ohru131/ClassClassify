@@ -4,11 +4,11 @@ import { Pressable, Text, TextInput, View } from 'react-native'
 
 import { confirmAction } from '@/lib/confirm'
 import { useI18n } from '@/lib/language-provider'
-import { roster, type ColumnSpec, type Problem } from '@/lib/solver'
+import { DEGREE_LEVELS, roster, type ColumnSpec, type Problem } from '@/lib/solver'
 import { C } from './theme'
 import { Btn, Chip, styles } from './ui'
 
-const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', numeric: 'kindNumeric' } as const
+const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', degree: 'kindDegree', numeric: 'kindNumeric' } as const
 
 /**
  * 生徒1人の編集。テキストは入力中は手元に持ち、確定（Enter・フォーカスが外れたとき）で名簿へ反映する
@@ -158,6 +158,17 @@ function ValueField({ column, value, onCommit, onAddOption, flagMark }: { column
       </Pressable>
     )
   }
+  if (column.kind === 'degree')
+    return (
+      <View>
+        {label}
+        <View style={styles.wrap}>
+          {DEGREE_LEVELS.map((l) => (
+            <Chip key={l} label={l} selected={value === l} onPress={() => onCommit(value === l ? '' : l)} />
+          ))}
+        </View>
+      </View>
+    )
   if (column.kind === 'category')
     return (
       <View>

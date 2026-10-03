@@ -57,6 +57,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   noTaken: 'Nr. {no} ist bereits vergeben',
   kindFlag: 'Ankreuzen',
   kindCategory: 'Liste',
+  kindDegree: 'Stufe (1–5)',
   kindNumeric: 'Zahl',
   blank: 'Leer',
   newValuePlaceholder: 'Neue Option eingeben und Enter drücken',
@@ -69,7 +70,7 @@ export const DE_COPY: Record<CopyKey, string> = {
   deleteStudentBody: '{who} wird aus der Liste und aus allen Wünschen entfernt.',
 
   columnsHelp:
-    'Merkmale mit höherem Gewicht werden zuerst gleichmäßig auf die Klassen verteilt. Bei Gewicht 0 bleibt das Merkmal unberücksichtigt. Beim Ankreuzen wird die Zahl der angekreuzten Schüler angeglichen, bei einer Liste jede Option, bei einer Zahl (7 oder mehr verschiedene Werte) die Klassendurchschnitte.',
+    'Merkmale mit höherem Gewicht werden zuerst gleichmäßig auf die Klassen verteilt. Bei Gewicht 0 bleibt das Merkmal unberücksichtigt. Beim Ankreuzen wird die Zahl der angekreuzten Schüler angeglichen, bei einer Liste oder Stufe (1–5) jede Option bzw. Stufe, bei einer Zahl (7 oder mehr verschiedene Werte) die Klassendurchschnitte.',
   deleteColumnA11y: 'Merkmal „{name}“ löschen',
   deleteColumnTitle: 'Merkmal löschen',
   deleteColumnBody: '„{name}“ wird für alle Schüler entfernt.',

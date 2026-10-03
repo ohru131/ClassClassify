@@ -1,4 +1,4 @@
-import { detectKind } from './columns'
+import { detectKind, isDegreeValue } from './columns'
 import type { ColumnKind, ColumnSpec, Problem, Student } from './types'
 
 export type GroupKind = 'wanted' | 'unwanted'
@@ -6,7 +6,8 @@ const key = (k: GroupKind) => (k === 'wanted' ? 'wantedGroups' : 'unwantedGroups
 
 /**
  * 生徒の値から各列の水準を再計算する（重み・有効/無効は維持）。
- * 編集中に入力欄の種類が変わらないよう、数値・カテゴリ列の種類は保持する（該当→カテゴリへの昇格のみ）。
+ * 編集中に入力欄の種類が変わらないよう、数値・程度・リスト列の種類は保持する（チェックからの昇格と、
+ * 合わない値が入った数値・程度のリストへの切り替えのみ）。
  * カテゴリ（リスト）の選択肢は、誰も選んでいなくても残す（消すのは removeLevel だけ）。
  */
 export function refreshColumns(students: Student[], columns: ColumnSpec[]): ColumnSpec[] {
@@ -14,8 +15,14 @@ export function refreshColumns(students: Student[], columns: ColumnSpec[]): Colu
     const detected = detectKind(students.map((s) => s.values[c.name] ?? ''))
     const allNumeric = detected.levels.every((v) => Number.isFinite(Number(v)))
     const kind: ColumnKind =
-      c.kind === 'numeric' && allNumeric ? 'numeric' : c.kind === 'category' || (c.kind === 'numeric' && !allNumeric) ? 'category' : detected.kind
-    const levels = c.kind === 'category' && kind === 'category' ? [...c.levels, ...detected.levels.filter((l) => !c.levels.includes(l))] : detected.levels
+      c.kind === 'category'
+        ? 'category'
+        : c.kind === 'numeric'
+          ? allNumeric ? 'numeric' : 'category'
+          : c.kind === 'degree'
+            ? detected.levels.every(isDegreeValue) ? 'degree' : 'category'
+            : detected.kind
+    const levels = c.kind === 'category' ? [...c.levels, ...detected.levels.filter((l) => !c.levels.includes(l))] : detected.levels
     const wasEmpty = c.levels.length === 0
     return { ...c, kind, levels, enabled: wasEmpty && levels.length > 0 ? c.weight > 0 : c.enabled && levels.length > 0 }
   })

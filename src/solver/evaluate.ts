@@ -1,8 +1,8 @@
-import type { Problem } from './types'
+import type { ColumnKind, Problem } from './types'
 
 export interface ColumnReport {
   column: string
-  kind: 'flag' | 'category' | 'numeric'
+  kind: ColumnKind
   weight: number
   /** category/flag: rows[level][class] = 人数、numeric: rows[0][class] = 平均 */
   levels: string[]

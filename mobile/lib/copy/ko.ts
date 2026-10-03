@@ -57,6 +57,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   noTaken: '번호 {no}은(는) 다른 학생이 사용 중입니다',
   kindFlag: '체크',
   kindCategory: '목록',
+  kindDegree: '정도(1–5)',
   kindNumeric: '숫자',
   blank: '빈칸',
   newValuePlaceholder: '새 선택지를 입력하고 Enter',
@@ -69,7 +70,7 @@ export const KO_COPY: Record<CopyKey, string> = {
   deleteStudentBody: '{who} 학생을 명단과 배정 조건에서 삭제합니다.',
 
   columnsHelp:
-    '가중치가 큰 항목일수록 먼저 각 반에 고르게 나눕니다. 0이면 그 항목은 반영하지 않습니다. "체크"는 체크된 학생 수를, "목록"은 선택지별 인원을, "숫자"(7종류 이상의 숫자)는 반 평균을 맞춥니다.',
+    '가중치가 큰 항목일수록 먼저 각 반에 고르게 나눕니다. 0이면 그 항목은 반영하지 않습니다. "체크"는 체크된 학생 수를, "목록"과 "정도"(1–5)는 선택지·단계별 인원을, "숫자"(7종류 이상의 숫자)는 반 평균을 맞춥니다.',
   deleteColumnA11y: '항목 "{name}" 삭제',
   deleteColumnTitle: '항목 삭제',
   deleteColumnBody: '모든 학생의 명단에서 "{name}" 항목을 삭제합니다.',

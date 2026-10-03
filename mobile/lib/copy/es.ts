@@ -57,6 +57,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   noTaken: 'El N.º {no} ya lo usa otro estudiante',
   kindFlag: 'Casilla',
   kindCategory: 'Lista',
+  kindDegree: 'Nivel (1–5)',
   kindNumeric: 'Número',
   blank: 'Vacío',
   newValuePlaceholder: 'Escribe una opción nueva y presiona Enter',
@@ -69,7 +70,7 @@ export const ES_COPY: Record<CopyKey, string> = {
   deleteStudentBody: '{who} se quitará de la lista y de todas las condiciones.',
 
   columnsHelp:
-    'Los criterios con más peso se reparten primero de forma pareja entre los grupos. Con peso 0 el criterio no se toma en cuenta. Una casilla equilibra cuántos estudiantes la tienen marcada, una lista equilibra cada opción y un número (7 o más valores distintos) equilibra los promedios.',
+    'Los criterios con más peso se reparten primero de forma pareja entre los grupos. Con peso 0 el criterio no se toma en cuenta. Una casilla equilibra cuántos estudiantes la tienen marcada, una lista o un nivel (1–5) equilibra cada opción o nivel, y un número (7 o más valores distintos) equilibra los promedios.',
   deleteColumnA11y: 'Eliminar el criterio “{name}”',
   deleteColumnTitle: 'Eliminar criterio',
   deleteColumnBody: '“{name}” se eliminará para todos los estudiantes.',
