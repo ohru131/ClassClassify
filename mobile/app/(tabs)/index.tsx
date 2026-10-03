@@ -1,6 +1,7 @@
+import Ionicons from '@expo/vector-icons/Ionicons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 
 import { ColumnEditor } from '@/components/column-editor'
 import { ExportButton } from '@/components/export-button'
@@ -70,32 +71,41 @@ export default function RosterScreen() {
         </>
       ) : (
         <>
-          <Card style={{ gap: 10 }}>
-            <View style={[styles.row, { flexWrap: 'wrap', justifyContent: 'space-between' }]}>
-              <View style={{ flexShrink: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }} numberOfLines={1}>
-                  {fileName ?? t('rosterTitle')}
-                </Text>
-                <Text style={{ fontSize: 13, color: C.sub }}>
-                  {t('rosterSummary', { n: problem.students.length, cols: problem.columns.length, w: problem.wantedGroups.length, u: problem.unwantedGroups.length })}
-                </Text>
-              </View>
-              {/* 長い言語でもカードからはみ出さないよう、行の幅に収めて折り返す */}
-              <View style={[styles.row, { flexWrap: 'wrap', flexShrink: 1 }]}>
-                <Btn small icon="folder-open-outline" label={t('otherRoster')} onPress={() => setShowLoad(true)} />
-                <ExportButton
-                  icon={isPro ? 'grid-outline' : 'lock-closed-outline'}
-                  label={t('saveRosterXlsx')}
-                  title={t('exportSheetTitle', { format: t('exportExcel') })}
-                  isPro={isPro}
-                  busy={busy === 'xlsx' || busy === 'save'}
-                  choices={[
-                    { icon: 'share-social-outline', label: t('shareVia'), sub: t('shareViaSub'), onPress: () => exportXlsx(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster')) },
-                    ...(canSaveToFile ? [{ icon: 'save-outline' as const, label: t('saveToFile'), sub: t('saveToFileSub'), onPress: () => saveToFile(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster')) }] : []),
-                  ]}
-                />
-                <Btn small variant="primary" icon="arrow-forward" label={t('toRun')} onPress={() => router.navigate('/run')} />
-              </View>
+          {/* 名簿の切り替えは名簿そのものへの操作（書き出し・実行）とは別の段にする */}
+          <View style={[styles.row, { justifyContent: 'space-between', flexWrap: 'wrap' }]}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: C.sub }}>{t('currentRoster')}</Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setShowLoad(true)}
+              style={(st: { pressed: boolean; hovered?: boolean }) => [styles.row, { gap: 4, paddingVertical: 6, paddingHorizontal: 4, borderRadius: 8 }, (st.pressed || st.hovered) && { backgroundColor: C.hover }]}
+            >
+              <Ionicons name="swap-horizontal" size={16} color={C.primary} />
+              <Text style={{ fontSize: 13, fontWeight: '700', color: C.primary }}>{t('otherRoster')}</Text>
+            </Pressable>
+          </View>
+          <Card style={{ gap: 12, marginTop: -8 }}>
+            <View>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }} numberOfLines={1}>
+                {fileName ?? t('rosterTitle')}
+              </Text>
+              <Text style={{ fontSize: 13, color: C.sub }}>
+                {t('rosterSummary', { n: problem.students.length, cols: problem.columns.length, w: problem.wantedGroups.length, u: problem.unwantedGroups.length })}
+              </Text>
+            </View>
+            {/* 長い言語でもカードからはみ出さないよう、行の幅に収めて折り返す */}
+            <View style={[styles.row, { flexWrap: 'wrap' }]}>
+              <ExportButton
+                icon={isPro ? 'grid-outline' : 'lock-closed-outline'}
+                label={t('saveRosterXlsx')}
+                title={t('exportSheetTitle', { format: t('exportExcel') })}
+                isPro={isPro}
+                busy={busy === 'xlsx' || busy === 'save'}
+                choices={[
+                  { icon: 'share-social-outline', label: t('shareVia'), sub: t('shareViaSub'), onPress: () => exportXlsx(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster')) },
+                  ...(canSaveToFile ? [{ icon: 'save-outline' as const, label: t('saveToFile'), sub: t('saveToFileSub'), onPress: () => saveToFile(() => rosterWorkbook(problem, numClasses, fileLang), t('fileRoster')) }] : []),
+                ]}
+              />
+              <Btn small variant="primary" icon="arrow-forward" label={t('toRun')} onPress={() => router.navigate('/run')} />
             </View>
             {!isPro ? <Text style={{ fontSize: 12, color: C.muted }}>{t('proFeaturesNote')}</Text> : null}
           </Card>

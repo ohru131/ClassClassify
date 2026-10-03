@@ -329,6 +329,20 @@ function jaWorkbook(id: SampleId): WorkBook {
   const wb = XLSX.read(file, { type: 'buffer', cellStyles: true })
   const ws = wb.Sheets['生徒名簿']
   const range = XLSX.utils.decode_range(ws['!ref']!)
+  // 性別♀（○ = 女、空欄 = 男）→ 性別（♀ / ♂ のリスト）
+  for (let c = range.s.c; c <= range.e.c; c++) {
+    const head = ws[XLSX.utils.encode_cell({ r: 1, c })]
+    if (!head || head.v !== '性別♀') continue
+    head.v = '性別'
+    delete head.w
+    for (let row = 2; row <= range.e.r; row++) {
+      if (!ws[XLSX.utils.encode_cell({ r: row, c: 0 })]) continue
+      const addr = XLSX.utils.encode_cell({ r: row, c })
+      const female = ws[addr] && String(ws[addr].v ?? '').trim() !== ''
+      ws[addr] = { ...(ws[addr] ?? {}), t: 's', v: female ? '♀' : '♂' }
+      delete ws[addr].w
+    }
+  }
   const col = range.e.c + 1
   const r = rng(id.length * 97 + 13)
   const spec = JA_SCORE[id]

@@ -61,11 +61,14 @@ export async function saveBase64As(fileName: string, mimeType: string, base64: s
 export const saveXlsx = (wb: WorkBook, fileName: string): Promise<boolean> => saveBase64As(fileName, XLSX_MIME, writeXlsx(wb, 'base64'))
 
 /** ブックを .xlsx としてキャッシュに書き、OS の共有シートを開く（Excel・Google ドライブ・メール等へ） */
-export async function shareXlsx(wb: WorkBook, fileName: string, unavailableMessage: string): Promise<void> {
+export const shareXlsx = (wb: WorkBook, fileName: string, unavailableMessage: string): Promise<void> => shareXlsxBase64(writeXlsx(wb, 'base64'), fileName, unavailableMessage)
+
+/** .xlsx の中身（base64）をそのまま共有する（埋め込みのサンプルなど） */
+export async function shareXlsxBase64(base64: string, fileName: string, unavailableMessage: string): Promise<void> {
   if (!(await Sharing.isAvailableAsync())) throw new Error(unavailableMessage)
   const uri = await exportUri(fileName)
   try {
-    await FileSystem.writeAsStringAsync(uri, writeXlsx(wb, 'base64'), { encoding: FileSystem.EncodingType.Base64 })
+    await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 })
     await Sharing.shareAsync(uri, { mimeType: XLSX_MIME, UTI: 'org.openxmlformats.spreadsheetml.sheet', dialogTitle: fileName })
   } finally {
     // 共有シートが閉じたら消す（渡した先のアプリは既に自分の側へコピーしている）

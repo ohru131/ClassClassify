@@ -5,7 +5,6 @@ import type { AppLanguage } from './languages'
 export type PrivacySection = { title: string; body: string[] }
 
 const RC = 'https://www.revenuecat.com/privacy'
-const GH = 'https://github.com/ohru131/ClassClassify'
 
 /** 最終更新日（本文を変えたら更新する）。Web で公開しているページ（privacy/index.html）にも出す */
 export const PRIVACY_UPDATED = '2026-10-01'
@@ -54,7 +53,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `RevenueCat のプライバシーポリシー: ${RC}`,
       ],
     },
-    { title: 'お問い合わせ', body: [`ご質問は GitHub（${GH}）の Issues からお寄せください。`] },
   ],
   en: [
     {
@@ -76,7 +74,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `RevenueCat privacy policy: ${RC}`,
       ],
     },
-    { title: 'Contact', body: [`Please send questions via Issues on GitHub (${GH}).`] },
   ],
   ko: [
     {
@@ -98,7 +95,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `RevenueCat 개인정보 처리방침: ${RC}`,
       ],
     },
-    { title: '문의', body: [`문의는 GitHub(${GH})의 Issues로 보내 주십시오.`] },
   ],
   es: [
     {
@@ -120,7 +116,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `Política de privacidad de RevenueCat: ${RC}`,
       ],
     },
-    { title: 'Contacto', body: [`Envía tus preguntas en Issues de GitHub (${GH}).`] },
   ],
   de: [
     {
@@ -142,7 +137,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `Datenschutzerklärung von RevenueCat: ${RC}`,
       ],
     },
-    { title: 'Kontakt', body: [`Fragen bitte über die Issues auf GitHub (${GH}).`] },
   ],
   'pt-BR': [
     {
@@ -164,7 +158,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `Política de privacidade do RevenueCat: ${RC}`,
       ],
     },
-    { title: 'Contato', body: [`Envie dúvidas pelas Issues do GitHub (${GH}).`] },
   ],
 }
 

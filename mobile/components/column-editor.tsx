@@ -43,7 +43,7 @@ export function ColumnEditor({ problem, onChange }: { problem: Problem; onChange
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 16, fontWeight: '800', color: C.text }}>{c.name}</Text>
                 <Text style={{ fontSize: 12, color: C.sub, marginTop: 2 }} numberOfLines={2}>
-                  {t(KIND_KEY[c.kind])} · {levelsText(c, t('blankOnly'))}
+                  {c.kind === 'category' ? t(KIND_KEY[c.kind]) : `${t(KIND_KEY[c.kind])} · ${levelsText(c, t('blankOnly'))}`}
                 </Text>
               </View>
               <Btn
@@ -60,7 +60,8 @@ export function ColumnEditor({ problem, onChange }: { problem: Problem; onChange
               <Text style={styles.label}>{t('weight')}</Text>
               <Stepper label={t('weightA11y', { name: c.name })} value={w} min={0} max={5} step={0.5} format={(v) => i18nNum(v)} onChange={(v) => setWeight(i, v)} />
             </View>
-            {c.levels.length === 0 ? <Text style={{ fontSize: 12, color: C.warn }}>{t('columnEmpty')}</Text> : null}
+            {c.kind === 'category' ? <OptionsEditor problem={problem} column={c} onChange={onChange} /> : null}
+            {c.levels.length === 0 && c.kind !== 'category' ? <Text style={{ fontSize: 12, color: C.warn }}>{t('columnEmpty')}</Text> : null}
           </Card>
         )
       })}
@@ -79,6 +80,85 @@ export function ColumnEditor({ problem, onChange }: { problem: Problem; onChange
         {duplicate && trimmed ? <Text style={{ color: C.danger, fontSize: 12 }}>{t('duplicateColumn')}</Text> : null}
         <Btn variant="soft" icon="add" label={t('add')} disabled={!trimmed || duplicate} onPress={add} />
       </Card>
+    </View>
+  )
+}
+
+/** リストの選択肢の一覧・追加・名前の変更・削除 */
+function OptionsEditor({ problem, column, onChange }: { problem: Problem; column: ColumnSpec; onChange: (f: (p: Problem) => Problem) => void }) {
+  const { t } = useI18n()
+  const [editing, setEditing] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
+  const [added, setAdded] = useState('')
+  const name = column.name
+  const count = (l: string) => problem.students.filter((s) => s.values[name] === l).length
+  const v = added.trim()
+  const addDup = column.levels.includes(v)
+  const add = () => {
+    if (!v || addDup) return
+    onChange((p) => roster.addLevel(p, name, v))
+    setAdded('')
+  }
+  const d = draft.trim()
+  const renameDup = editing !== null && d !== editing && column.levels.includes(d)
+  const rename = () => {
+    if (editing !== null && d && !renameDup) onChange((p) => roster.renameLevel(p, name, editing, d))
+    setEditing(null)
+  }
+  return (
+    <View style={{ gap: 8 }}>
+      <Text style={styles.label}>{t('listOptions')}</Text>
+      {column.levels.map((l) =>
+        editing === l ? (
+          <View key={l} style={styles.row}>
+            <TextInput style={[styles.input, { flex: 1 }]} value={draft} onChangeText={setDraft} onSubmitEditing={rename} autoFocus returnKeyType="done" accessibilityLabel={t('editOptionA11y', { v: l })} />
+            <Btn small variant="soft" icon="checkmark" accessibilityLabel={t('save')} disabled={!d || renameDup} onPress={rename} />
+            <Btn small icon="close" accessibilityLabel={t('cancel')} onPress={() => setEditing(null)} />
+          </View>
+        ) : (
+          <View key={l} style={[styles.row, { paddingLeft: 12, borderRadius: 10, backgroundColor: '#F8FAFC' }]}>
+            <Text style={{ flex: 1, fontSize: 15, fontWeight: '700', color: C.text }}>{l}</Text>
+            <Text style={{ fontSize: 12, color: C.muted, fontVariant: ['tabular-nums'] }}>{count(l)}</Text>
+            <Btn
+              small
+              icon="create-outline"
+              accessibilityLabel={t('editOptionA11y', { v: l })}
+              onPress={() => {
+                setEditing(l)
+                setDraft(l)
+              }}
+              style={{ backgroundColor: 'transparent', borderWidth: 0 }}
+            />
+            <Btn
+              small
+              icon="trash-outline"
+              variant="danger"
+              accessibilityLabel={t('deleteOptionA11y', { v: l })}
+              onPress={async () => {
+                const n = count(l)
+                if (n === 0 || (await confirmAction(t('deleteOptionTitle'), t('deleteOptionBody', { v: l, n }), t('delete'), t('cancel')))) onChange((p) => roster.removeLevel(p, name, l))
+              }}
+              style={{ backgroundColor: 'transparent' }}
+            />
+          </View>
+        ),
+      )}
+      {renameDup ? <Text style={{ color: C.danger, fontSize: 12 }}>{t('duplicateOption')}</Text> : null}
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, { flex: 1 }]}
+          value={added}
+          onChangeText={setAdded}
+          onSubmitEditing={add}
+          returnKeyType="done"
+          placeholder={t('newValuePlaceholder')}
+          placeholderTextColor={C.muted}
+          accessibilityLabel={t('addOptionChip')}
+        />
+        <Btn small variant="soft" icon="add" accessibilityLabel={t('addOptionChip')} disabled={!v || addDup} onPress={add} />
+      </View>
+      {addDup && v ? <Text style={{ color: C.danger, fontSize: 12 }}>{t('duplicateOption')}</Text> : null}
+      <Text style={{ fontSize: 12, color: C.muted }}>{t('listOptionsHint')}</Text>
     </View>
   )
 }
