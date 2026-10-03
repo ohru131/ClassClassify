@@ -39,7 +39,7 @@ export const EN_COPY = {
   sampleGroup: 'Group work (30 students, 6 groups)',
   sampleExcelTitle: 'Download "{label}" as Excel',
   samplesExcelHint: 'Click ⬇ to download a sample as Excel (free). Edit it and load it in the box above.',
-  currentRoster: 'Open roster',
+  currentRoster: 'Current roster',
   otherRoster: 'Open another roster',
   backToRoster: 'Cancel (back to the current roster)',
   rosterSummary: '{n} students · {cols} attributes · keep together {w} · keep apart {u}',

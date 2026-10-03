@@ -93,7 +93,7 @@ export const EN_COPY = {
   listOptionsHint: 'Options that no one has chosen are not kept when exporting to Excel.',
   sampleExcelA11y: 'Get "{label}" as Excel',
   samplesExcelHint: 'Tap ⬇ to get a sample as Excel. Edit it and load it with "Choose an Excel file".',
-  currentRoster: 'Open roster',
+  currentRoster: 'Current roster',
 
   wantedTitle: 'Keep together',
   unwantedTitle: 'Keep apart',
