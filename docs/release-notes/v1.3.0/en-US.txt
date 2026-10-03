@@ -1,0 +1,6 @@
+- Attributes now come in four types: Checkbox, List, Scale (1–5) and Number. Lists and scales are picked from chips.
+- You can add, rename and delete list options on the Attributes tab.
+- In a new roster, "Gender" is now a list (♂ ♀ ?).
+- Get the sample rosters as Excel files for free from the loading screen. Edit them and load them back.
+- "Open another roster" now sits on its own row, apart from the roster actions.
+- The sample attributes have been reviewed for each country.

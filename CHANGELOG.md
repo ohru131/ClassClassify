@@ -6,6 +6,8 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-03
+
 - 項目の種類「該当」を「チェック」、「カテゴリ」を「リスト」に改めた。チェックはチェックボックス、リストは1つだけ選ぶチップで入力する。リストの選択肢は「項目・重み」で追加・名前の変更・削除ができ、誰も選んでいなくても残る。
 - 項目の種類に「程度」（1〜5の整数）を加え、チェック・リスト・程度・数値の4種類にした。値が 1〜5 の整数だけの列は程度として読み込む。
 - Web 版も同じ入力（チェックボックス・リストと程度のチップ・選択肢の編集）、サンプルの Excel の入手、「別の名簿を開く」の配置にした。
@@ -34,7 +36,8 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 - 結果の Excel 書き出し・印刷・PDF 共有は Pro（買い切り）で提供する。
 - 日本語・英語・ドイツ語・スペイン語・韓国語・ポルトガル語に対応する。
 
-[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/ohru131/ClassClassify/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ohru131/ClassClassify/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/ohru131/ClassClassify/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ohru131/ClassClassify/releases/tag/v1.0.0
