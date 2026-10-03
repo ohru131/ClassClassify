@@ -4,7 +4,7 @@
 // - 書き出し（export.ts）は渡された言語の語彙で出す。省略時は日本語（Web 版の挙動のまま）
 // 書き出した名前は必ず読み込みの別名にも含まれる（同じ表を両方が使うので、往復で壊れない）。
 
-import type { Problem } from './types'
+import type { ColumnKind, Problem } from './types'
 import type { Violation } from './evaluate'
 
 export type FileLanguage = 'ja' | 'en' | 'ko' | 'es' | 'de' | 'pt-BR'
@@ -21,7 +21,12 @@ export interface FileLabels {
     pairs: string
     summary: string
     failed: string
+    /** 項目の種類とリストの選択肢（名簿に書き出し、読み込みで種類・選択肢を戻す） */
+    attributes: string
   }
+  /** 項目シートの見出しと種類の名前 */
+  attrHead: { name: string; kind: string; options: string }
+  kindNames: Record<ColumnKind, string>
   /** 生徒名簿の見出し */
   weight: string
   no: string
@@ -60,7 +65,9 @@ const who = (p: Problem, i: number) => `${p.students[i].no}:${p.students[i].name
 
 export const FILE_LABELS: Record<FileLanguage, FileLabels> = {
   ja: {
-    sheets: { settings: '設定', roster: '生徒名簿', wanted: '同じ組ペア', unwanted: '別の組ペア', assign: '組分け', byClass: 'クラス別名簿', pairs: 'ペア指定', summary: '集計', failed: '組み合わせ失敗' },
+    sheets: { settings: '設定', roster: '生徒名簿', wanted: '同じ組ペア', unwanted: '別の組ペア', assign: '組分け', byClass: 'クラス別名簿', pairs: 'ペア指定', summary: '集計', failed: '組み合わせ失敗', attributes: '項目' },
+    attrHead: { name: '項目', kind: '種類', options: '選択肢' },
+    kindNames: { flag: 'チェック', category: 'リスト', degree: '程度', numeric: '数値' },
     weight: '重み',
     no: 'NO',
     name: '名前',
@@ -89,7 +96,9 @@ export const FILE_LABELS: Record<FileLanguage, FileLabels> = {
     joinSep: '・',
   },
   en: {
-    sheets: { settings: 'Settings', roster: 'Roster', wanted: 'Keep together', unwanted: 'Keep apart', assign: 'Placement', byClass: 'Class lists', pairs: 'Pairings', summary: 'Summary', failed: 'Unmet conditions' },
+    sheets: { settings: 'Settings', roster: 'Roster', wanted: 'Keep together', unwanted: 'Keep apart', assign: 'Placement', byClass: 'Class lists', pairs: 'Pairings', summary: 'Summary', failed: 'Unmet conditions', attributes: 'Attributes' },
+    attrHead: { name: 'Attribute', kind: 'Type', options: 'Options' },
+    kindNames: { flag: 'Checkbox', category: 'List', degree: 'Scale', numeric: 'Number' },
     weight: 'Weight',
     no: 'No.',
     name: 'Name',
@@ -118,7 +127,9 @@ export const FILE_LABELS: Record<FileLanguage, FileLabels> = {
     joinSep: ' / ',
   },
   ko: {
-    sheets: { settings: '설정', roster: '학생 명단', wanted: '같은 반 배정', unwanted: '분리 배정', assign: '반 편성', byClass: '반별 명단', pairs: '배정 조건', summary: '집계', failed: '충족하지 못한 조건' },
+    sheets: { settings: '설정', roster: '학생 명단', wanted: '같은 반 배정', unwanted: '분리 배정', assign: '반 편성', byClass: '반별 명단', pairs: '배정 조건', summary: '집계', failed: '충족하지 못한 조건', attributes: '항목' },
+    attrHead: { name: '항목', kind: '종류', options: '선택지' },
+    kindNames: { flag: '체크', category: '목록', degree: '정도', numeric: '숫자' },
     weight: '가중치',
     no: '번호',
     name: '이름',
@@ -147,7 +158,9 @@ export const FILE_LABELS: Record<FileLanguage, FileLabels> = {
     joinSep: '·',
   },
   es: {
-    sheets: { settings: 'Configuración', roster: 'Lista de estudiantes', wanted: 'Mantener juntos', unwanted: 'Separar', assign: 'Distribución', byClass: 'Listas por grupo', pairs: 'Condiciones', summary: 'Resumen', failed: 'Condiciones no cumplidas' },
+    sheets: { settings: 'Configuración', roster: 'Lista de estudiantes', wanted: 'Mantener juntos', unwanted: 'Separar', assign: 'Distribución', byClass: 'Listas por grupo', pairs: 'Condiciones', summary: 'Resumen', failed: 'Condiciones no cumplidas', attributes: 'Criterios' },
+    attrHead: { name: 'Criterio', kind: 'Tipo', options: 'Opciones' },
+    kindNames: { flag: 'Casilla', category: 'Lista', degree: 'Nivel', numeric: 'Número' },
     weight: 'Peso',
     no: 'N.º',
     name: 'Nombre',
@@ -176,7 +189,9 @@ export const FILE_LABELS: Record<FileLanguage, FileLabels> = {
     joinSep: ' / ',
   },
   de: {
-    sheets: { settings: 'Einstellungen', roster: 'Schülerliste', wanted: 'Zusammen', unwanted: 'Trennen', assign: 'Klasseneinteilung', byClass: 'Klassenlisten', pairs: 'Wünsche', summary: 'Auswertung', failed: 'Nicht erfüllt' },
+    sheets: { settings: 'Einstellungen', roster: 'Schülerliste', wanted: 'Zusammen', unwanted: 'Trennen', assign: 'Klasseneinteilung', byClass: 'Klassenlisten', pairs: 'Wünsche', summary: 'Auswertung', failed: 'Nicht erfüllt', attributes: 'Merkmale' },
+    attrHead: { name: 'Merkmal', kind: 'Art', options: 'Optionen' },
+    kindNames: { flag: 'Ankreuzen', category: 'Liste', degree: 'Stufe', numeric: 'Zahl' },
     weight: 'Gewicht',
     no: 'Nr.',
     name: 'Name',
@@ -205,7 +220,9 @@ export const FILE_LABELS: Record<FileLanguage, FileLabels> = {
     joinSep: ' / ',
   },
   'pt-BR': {
-    sheets: { settings: 'Configurações', roster: 'Lista de alunos', wanted: 'Manter juntos', unwanted: 'Separar', assign: 'Enturmação', byClass: 'Listas por turma', pairs: 'Condições', summary: 'Resumo', failed: 'Condições não atendidas' },
+    sheets: { settings: 'Configurações', roster: 'Lista de alunos', wanted: 'Manter juntos', unwanted: 'Separar', assign: 'Enturmação', byClass: 'Listas por turma', pairs: 'Condições', summary: 'Resumo', failed: 'Condições não atendidas', attributes: 'Critérios' },
+    attrHead: { name: 'Critério', kind: 'Tipo', options: 'Opções' },
+    kindNames: { flag: 'Caixa de seleção', category: 'Lista', degree: 'Nível', numeric: 'Número' },
     weight: 'Peso',
     no: 'Nº',
     name: 'Nome',
@@ -263,7 +280,13 @@ export const SHEET_ALIASES = {
   roster: Object.values(FILE_LABELS).map((l) => l.sheets.roster),
   wanted: Object.values(FILE_LABELS).map((l) => l.sheets.wanted),
   unwanted: Object.values(FILE_LABELS).map((l) => l.sheets.unwanted),
+  attributes: Object.values(FILE_LABELS).map((l) => l.sheets.attributes),
 }
+
+const KINDS: ColumnKind[] = ['flag', 'category', 'degree', 'numeric']
+const KIND_NAMES = new Map<string, ColumnKind>([...KINDS.map((k) => [k, k] as const), ...Object.values(FILE_LABELS).flatMap((l) => KINDS.map((k) => [norm(l.kindNames[k]), k] as const))])
+/** 項目シートの種類の名前（どの言語でも、内部の名前でも）→ 種類 */
+export const kindFromName = (s: string): ColumnKind | undefined => KIND_NAMES.get(s) ?? KIND_NAMES.get(norm(s))
 
 // 素の「N」「#」は入れない（属性の列名として使われうるので、番号の列と取り違える）
 const NO_HEADERS = new Set([...all('no'), 'NO', 'NUM', 'NÚM', 'NUMERO', 'NÚMERO', 'NUMMER', 'NR'].map(norm))

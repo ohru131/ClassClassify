@@ -4,7 +4,7 @@
 // （スマホ版は mobile/ の `npm run samples:embed` でこの出力を base64 にして埋め込む）
 //
 // - ja: 既存の public/sample*.xlsx（ピアノ伴奏者など日本固有の配慮を含む）を基本にし、
-//   点数の項目を1つだけ足して「該当／カテゴリ／数値（平均）」の3種類がすべて使われるようにする。
+//   点数の項目を1つだけ足して「チェック／リスト／程度／数値」の4種類がすべて使われるようにする。
 //   Web 版の従来の URL（public/sample*.xlsx・public/template.zip）は変えずに残す。
 // - 他の言語: その国の学校でクラス分けに実際に使われる項目で作り直す（根拠は docs/i18n-glossary.md 第3節）。
 //   人数・組数・ペア指定の数は日本語のサンプルに揃える。値は固定の乱数で作るので毎回同じ出力になる。
@@ -41,7 +41,8 @@ type Col =
   | { kind: 'flag'; name: string; rate: number; mark?: string }
   | { kind: 'category'; name: string; values: string[]; weights?: number[] }
   | { kind: 'score'; name: string; min: number; max: number; step: number; decimals?: number }
-  | { kind: 'gender'; name: string; values: [string, string] }
+  // third: 3つ目の選択肢（count 人だけ。生徒の並びの中で等間隔に決まる）
+  | { kind: 'gender'; name: string; values: [string, string]; third?: { value: string; count: number } }
 
 interface SampleDef {
   n: number
@@ -54,37 +55,43 @@ interface SampleDef {
 
 const TICK = '✓'
 
+/** 程度（1〜5）の項目。中央寄りの重み */
+const degree = (name: string): Col => ({ kind: 'category', name, values: ['1', '2', '3', '4', '5'], weights: [1, 2, 3, 2, 1] })
+const GROUPS = ['1', '2', '3', '4', '5', '6']
+
 // 国ごとの項目（docs/i18n-glossary.md 第3節に対訳と根拠）
 const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
   en: {
     sample1: {
       n: 80, k: 4, max: 25, wanted: 4, unwanted: 4,
       columns: [
-        { kind: 'gender', name: 'Gender', values: ['F', 'M'] },
+        { kind: 'gender', name: 'Gender', values: ['F', 'M'], third: { value: 'X', count: 3 } },
         { kind: 'score', name: 'Reading score', min: 55, max: 100, step: 1 },
-        { kind: 'category', name: 'Math level', values: ['1', '2', '3'], weights: [1, 2, 1] },
-        { kind: 'flag', name: 'IEP/504 plan', rate: 0.12 },
-        { kind: 'flag', name: 'English learner', rate: 0.1 },
-        { kind: 'flag', name: 'Behavior support', rate: 0.08 },
+        degree('Math level'),
+        { kind: 'flag', name: 'Learning support', rate: 0.12 },
+        { kind: 'flag', name: 'English support', rate: 0.1 },
         { kind: 'flag', name: 'Leadership', rate: 0.12 },
+        { kind: 'category', name: 'Previous class', values: ['A', 'B', 'C', 'D'] },
       ],
     },
     sample2: {
       n: 80, k: 4, max: 25, wanted: 1, unwanted: 2,
       columns: [
-        { kind: 'gender', name: 'Gender', values: ['F', 'M'] },
+        { kind: 'gender', name: 'Gender', values: ['F', 'M'], third: { value: 'X', count: 2 } },
         { kind: 'score', name: 'Reading score', min: 55, max: 100, step: 1 },
-        { kind: 'flag', name: 'IEP/504 plan', rate: 0.12 },
+        degree('Reading level'),
+        { kind: 'flag', name: 'Learning support', rate: 0.12 },
         { kind: 'category', name: 'Previous class', values: ['A', 'B', 'C', 'D'] },
       ],
     },
     'sample-group': {
       n: 30, k: 6, max: 5, wanted: 0, unwanted: 4,
       columns: [
-        { kind: 'gender', name: 'Gender', values: ['F', 'M'] },
+        { kind: 'gender', name: 'Gender', values: ['F', 'M'], third: { value: 'X', count: 1 } },
         { kind: 'score', name: 'Reading score', min: 55, max: 100, step: 1 },
+        degree('Math level'),
         { kind: 'flag', name: 'Leadership', rate: 0.2 },
-        { kind: 'category', name: 'Previous group', values: ['1', '2', '3', '4', '5', '6'] },
+        { kind: 'category', name: 'Previous group', values: GROUPS },
       ],
     },
   },
@@ -94,9 +101,8 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       columns: [
         { kind: 'gender', name: '성별', values: ['여', '남'] },
         { kind: 'score', name: '학업 성취도', min: 55, max: 100, step: 1 },
-        // 교우 관계를 원만/보통 のような評価の値で持たない（名簿に評価が残る）。支援が要る子だけに印を付ける
-        { kind: 'flag', name: '교우 관계 지원', rate: 0.12 },
-        { kind: 'flag', name: '특수교육 대상', rate: 0.06 },
+        degree('수학 수준'),
+        { kind: 'flag', name: '학습 지원', rate: 0.06 },
         { kind: 'flag', name: '한국어 지원', rate: 0.06 },
         { kind: 'flag', name: '리더십', rate: 0.12 },
         { kind: 'category', name: '출신 초등학교', values: ['가람초', '나래초', '다솜초', '라온초'] },
@@ -107,7 +113,8 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       columns: [
         { kind: 'gender', name: '성별', values: ['여', '남'] },
         { kind: 'score', name: '학업 성취도', min: 55, max: 100, step: 1 },
-        { kind: 'flag', name: '특수교육 대상', rate: 0.06 },
+        degree('국어 수준'),
+        { kind: 'flag', name: '학습 지원', rate: 0.06 },
         { kind: 'category', name: '이전 반', values: ['1반', '2반', '3반', '4반'] },
       ],
     },
@@ -116,8 +123,9 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       columns: [
         { kind: 'gender', name: '성별', values: ['여', '남'] },
         { kind: 'score', name: '학업 성취도', min: 55, max: 100, step: 1 },
+        degree('수학 수준'),
         { kind: 'flag', name: '리더십', rate: 0.2 },
-        { kind: 'category', name: '이전 모둠', values: ['1', '2', '3', '4', '5', '6'] },
+        { kind: 'category', name: '이전 모둠', values: GROUPS },
       ],
     },
   },
@@ -125,10 +133,10 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
     sample1: {
       n: 80, k: 4, max: 25, wanted: 4, unwanted: 4,
       columns: [
-        { kind: 'gender', name: 'Género', values: ['F', 'M'] },
+        { kind: 'gender', name: 'Género', values: ['F', 'M'], third: { value: 'X', count: 3 } },
         { kind: 'score', name: 'Promedio de notas', min: 4.0, max: 7.0, step: 0.1, decimals: 1 },
-        { kind: 'flag', name: 'NEE (PIE)', rate: 0.1 },
-        { kind: 'category', name: 'Convivencia escolar', values: ['Sin observaciones', 'Seguimiento'], weights: [7, 1] },
+        degree('Nivel de lectura'),
+        { kind: 'flag', name: 'Apoyo educativo', rate: 0.1 },
         { kind: 'flag', name: 'Liderazgo', rate: 0.12 },
         { kind: 'category', name: 'Grupo de origen', values: ['A', 'B', 'C', 'D'] },
       ],
@@ -136,19 +144,21 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
     sample2: {
       n: 80, k: 4, max: 25, wanted: 1, unwanted: 2,
       columns: [
-        { kind: 'gender', name: 'Género', values: ['F', 'M'] },
+        { kind: 'gender', name: 'Género', values: ['F', 'M'], third: { value: 'X', count: 2 } },
         { kind: 'score', name: 'Promedio de notas', min: 4.0, max: 7.0, step: 0.1, decimals: 1 },
-        { kind: 'flag', name: 'NEE (PIE)', rate: 0.1 },
+        degree('Nivel de matemática'),
+        { kind: 'flag', name: 'Apoyo educativo', rate: 0.1 },
         { kind: 'category', name: 'Grupo de origen', values: ['A', 'B', 'C', 'D'] },
       ],
     },
     'sample-group': {
       n: 30, k: 6, max: 5, wanted: 0, unwanted: 4,
       columns: [
-        { kind: 'gender', name: 'Género', values: ['F', 'M'] },
+        { kind: 'gender', name: 'Género', values: ['F', 'M'], third: { value: 'X', count: 1 } },
         { kind: 'score', name: 'Promedio de notas', min: 4.0, max: 7.0, step: 0.1, decimals: 1 },
+        degree('Nivel de lectura'),
         { kind: 'flag', name: 'Liderazgo', rate: 0.2 },
-        { kind: 'category', name: 'Equipo anterior', values: ['1', '2', '3', '4', '5', '6'] },
+        { kind: 'category', name: 'Equipo anterior', values: GROUPS },
       ],
     },
   },
@@ -156,31 +166,33 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
     sample1: {
       n: 80, k: 4, max: 25, wanted: 4, unwanted: 4,
       columns: [
-        { kind: 'gender', name: 'Geschlecht', values: ['w', 'm'] },
+        { kind: 'gender', name: 'Geschlecht', values: ['w', 'm'], third: { value: 'd', count: 3 } },
         { kind: 'score', name: 'Notenschnitt', min: 1.0, max: 4.0, step: 0.1, decimals: 1 },
-        { kind: 'flag', name: 'Förderbedarf', rate: 0.08 },
+        degree('Lesekompetenz'),
+        { kind: 'flag', name: 'Förderung', rate: 0.08 },
         { kind: 'flag', name: 'DaZ', rate: 0.1 },
-        // 「unauffällig」のような評価の値を名簿に残さない。支援が要る子だけに印を付ける
-        { kind: 'flag', name: 'Unterstützung Verhalten', rate: 0.12 },
+        { kind: 'flag', name: 'Teamfähigkeit', rate: 0.12 },
         { kind: 'category', name: 'Herkunftsgrundschule', values: ['GS Am Park', 'GS Lindenweg', 'GS Nord', 'GS Süd'] },
       ],
     },
     sample2: {
       n: 80, k: 4, max: 25, wanted: 1, unwanted: 2,
       columns: [
-        { kind: 'gender', name: 'Geschlecht', values: ['w', 'm'] },
+        { kind: 'gender', name: 'Geschlecht', values: ['w', 'm'], third: { value: 'd', count: 2 } },
         { kind: 'score', name: 'Notenschnitt', min: 1.0, max: 4.0, step: 0.1, decimals: 1 },
-        { kind: 'flag', name: 'Förderbedarf', rate: 0.08 },
+        degree('Mathematikniveau'),
+        { kind: 'flag', name: 'Förderung', rate: 0.08 },
         { kind: 'category', name: 'Herkunftsgrundschule', values: ['GS Am Park', 'GS Lindenweg', 'GS Nord', 'GS Süd'] },
       ],
     },
     'sample-group': {
       n: 30, k: 6, max: 5, wanted: 0, unwanted: 4,
       columns: [
-        { kind: 'gender', name: 'Geschlecht', values: ['w', 'm'] },
+        { kind: 'gender', name: 'Geschlecht', values: ['w', 'm'], third: { value: 'd', count: 1 } },
         { kind: 'score', name: 'Notenschnitt', min: 1.0, max: 4.0, step: 0.1, decimals: 1 },
+        degree('Lesekompetenz'),
         { kind: 'flag', name: 'Teamfähigkeit', rate: 0.2 },
-        { kind: 'category', name: 'Vorherige Gruppe', values: ['1', '2', '3', '4', '5', '6'] },
+        { kind: 'category', name: 'Vorherige Gruppe', values: GROUPS },
       ],
     },
   },
@@ -190,8 +202,8 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       columns: [
         { kind: 'gender', name: 'Gênero', values: ['F', 'M'] },
         { kind: 'score', name: 'Média', min: 5.0, max: 10.0, step: 0.1, decimals: 1 },
-        { kind: 'flag', name: 'AEE', rate: 0.08 },
-        { kind: 'category', name: 'Convivência', values: ['Tranquila', 'Acompanhamento'], weights: [7, 1] },
+        degree('Nível de leitura'),
+        { kind: 'flag', name: 'Apoio educacional', rate: 0.08 },
         { kind: 'flag', name: 'Liderança', rate: 0.12 },
         { kind: 'category', name: 'Turma de origem', values: ['A', 'B', 'C', 'D'] },
       ],
@@ -201,7 +213,8 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       columns: [
         { kind: 'gender', name: 'Gênero', values: ['F', 'M'] },
         { kind: 'score', name: 'Média', min: 5.0, max: 10.0, step: 0.1, decimals: 1 },
-        { kind: 'flag', name: 'AEE', rate: 0.08 },
+        degree('Nível de matemática'),
+        { kind: 'flag', name: 'Apoio educacional', rate: 0.08 },
         { kind: 'category', name: 'Turma de origem', values: ['A', 'B', 'C', 'D'] },
       ],
     },
@@ -210,8 +223,9 @@ const DEFS: Record<Lang, Record<SampleId, SampleDef>> = {
       columns: [
         { kind: 'gender', name: 'Gênero', values: ['F', 'M'] },
         { kind: 'score', name: 'Média', min: 5.0, max: 10.0, step: 0.1, decimals: 1 },
+        degree('Nível de leitura'),
         { kind: 'flag', name: 'Liderança', rate: 0.2 },
-        { kind: 'category', name: 'Grupo anterior', values: ['1', '2', '3', '4', '5', '6'] },
+        { kind: 'category', name: 'Grupo anterior', values: GROUPS },
       ],
     },
   },
@@ -278,7 +292,12 @@ function build(lang: Lang, id: SampleId): Problem {
     const g: 'f' | 'm' = i % 2 === 0 ? 'f' : 'm' // 男女は半々
     const values: Record<string, string> = {}
     for (const c of def.columns) {
-      if (c.kind === 'gender') values[c.name] = g === 'f' ? c.values[0] : c.values[1]
+      if (c.kind === 'gender') {
+        const t = c.third
+        // 3つ目の選択肢は等間隔の count 人だけ（決定的）。ほかは交互
+        const isThird = t && Array.from({ length: t.count }, (_, j) => Math.floor(((j + 0.5) * def.n) / t.count)).includes(i)
+        values[c.name] = isThird ? t.value : g === 'f' ? c.values[0] : c.values[1]
+      }
       else if (c.kind === 'flag') values[c.name] = r() < c.rate ? (c.mark ?? TICK) : ''
       else if (c.kind === 'category') values[c.name] = pick(r, c.values, c.weights)
       else {
@@ -329,6 +348,20 @@ function jaWorkbook(id: SampleId): WorkBook {
   const wb = XLSX.read(file, { type: 'buffer', cellStyles: true })
   const ws = wb.Sheets['生徒名簿']
   const range = XLSX.utils.decode_range(ws['!ref']!)
+  // 性別♀（○ = 女、空欄 = 男）→ 性別（♀ / ♂ のリスト）
+  for (let c = range.s.c; c <= range.e.c; c++) {
+    const head = ws[XLSX.utils.encode_cell({ r: 1, c })]
+    if (!head || head.v !== '性別♀') continue
+    head.v = '性別'
+    delete head.w
+    for (let row = 2; row <= range.e.r; row++) {
+      if (!ws[XLSX.utils.encode_cell({ r: row, c: 0 })]) continue
+      const addr = XLSX.utils.encode_cell({ r: row, c })
+      const female = ws[addr] && String(ws[addr].v ?? '').trim() !== ''
+      ws[addr] = { ...(ws[addr] ?? {}), t: 's', v: female ? '♀' : '♂' }
+      delete ws[addr].w
+    }
+  }
   const col = range.e.c + 1
   const r = rng(id.length * 97 + 13)
   const spec = JA_SCORE[id]
@@ -339,6 +372,16 @@ function jaWorkbook(id: SampleId): WorkBook {
     rows.push(hasNo ? [Number((spec.min + u * (spec.max - spec.min)).toFixed(spec.decimals))] : [''])
   }
   XLSX.utils.sheet_add_aoa(ws, rows, { origin: { r: 0, c: col } })
+  // sample2 には程度（1〜5）の項目が無いので、算数の習熟度を1つ足す（中央寄りの重み）
+  if (id === 'sample2') {
+    const rd = rng(id.length * 193 + 7)
+    const drows: (string | number)[][] = [[1], ['算数の習熟度']]
+    for (let row = 2; row <= range.e.r; row++) {
+      const hasNo = ws[XLSX.utils.encode_cell({ r: row, c: 0 })]
+      drows.push([hasNo ? Number(pick(rd, ['1', '2', '3', '4', '5'], [1, 2, 3, 2, 1])) : ''])
+    }
+    XLSX.utils.sheet_add_aoa(ws, drows, { origin: { r: 0, c: col + 1 } })
+  }
   return wb
 }
 

@@ -47,6 +47,8 @@ export default function App() {
   const [templateUrl, setTemplateUrl] = useState<string | null>(null)
   const [savedUrl, setSavedUrl] = useState<string | null>(null)
   const [editorTab, setEditorTab] = useState<EditorTab | null>(null)
+  // 読み込むたびに増やす（読み込み画面を閉じて名簿カードに戻すため）
+  const [loadCount, setLoadCount] = useState(0)
   const cancelRef = useRef<() => void>(() => {})
   const problemRef = useRef<Problem | null>(null)
   useEffect(() => {
@@ -65,6 +67,7 @@ export default function App() {
       setFileName(name)
       setSolution(null)
       setError(null)
+      setLoadCount((n) => n + 1)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     }
@@ -177,6 +180,16 @@ export default function App() {
     }
   }
 
+  // 名簿をひな形と同じ形式で保存（あとで読み込み直せる）
+  const exportRoster = async () => {
+    if (!problem) return
+    try {
+      saveBlob((await loadExport()).exportRoster(problem, numClasses, fileLang), `${t('fileRoster')}_${new Date().toISOString().slice(0, 10)}.xlsx`)
+    } catch (e) {
+      showError(e)
+    }
+  }
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 border-b border-white/60 bg-white/60 backdrop-blur-xl">
@@ -253,8 +266,12 @@ export default function App() {
         )}
 
         <DataStep
+          key={loadCount}
           onLoad={(d, n) => onLoad(d, n)}
+          problem={problem}
           fileName={fileName}
+          onOpenEditor={() => setEditorTab('students')}
+          onExport={exportRoster}
           onGoogle={googleEnabled ? loadFromGoogle : undefined}
           googleBusy={googleBusy}
           onCreateTemplate={googleEnabled ? createTemplate : undefined}
@@ -360,13 +377,7 @@ export default function App() {
           setTab={setEditorTab}
           onChange={onProblemChange}
           onClose={() => setEditorTab(null)}
-          onExport={async () => {
-            try {
-              saveBlob((await loadExport()).exportRoster(problem, numClasses, fileLang), `${t('fileRoster')}_${new Date().toISOString().slice(0, 10)}.xlsx`)
-            } catch (e) {
-              showError(e)
-            }
-          }}
+          onExport={exportRoster}
         />
       )}
 

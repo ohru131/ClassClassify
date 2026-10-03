@@ -5,9 +5,9 @@ import { Text, View } from 'react-native'
 import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
-import { blankProblem, loadSample, samplesFor } from '@/lib/samples'
+import { blankProblem, loadSample, sampleFile, samplesFor } from '@/lib/samples'
 import { parseWorkbook, rosterWorkbook } from '@/lib/solver'
-import { pickXlsx, shareXlsx } from '@/lib/xlsx-files'
+import { pickXlsx, safeFileName, shareXlsx, shareXlsxBase64 } from '@/lib/xlsx-files'
 import { C } from './theme'
 import { Btn, Card, styles, Title } from './ui'
 
@@ -17,7 +17,7 @@ export function LoadPanel({ onDone }: { onDone?: () => void }) {
   const { lang, t, parseMessages, fileLang } = useI18n()
   const { isWide } = useLayout()
   const router = useRouter()
-  const [busy, setBusy] = useState<null | 'pick' | 'template'>(null)
+  const [busy, setBusy] = useState<null | 'pick' | 'template' | `sample:${string}`>(null)
   // 二度押し対策（busy は再描画後にしか効かない）
   const lockRef = useRef(false)
   const fail = (e: unknown) => setError(e instanceof Error ? e.message : String(e))
@@ -53,6 +53,23 @@ export function LoadPanel({ onDone }: { onDone?: () => void }) {
       })
   }
 
+  // サンプルの Excel（無料）。書き換えて「Excel ファイルを選ぶ」から読み込める
+  const sampleExcel = (id: string) => {
+    if (lockRef.current) return
+    lockRef.current = true
+    setBusy(`sample:${id}`)
+    Promise.resolve()
+      .then(() => {
+        const { base64, label } = sampleFile(lang, id)
+        return shareXlsxBase64(base64, `${safeFileName(label)}.xlsx`, t('sharingUnavailable'))
+      })
+      .catch(fail)
+      .finally(() => {
+        lockRef.current = false
+        setBusy(null)
+      })
+  }
+
   const grow = isWide ? undefined : { flexGrow: 1 }
   return (
     <Card>
@@ -74,24 +91,27 @@ export function LoadPanel({ onDone }: { onDone?: () => void }) {
       <Text style={[styles.label, { marginTop: 16 }]}>{t('trySamples')}</Text>
       <View style={styles.wrap}>
         {samplesFor(lang).map((s) => (
-          <Btn
-            key={s.id}
-            small
-            variant="soft"
-            icon="sparkles-outline"
-            label={s.label}
-            onPress={() => {
-              try {
-                const { problem, label } = loadSample(lang, s.id)
-                loadProblem(problem, t('samplePrefix', { label }))
-                onDone?.()
-              } catch (e) {
-                fail(e)
-              }
-            }}
-          />
+          <View key={s.id} style={[styles.row, { gap: 4 }]}>
+            <Btn
+              small
+              variant="soft"
+              icon="sparkles-outline"
+              label={s.label}
+              onPress={() => {
+                try {
+                  const { problem, label } = loadSample(lang, s.id)
+                  loadProblem(problem, t('samplePrefix', { label }))
+                  onDone?.()
+                } catch (e) {
+                  fail(e)
+                }
+              }}
+            />
+            <Btn small icon="download-outline" accessibilityLabel={t('sampleExcelA11y', { label: s.label })} busy={busy === `sample:${s.id}`} onPress={() => sampleExcel(s.id)} />
+          </View>
         ))}
       </View>
+      <Text style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>{t('samplesExcelHint')}</Text>
       <Text style={{ fontSize: 12, color: C.muted, marginTop: 14 }} onPress={() => router.push('/privacy')} accessibilityRole="link">
         {t('privacyLink')}
       </Text>

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import { ChevronRight, Download, ExternalLink, Pencil, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
+import { ArrowLeftRight, ChevronRight, Download, ExternalLink, Pencil, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
 import type { ColumnSpec, Problem } from '../solver/types'
+import { safeFileName } from '../solver/filename'
 import { Segmented, StepHeader } from './ui'
 import { useT } from '../i18n/web'
 import { sampleUrl, templateZipUrl } from '../copy/core'
@@ -12,9 +13,14 @@ const SAMPLES = [
   { id: 'sample-group', label: 'sampleGroup' },
 ] as const
 
+/** ファイル名に使えない文字を除く（サンプルの表示名をそのままダウンロード名にするため） */
+
 export function DataStep({
   onLoad,
+  problem,
   fileName,
+  onOpenEditor,
+  onExport,
   onGoogle,
   googleBusy,
   onCreateTemplate,
@@ -22,7 +28,11 @@ export function DataStep({
   templateUrl,
 }: {
   onLoad: (data: ArrayBuffer, name: string) => void
+  problem: Problem | null
   fileName: string | null
+  onOpenEditor: () => void
+  /** 名簿をひな形と同じ形式の Excel で保存 */
+  onExport: () => void
   /** Google 連携が有効なときだけ渡す */
   onGoogle?: () => void
   googleBusy?: boolean
@@ -34,6 +44,9 @@ export function DataStep({
   const { t, lang } = useT()
   const input = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
+  // 名簿を開いているときは名簿カードを出し、「別の名簿を開く」で読み込み画面に切り替える
+  // （読み込むたびに App 側で key を変えるので、読み込んだら名簿カードに戻る）
+  const [showLoad, setShowLoad] = useState(false)
 
   const readFile = async (f: File) => onLoad(await f.arrayBuffer(), f.name)
   const loadSample = async (id: (typeof SAMPLES)[number]['id'], label: string) => {
@@ -41,11 +54,51 @@ export function DataStep({
     onLoad(await res.arrayBuffer(), t('samplePrefix', { label }))
   }
 
+  if (problem && !showLoad)
+    return (
+      <div>
+        {/* 名簿の切り替えは名簿そのものへの操作（編集・保存）とは別の段にする */}
+        <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2 px-1">
+          <span className="text-xs font-semibold text-slate-500">{t('currentRoster')}</span>
+          <button
+            type="button"
+            onClick={() => setShowLoad(true)}
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-50"
+          >
+            <ArrowLeftRight className="size-3.5" /> {t('otherRoster')}
+          </button>
+        </div>
+        <section className="card p-5 sm:p-8">
+          <StepHeader n={1} done title={t('step1Title')} />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30">
+                <FileSpreadsheet className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="truncate font-semibold text-slate-800">{fileName ?? t('rosterTitle')}</div>
+                <div className="text-xs text-slate-500">
+                  {t('rosterSummary', { n: problem.students.length, cols: problem.columns.length, w: problem.wantedGroups.length, u: problem.unwantedGroups.length })}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" className="btn-ghost" onClick={onExport} title={t('saveRosterTitle')}>
+                <Download className="size-4" /> {t('saveRoster')}
+              </button>
+              <button type="button" className="btn-primary" onClick={onOpenEditor}>
+                <Pencil className="size-4" /> {t('editRoster')}
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+
   return (
     <section className="card p-5 sm:p-8">
       <StepHeader
         n={1}
-        done={!!fileName}
         title={t('step1Title')}
         desc={onGoogle ? t('step1DescGoogle') : t('step1Desc')}
       />
@@ -68,10 +121,10 @@ export function DataStep({
         }`}
       >
         <div className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30 transition group-hover:scale-105">
-          {fileName ? <FileSpreadsheet className="size-6" /> : <Upload className="size-6" />}
+          <Upload className="size-6" />
         </div>
-        <div className="mt-4 font-semibold text-slate-800">{fileName ?? t('dropTitle')}</div>
-        <div className="mt-1 text-sm text-slate-500">{fileName ? t('dropAgain') : t('dropSub')}</div>
+        <div className="mt-4 font-semibold text-slate-800">{t('dropTitle')}</div>
+        <div className="mt-1 text-sm text-slate-500">{t('dropSub')}</div>
         <input
           ref={input}
           type="file"
@@ -117,16 +170,36 @@ export function DataStep({
         <span className="mx-1 hidden h-5 w-px bg-slate-200 sm:block" />
         <span className="text-xs font-semibold text-slate-400">{t('trySamples')}</span>
         {SAMPLES.map((s) => (
-          <button key={s.id} type="button" onClick={() => loadSample(s.id, t(s.label))} className="btn-ghost !px-3 !py-1.5 !text-xs">
-            <Sparkles className="size-3.5 text-fuchsia-500" /> {t(s.label)}
-          </button>
+          // サンプルはそのまま読み込むか、Excel をダウンロードして書き換えてから読み込む（無料）
+          <span key={s.id} className="inline-flex items-center gap-1">
+            <button type="button" onClick={() => loadSample(s.id, t(s.label))} className="btn-ghost !px-3 !py-1.5 !text-xs">
+              <Sparkles className="size-3.5 text-fuchsia-500" /> {t(s.label)}
+            </button>
+            <a
+              href={sampleUrl(lang, s.id)}
+              download={`${safeFileName(t(s.label))}.xlsx`}
+              title={t('sampleExcelTitle', { label: t(s.label) })}
+              aria-label={t('sampleExcelTitle', { label: t(s.label) })}
+              className="btn-ghost !px-2 !py-1.5 !text-xs"
+            >
+              <Download className="size-3.5" />
+            </a>
+          </span>
         ))}
       </div>
+      <p className="mt-2 text-xs text-slate-400">{t('samplesExcelHint')}</p>
+      {problem && (
+        <div className="mt-5 border-t border-slate-100 pt-4">
+          <button type="button" className="btn-ghost" onClick={() => setShowLoad(false)}>
+            {t('backToRoster')}
+          </button>
+        </div>
+      )}
     </section>
   )
 }
 
-const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', numeric: 'kindNumeric' } as const
+export const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', degree: 'kindDegree', numeric: 'kindNumeric' } as const
 
 export function SettingsStep({
   problem,
@@ -219,7 +292,11 @@ export function SettingsStep({
                 <td className="hidden px-4 py-3 sm:table-cell">
                   <span className="mr-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{t(KIND_KEY[c.kind])}</span>
                   <span className="text-xs text-slate-500">
-                    {c.kind === 'numeric' ? `${c.levels[0]}${dash}${c.levels[c.levels.length - 1]}` : c.levels.join(' / ') || t('blankOnly')}
+                    {c.kind === 'degree'
+                      ? `1${dash}5`
+                      : c.kind === 'numeric'
+                        ? `${c.levels[0]}${dash}${c.levels[c.levels.length - 1]}`
+                        : c.levels.join(' / ') || t('blankOnly')}
                   </span>
                 </td>
                 <td className="px-3 py-3 sm:px-4">

@@ -13,12 +13,12 @@ describe('サンプル', () => {
         expect(s.base64, `${lang}/${s.id}`).toBe(b.toString('base64'))
       }
   })
-  it.each(APP_LANGUAGES)('%s: 全サンプルが警告なしで読め、3種類の項目とペア指定を含む', (lang) => {
+  it.each(APP_LANGUAGES)('%s: 全サンプルが警告なしで読め、4種類の項目とペア指定を含む', (lang) => {
     expect(samplesFor(lang).map((s) => s.id)).toEqual(['sample1', 'sample2', 'sample-group'])
     for (const s of samplesFor(lang)) {
       const { problem } = loadSample(lang, s.id)
       expect(problem.warnings).toEqual([])
-      expect(new Set(problem.columns.map((c) => c.kind))).toEqual(new Set(['flag', 'category', 'numeric']))
+      expect(new Set(problem.columns.map((c) => c.kind))).toEqual(new Set(['flag', 'category', 'degree', 'numeric']))
       expect(problem.unwantedGroups.length).toBeGreaterThan(0)
       expect(new Set(problem.students.map((x) => x.name)).size).toBe(problem.students.length)
       if (lang !== 'ja') expect(JSON.stringify(problem)).not.toMatch(/[ぁ-んァ-ヶ一-龥○]/)

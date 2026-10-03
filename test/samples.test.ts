@@ -20,11 +20,11 @@ describe('言語別サンプル', () => {
   })
 
   describe.each(LANGS)('%s', (lang) => {
-    it.each(['sample1.xlsx', 'sample2.xlsx', 'sample-group.xlsx'])('%s: 3種類の項目・ペア指定を含み、違反0・全項目が理想範囲内に届く', (f) => {
+    it.each(['sample1.xlsx', 'sample2.xlsx', 'sample-group.xlsx'])('%s: 4種類の項目・ペア指定を含み、違反0・全項目が理想範囲内に届く', (f) => {
       const p = load(lang, f)
       expect(p.warnings).toEqual([])
       const kinds = new Set(p.columns.filter((c) => c.enabled).map((c) => c.kind))
-      expect([...kinds].sort()).toEqual(['category', 'flag', 'numeric'])
+      expect([...kinds].sort()).toEqual(['category', 'degree', 'flag', 'numeric'])
       expect(p.unwantedGroups.length).toBeGreaterThan(0)
       if (f !== 'sample-group.xlsx') expect(p.wantedGroups.length).toBeGreaterThan(0)
       expect(new Set(p.students.map((s) => s.name)).size).toBe(p.students.length)

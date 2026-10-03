@@ -1,4 +1,4 @@
-import { detectKind } from './columns'
+import { detectKind, isDegreeValue } from './columns'
 import type { ColumnKind, ColumnSpec, Problem, Student } from './types'
 
 export type GroupKind = 'wanted' | 'unwanted'
@@ -6,15 +6,23 @@ const key = (k: GroupKind) => (k === 'wanted' ? 'wantedGroups' : 'unwantedGroups
 
 /**
  * 生徒の値から各列の水準を再計算する（重み・有効/無効は維持）。
- * 編集中に入力欄の種類が変わらないよう、数値・カテゴリ列の種類は保持する（該当→カテゴリへの昇格のみ）。
+ * 編集中に入力欄の種類が変わらないよう、数値・程度・リスト列の種類は保持する（チェックからの昇格と、
+ * 合わない値が入った数値・程度のリストへの切り替えのみ）。
+ * カテゴリ（リスト）の選択肢は、誰も選んでいなくても残す（消すのは removeLevel だけ）。
  */
 export function refreshColumns(students: Student[], columns: ColumnSpec[]): ColumnSpec[] {
   return columns.map((c) => {
     const detected = detectKind(students.map((s) => s.values[c.name] ?? ''))
-    const { levels } = detected
-    const allNumeric = levels.every((v) => Number.isFinite(Number(v)))
+    const allNumeric = detected.levels.every((v) => Number.isFinite(Number(v)))
     const kind: ColumnKind =
-      c.kind === 'numeric' && allNumeric ? 'numeric' : c.kind === 'category' || (c.kind === 'numeric' && !allNumeric) ? 'category' : detected.kind
+      c.kind === 'category'
+        ? 'category'
+        : c.kind === 'numeric'
+          ? allNumeric ? 'numeric' : 'category'
+          : c.kind === 'degree'
+            ? detected.levels.every(isDegreeValue) ? 'degree' : 'category'
+            : detected.kind
+    const levels = c.kind === 'category' ? [...c.levels, ...detected.levels.filter((l) => !c.levels.includes(l))] : detected.levels
     const wasEmpty = c.levels.length === 0
     return { ...c, kind, levels, enabled: wasEmpty && levels.length > 0 ? c.weight > 0 : c.enabled && levels.length > 0 }
   })
@@ -63,12 +71,49 @@ export function removeStudents(p: Problem, idxs: number[]): Problem {
   }
 }
 
-export function addColumn(p: Problem, name: string, kind: ColumnKind = 'flag'): Problem {
+export function addColumn(p: Problem, name: string, kind: ColumnKind = 'flag', levels: string[] = []): Problem {
   if (!name || name === 'NO' || name === '名前' || p.columns.some((c) => c.name === name)) return p
   return {
     ...p,
     students: p.students.map((s) => ({ ...s, values: { ...s.values, [name]: '' } })),
-    columns: [...p.columns, { name, weight: 1, kind, levels: [], enabled: false }],
+    columns: [...p.columns, { name, weight: 1, kind, levels: kind === 'category' ? [...new Set(levels)] : [], enabled: kind === 'category' && levels.length > 0 }],
+  }
+}
+
+const mapColumn = (p: Problem, name: string, f: (c: ColumnSpec) => ColumnSpec): ColumnSpec[] => p.columns.map((c) => (c.name === name ? f(c) : c))
+
+/** リスト（カテゴリ）の選択肢を足す（誰も選んでいなくても残る） */
+export function addLevel(p: Problem, column: string, level: string): Problem {
+  const v = level.trim()
+  const col = p.columns.find((c) => c.name === column)
+  if (!v || !col || col.kind !== 'category' || col.levels.includes(v)) return p
+  return {
+    ...p,
+    columns: mapColumn(p, column, (c) => ({ ...c, levels: [...c.levels, v], enabled: c.levels.length === 0 ? c.weight > 0 : c.enabled })),
+  }
+}
+
+/** リストの選択肢の名前を変える（選んでいる生徒の値も変える）。既にある名前には変えない */
+export function renameLevel(p: Problem, column: string, from: string, to: string): Problem {
+  const v = to.trim()
+  const col = p.columns.find((c) => c.name === column)
+  if (!v || v === from || !col || col.kind !== 'category' || !col.levels.includes(from) || col.levels.includes(v)) return p
+  return {
+    ...p,
+    students: p.students.map((s) => (s.values[column] === from ? { ...s, values: { ...s.values, [column]: v } } : s)),
+    columns: mapColumn(p, column, (c) => ({ ...c, levels: c.levels.map((l) => (l === from ? v : l)) })),
+  }
+}
+
+/** リストの選択肢を消す（選んでいた生徒は空欄になる） */
+export function removeLevel(p: Problem, column: string, level: string): Problem {
+  const col = p.columns.find((c) => c.name === column)
+  if (!col || col.kind !== 'category' || !col.levels.includes(level)) return p
+  const levels = col.levels.filter((l) => l !== level)
+  return {
+    ...p,
+    students: p.students.map((s) => (s.values[column] === level ? { ...s, values: { ...s.values, [column]: '' } } : s)),
+    columns: mapColumn(p, column, (c) => ({ ...c, levels, enabled: c.enabled && levels.length > 0 })),
   }
 }
 
@@ -131,6 +176,14 @@ export function findConflicts(p: Problem): [number, number][] {
 /** 数値として正規な文字列（"3", "2.5"）だけ数値にする。"007" などは文字列のまま */
 export const toCell = (v: string | undefined): string | number =>
   v === undefined || v === '' ? '' : String(Number(v)) === v ? Number(v) : v
+
+/** 項目シート（項目名・種類・リストの選択肢）。読み込みで種類と、誰も選んでいない選択肢を戻すのに使う */
+export function attributeRows(p: Problem, labels: { attrHead: { name: string; kind: string; options: string }; kindNames: Record<ColumnKind, string> }): string[][] {
+  return [
+    [labels.attrHead.name, labels.attrHead.kind, labels.attrHead.options],
+    ...p.columns.map((c) => [c.name, labels.kindNames[c.kind], ...(c.kind === 'category' ? c.levels : [])]),
+  ]
+}
 
 /** 出力用の元名簿シートを現在の内容から作り直す（見出しの語は labels、既定は日本語） */
 export function rosterRows(p: Problem, labels: { weight: string; no: string; name: string } = { weight: '重み', no: 'NO', name: '名前' }): (string | number | null)[][] {

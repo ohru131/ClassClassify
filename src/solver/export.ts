@@ -2,7 +2,7 @@ import type { WorkBook } from 'xlsx-js-style'
 import XLSX from './xlsx'
 import type { Problem } from './types'
 import type { Report } from './evaluate'
-import { rosterRows, toCell } from './roster'
+import { attributeRows, rosterRows, toCell } from './roster'
 import { pairStatus, rowColor, tagText, UNWANTED_COLOR, VIOLATION_COLOR, type PairTag } from './pairs'
 import { FILE_LABELS, violationText, type FileLanguage } from './labels'
 
@@ -189,6 +189,7 @@ export function resultWorkbook(p: Problem, classOf: number[], k: number, report:
   add(summary)
   add(failed)
   add({ name: L.sheets.roster, rows: rosterRows(p, L) })
+  add({ name: L.sheets.attributes, rows: attributeRows(p, L) })
   return wb
 }
 
@@ -211,5 +212,6 @@ export function rosterWorkbook(p: Problem, numClasses: number, lang: FileLanguag
   const nos = (groups: number[][]) => groups.map((g) => g.map((i) => p.students[i].no))
   add(L.sheets.wanted, nos(p.wantedGroups))
   add(L.sheets.unwanted, nos(p.unwantedGroups))
+  add(L.sheets.attributes, attributeRows(p, L))
   return wb
 }

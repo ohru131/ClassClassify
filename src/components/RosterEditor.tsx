@@ -9,9 +9,11 @@ import {
   Download,
   Filter,
   Link2,
+  Pencil,
   Plus,
   RefreshCw,
   Search,
+  Settings2,
   Split,
   Trash2,
   UserPlus,
@@ -22,19 +24,24 @@ import type { ColumnKind, ColumnSpec, Problem } from '../solver/types'
 import {
   addColumn,
   addGroup,
+  addLevel,
   addStudent,
   findConflicts,
   groupsOf,
   isNoTaken,
   removeColumn,
   removeGroup,
+  removeLevel,
   removeStudents,
+  renameLevel,
   setGroup,
   setValueFor,
   updateStudent,
   type GroupKind,
 } from '../solver/roster'
+import { DEGREE_LEVELS } from '../solver/columns'
 import { useT } from '../i18n/web'
+import { KIND_KEY } from './Setup'
 
 export type EditorTab = 'students' | GroupKind
 
@@ -169,6 +176,20 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
   const desktop = useIsDesktop()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { wanted, unwanted } = useMemo(() => groupsOf(problem), [problem])
+  // 項目や選択肢を消した・名前を変えたら、もう無い値の絞り込みを外す（外せなくなって生徒が隠れたままにならないように）
+  useEffect(() => {
+    setFilters((f) => {
+      let changed = false
+      const next: Filters = {}
+      for (const [name, set] of Object.entries(f)) {
+        const col = problem.columns.find((c) => c.name === name)
+        const kept = new Set([...set].filter((v) => col && (v === EMPTY || col.levels.includes(v))))
+        if (!col || kept.size !== set.size) changed = true
+        if (col && kept.size) next[name] = kept
+      }
+      return changed ? next : f
+    })
+  }, [problem.columns])
 
   // 絞り込み・並べ替えは条件を変えたときだけ適用する（編集中の行が消えたり動いたりしないように）
   const problemRef = useRef(problem)
@@ -351,6 +372,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               >
                 <option value="flag">{t('kindOptFlag')}</option>
                 <option value="category">{t('kindOptCategory')}</option>
+                <option value="degree">{t('kindOptDegree')}</option>
                 <option value="numeric">{t('kindOptNumeric')}</option>
               </select>
               <button type="button" className="btn-ghost !py-2" onClick={() => setNewCol(null)}>
@@ -389,6 +411,14 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
         {/* スマホ: カード表示 */}
         {!desktop && (
         <div className="space-y-2 p-3">
+          {/* 項目ごとの設定（リストの選択肢の編集・項目の削除） */}
+          {problem.columns.length > 0 && (
+            <div className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none]">
+              {problem.columns.map((c) => (
+                <ColumnMenu key={c.name} column={c} problem={problem} onChange={change} chip />
+              ))}
+            </div>
+          )}
           {visible.length > 0 && (
             <label className="flex items-center gap-2 px-1 text-xs font-semibold text-slate-500">
               <Checkbox checked={allVisibleSelected} onChange={toggleAll} /> {t('selectAllVisible')}
@@ -442,9 +472,15 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                 )}
                 <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5">
                   {problem.columns.map((c) => (
-                    <div key={c.name} className="flex min-w-0 items-center justify-between gap-2">
+                    // チェックは2列に並べ、選択肢を並べる項目は1行を使う
+                    <div key={c.name} className={`flex min-w-0 items-center justify-between gap-2 ${c.kind === 'flag' ? '' : 'col-span-2'}`}>
                       <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-500">{c.name}</span>
-                      <ValueCell column={c} value={s.values[c.name] ?? ''} onChange={(v) => change(setValueFor(problem, isSel ? sel : [i], c.name, v))} />
+                      <ValueCell
+                        column={c}
+                        value={s.values[c.name] ?? ''}
+                        onChange={(v) => change(setValueFor(problem, isSel ? sel : [i], c.name, v))}
+                        onAddOption={(v) => change(setValueFor(addLevel(problem, c.name, v), isSel ? sel : [i], c.name, v))}
+                      />
                     </div>
                   ))}
                 </div>
@@ -466,17 +502,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
               <SortHeader id="名前" label={t('colName')} sort={sort} onSort={toggleSort} className="min-w-40" />
               {problem.columns.map((c) => (
                 <SortHeader key={c.name} label={c.name} sort={sort} onSort={toggleSort} sub={<Distribution column={c} problem={problem} />}>
-                  <button
-                    type="button"
-                    title={t('deleteColumnTitle', { name: c.name })}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (confirm(t('confirmDeleteColumn', { name: c.name }))) onChange(removeColumn(problem, c.name))
-                    }}
-                    className="rounded p-0.5 text-slate-300 opacity-0 transition hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100"
-                  >
-                    <Trash2 className="size-3.5" />
-                  </button>
+                  <ColumnMenu column={c} problem={problem} onChange={change} />
                 </SortHeader>
               ))}
               <th className="border-b border-slate-200 px-3 py-2 font-semibold">{t('colPair')}</th>
@@ -513,6 +539,7 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
                         column={c}
                         value={s.values[c.name] ?? ''}
                         onChange={(v) => change(setValueFor(problem, isSel ? sel : [i], c.name, v))}
+                        onAddOption={(v) => change(setValueFor(addLevel(problem, c.name, v), isSel ? sel : [i], c.name, v))}
                       />
                     </td>
                   ))}
@@ -685,22 +712,50 @@ function Distribution({ column, problem }: { column: ColumnSpec; problem: Proble
   )
 }
 
-function ValueCell({ column, value, onChange }: { column: ColumnSpec; value: string; onChange: (v: string) => void }) {
+/** 選択肢のチップ（選んでいるものは塗りつぶし） */
+function Chip({ selected, onClick, title, children }: { selected?: boolean; onClick: () => void; title?: string; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      title={title}
+      className={`inline-flex h-8 min-w-8 items-center justify-center whitespace-nowrap rounded-lg px-2 text-xs font-bold transition md:h-7 md:min-w-7 ${
+        selected ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30' : 'border border-slate-200 bg-white text-slate-500 hover:border-indigo-300 hover:text-indigo-600'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+/**
+ * 値の入力。チェック → チェックボックス、リスト → 選択肢のチップ（選んでいるものをもう一度押すと空欄）と選択肢の追加、
+ * 程度 → 1〜5 のチップ、数値 → 数値の入力欄
+ */
+function ValueCell({ column, value, onChange, onAddOption }: { column: ColumnSpec; value: string; onChange: (v: string) => void; onAddOption: (v: string) => void }) {
   const { t } = useT()
-  // 値が1種類（○など）または未入力の列はトグル
-  if (column.kind === 'flag' && (column.levels.length <= 1)) {
-    const mark = column.levels[0] ?? t('flagMark')
-    const on = value !== ''
+  const [adding, setAdding] = useState<string | null>(null)
+  // Esc でやめたときは、入力欄が消えるときの blur で追加しない
+  const cancelled = useRef(false)
+  if (column.kind === 'flag') {
+    const checked = value !== ''
     return (
       <button
         type="button"
-        onClick={() => onChange(on ? '' : mark)}
-        aria-pressed={on}
-        className={`grid h-9 min-w-12 place-items-center rounded-lg px-2 md:h-7 md:min-w-10 text-xs font-bold transition ${
-          on ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30' : 'border border-dashed border-slate-200 text-slate-300 hover:border-indigo-300 hover:text-indigo-400'
-        }`}
+        role="checkbox"
+        aria-checked={checked}
+        aria-label={column.name}
+        onClick={() => onChange(checked ? '' : (column.levels[0] ?? t('flagMark')))}
+        className="grid size-9 place-items-center rounded-lg transition hover:bg-indigo-50 md:size-7"
       >
-        {on ? value : '—'}
+        <span
+          className={`grid size-5 place-items-center rounded-md transition ${
+            checked ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30' : 'border-2 border-slate-300 bg-white'
+          }`}
+        >
+          {checked && <Check className="size-3.5" strokeWidth={3} />}
+        </span>
       </button>
     )
   }
@@ -713,30 +768,198 @@ function ValueCell({ column, value, onChange }: { column: ColumnSpec; value: str
         className="w-20 rounded-lg border border-slate-200 bg-white px-2 py-1 text-right text-sm tabular-nums outline-none focus:border-indigo-400"
       />
     )
-  return <CategorySelect levels={column.levels} value={value} onChange={onChange} />
+  // 単一選択: 選んでいるものをもう一度押すと空欄に戻る
+  const levels = column.kind === 'degree' ? DEGREE_LEVELS : column.levels
+  const addOption = () => {
+    const v = cancelled.current ? '' : adding?.trim()
+    cancelled.current = false
+    // 足した選択肢をそのまま選ぶ（既にあれば選ぶだけ）
+    if (v) {
+      if (column.levels.includes(v)) onChange(v)
+      else onAddOption(v)
+    }
+    setAdding(null)
+  }
+  return (
+    // 表では1行に並べる（行の高さをそろえる）。スマホのカードでは折り返す
+    <div className="flex flex-wrap items-center justify-end gap-1 md:flex-nowrap md:justify-start">
+      {levels.map((l) => (
+        <Chip key={l} selected={value === l} onClick={() => onChange(value === l ? '' : l)}>
+          {l}
+        </Chip>
+      ))}
+      {column.kind === 'category' &&
+        (adding === null ? (
+          <Chip onClick={() => setAdding('')} title={t('addOption')}>
+            <Plus className="size-3.5" />
+          </Chip>
+        ) : (
+          <input
+            autoFocus
+            value={adding}
+            onChange={(e) => setAdding(e.target.value)}
+            onBlur={addOption}
+            onKeyDown={(e) => {
+              // 確定は blur にまとめる（Enter で blur → 追加）
+              if (e.key === 'Enter') e.currentTarget.blur()
+              if (e.key === 'Escape') {
+                e.stopPropagation()
+                cancelled.current = true
+                e.currentTarget.blur()
+              }
+            }}
+            placeholder={t('newOptionPlaceholder')}
+            aria-label={t('addOption')}
+            className="h-8 w-36 rounded-lg border border-indigo-300 bg-white px-2 text-xs outline-none ring-2 ring-indigo-100 md:h-7"
+          />
+        ))}
+    </div>
+  )
 }
 
-function CategorySelect({ levels, value, onChange }: { levels: string[]; value: string; onChange: (v: string) => void }) {
+/** 項目の設定（種類の表示・リストの選択肢の編集・項目の削除）。chip はスマホのカード表示用の見た目 */
+function ColumnMenu({ column, problem, onChange, chip }: { column: ColumnSpec; problem: Problem; onChange: (p: Problem) => void; chip?: boolean }) {
   const { t } = useT()
   return (
-    <select
-      value={value}
-      onChange={(e) => {
-        if (e.target.value === '__new__') {
-          const v = prompt(t('newValuePrompt'))?.trim()
-          if (v) onChange(v)
-        } else onChange(e.target.value)
-      }}
-      className={`h-9 w-20 min-w-0 rounded-lg md:h-7 border px-1.5 text-sm outline-none focus:border-indigo-400 md:w-auto md:px-2 ${value === '' ? 'border-dashed border-slate-200 text-slate-300' : 'border-slate-200 bg-white font-semibold text-slate-700'}`}
+    <Popover
+      button={(open) =>
+        chip ? (
+          <span
+            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
+              open ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-slate-200 bg-white text-slate-600'
+            }`}
+          >
+            <Settings2 className="size-3.5 opacity-60" />
+            {column.name}
+            <span className="font-normal text-slate-400">· {t(KIND_KEY[column.kind])}</span>
+          </span>
+        ) : (
+          <span
+            title={t('columnSettings', { name: column.name })}
+            className={`grid place-items-center rounded p-0.5 transition hover:bg-slate-100 hover:text-slate-700 ${open ? 'bg-slate-100 text-slate-700' : 'text-slate-300'}`}
+          >
+            <Settings2 className="size-3.5" />
+          </span>
+        )
+      }
     >
-      <option value="">—</option>
-      {levels.map((l) => (
-        <option key={l} value={l}>
-          {l}
-        </option>
-      ))}
-      <option value="__new__">{t('newValueOption')}</option>
-    </select>
+      {(close) => (
+        <div className="max-h-[70vh] w-72 overflow-auto p-3 text-sm font-normal text-slate-700">
+          <div className="flex items-center gap-2">
+            <span className="min-w-0 flex-1 truncate font-bold text-slate-900">{column.name}</span>
+            <span className="shrink-0 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">{t(KIND_KEY[column.kind])}</span>
+          </div>
+          {column.kind === 'category' && <OptionsEditor column={column} problem={problem} onChange={onChange} />}
+          <button
+            type="button"
+            onClick={() => {
+              if (!confirm(t('confirmDeleteColumn', { name: column.name }))) return
+              close()
+              onChange(removeColumn(problem, column.name))
+            }}
+            className="mt-3 inline-flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+          >
+            <Trash2 className="size-3.5" /> {t('deleteColumnTitle', { name: column.name })}
+          </button>
+        </div>
+      )}
+    </Popover>
+  )
+}
+
+/** リストの選択肢の一覧（選んでいる人数）・追加・名前の変更・削除 */
+function OptionsEditor({ column, problem, onChange }: { column: ColumnSpec; problem: Problem; onChange: (p: Problem) => void }) {
+  const { t } = useT()
+  const [editing, setEditing] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
+  const [added, setAdded] = useState('')
+  const name = column.name
+  const count = (l: string) => problem.students.filter((s) => s.values[name] === l).length
+  const v = added.trim()
+  const addDup = column.levels.includes(v)
+  const add = () => {
+    if (!v || addDup) return
+    onChange(addLevel(problem, name, v))
+    setAdded('')
+  }
+  const d = draft.trim()
+  const renameDup = editing !== null && d !== editing && column.levels.includes(d)
+  const rename = () => {
+    if (renameDup) return
+    if (editing !== null && d) onChange(renameLevel(problem, name, editing, d))
+    setEditing(null)
+  }
+  const inputCls = 'min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm outline-none focus:border-indigo-400'
+  const iconBtn = 'rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40'
+  return (
+    <div className="mt-3 space-y-1">
+      <div className="text-xs font-semibold text-slate-500">{t('listOptions')}</div>
+      {column.levels.length === 0 && <div className="py-1 text-xs text-slate-400">{t('noOptions')}</div>}
+      {column.levels.map((l) =>
+        editing === l ? (
+          <form
+            key={l}
+            className="flex items-center gap-1"
+            onSubmit={(e) => {
+              e.preventDefault()
+              rename()
+            }}
+          >
+            <input autoFocus value={draft} onChange={(e) => setDraft(e.target.value)} aria-label={t('editOption', { v: l })} className={inputCls} />
+            <button type="submit" disabled={!d || renameDup} className={iconBtn} aria-label={t('edit')}>
+              <Check className="size-4" />
+            </button>
+            <button type="button" onClick={() => setEditing(null)} className={iconBtn} aria-label={t('cancel')}>
+              <X className="size-4" />
+            </button>
+          </form>
+        ) : (
+          <div key={l} className="flex items-center gap-1 rounded-lg bg-slate-50 pl-3">
+            <span className="min-w-0 flex-1 truncate font-semibold text-slate-800">{l}</span>
+            <span className="text-xs tabular-nums text-slate-400">{t('countAll', { n: count(l) })}</span>
+            <button
+              type="button"
+              title={t('editOption', { v: l })}
+              aria-label={t('editOption', { v: l })}
+              onClick={() => {
+                setEditing(l)
+                setDraft(l)
+              }}
+              className={iconBtn}
+            >
+              <Pencil className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              title={t('deleteOption', { v: l })}
+              aria-label={t('deleteOption', { v: l })}
+              onClick={() => {
+                const n = count(l)
+                if (n === 0 || confirm(t('confirmDeleteOption', { v: l, n }))) onChange(removeLevel(problem, name, l))
+              }}
+              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500"
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          </div>
+        ),
+      )}
+      {renameDup && <div className="text-xs text-rose-600">{t('duplicateOption')}</div>}
+      <form
+        className="flex items-center gap-1 pt-1"
+        onSubmit={(e) => {
+          e.preventDefault()
+          add()
+        }}
+      >
+        <input value={added} onChange={(e) => setAdded(e.target.value)} placeholder={t('newOptionPlaceholder')} aria-label={t('addOption')} className={inputCls} />
+        <button type="submit" disabled={!v || addDup} className="btn-primary !px-2 !py-1" aria-label={t('addOption')}>
+          <Plus className="size-4" />
+        </button>
+      </form>
+      {addDup && v && <div className="text-xs text-rose-600">{t('duplicateOption')}</div>}
+      <p className="pt-1 text-[11px] leading-snug text-slate-400">{t('listOptionsHint')}</p>
+    </div>
   )
 }
 
@@ -757,8 +980,8 @@ function BulkSet({ problem, onApply }: { problem: Problem; onApply: (col: string
           {problem.columns.filter((c) => c.kind !== 'numeric').map((c) => (
             <div key={c.name} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
               <span className="truncate text-sm font-semibold">{c.name}</span>
-              <div className="flex shrink-0 gap-1">
-                {(c.levels.length ? c.levels : c.kind === 'flag' ? [t('flagMark')] : []).slice(0, 6).map((l) => (
+              <div className="flex max-w-40 shrink-0 flex-wrap justify-end gap-1">
+                {(c.kind === 'degree' ? DEGREE_LEVELS : c.kind === 'flag' ? [c.levels[0] ?? t('flagMark')] : c.levels).map((l) => (
                   <button
                     key={l}
                     type="button"

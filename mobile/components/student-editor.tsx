@@ -1,13 +1,14 @@
+import Ionicons from '@expo/vector-icons/Ionicons'
 import { useRef, useState } from 'react'
-import { Text, TextInput, View } from 'react-native'
+import { Pressable, Text, TextInput, View } from 'react-native'
 
 import { confirmAction } from '@/lib/confirm'
+import { KIND_KEY } from '@/lib/kind-labels'
 import { useI18n } from '@/lib/language-provider'
-import { roster, type ColumnSpec, type Problem } from '@/lib/solver'
+import { DEGREE_LEVELS, roster, type ColumnSpec, type Problem } from '@/lib/solver'
 import { C } from './theme'
 import { Btn, Chip, styles } from './ui'
 
-const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', numeric: 'kindNumeric' } as const
 
 /**
  * 生徒1人の編集。テキストは入力中は手元に持ち、確定（Enter・フォーカスが外れたとき）で名簿へ反映する
@@ -76,7 +77,7 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
       {noError ? <Text style={{ color: C.danger, fontSize: 12 }}>{noError}</Text> : null}
 
       {problem.columns.map((c) => (
-        <ValueField key={c.name} column={c} value={s.values[c.name] ?? ''} onCommit={(v) => setValue(c.name, v)} flagMark={lang === 'ja' ? '○' : '✓'} />
+        <ValueField key={c.name} column={c} value={s.values[c.name] ?? ''} onCommit={(v) => setValue(c.name, v)} onAddOption={(v) => onChange((p) => roster.addLevel(p, c.name, v))} flagMark={lang === 'ja' ? '○' : '✓'} />
       ))}
       {problem.columns.length === 0 ? <Text style={{ color: C.muted }}>{t('noColumns')}</Text> : null}
 
@@ -109,63 +110,116 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
   )
 }
 
-function ValueField({ column, value, onCommit, flagMark }: { column: ColumnSpec; value: string; onCommit: (v: string) => void; flagMark: string }) {
+function ValueField({ column, value, onCommit, onAddOption, flagMark }: { column: ColumnSpec; value: string; onCommit: (v: string) => void; onAddOption: (v: string) => void; flagMark: string }) {
   const { t } = useI18n()
-  // カテゴリは選択肢のチップで選べるので、入力欄には選択肢に無い値だけを出す
-  const initial = column.kind === 'category' && column.levels.includes(value) ? '' : value
-  const [text, setText] = useState(initial)
-  const [lastValue, setLastValue] = useState(value)
-  // 名簿側の値が変わったら（チップで選んだときなど）手元の値も合わせる
-  if (value !== lastValue) {
-    setLastValue(value)
-    setText(initial)
+  const [adding, setAdding] = useState(false)
+  const [option, setOption] = useState('')
+  const addOption = () => {
+    const v = option.trim()
+    if (v) {
+      // 足した選択肢をそのまま選ぶ（既にあれば選ぶだけ）
+      if (!column.levels.includes(v)) onAddOption(v)
+      onCommit(v)
+    }
+    setOption('')
+    setAdding(false)
   }
-  const commit = (v: string) => {
-    const t = v.trim()
-    // カテゴリの入力欄が空のまま確定しても、チップで選んだ値は消さない
-    if (column.kind === 'category' && t === '') return
-    if (t !== value) onCommit(t)
+  const label = (
+    <Text style={styles.label}>
+      {column.name} <Text style={{ color: C.muted, fontWeight: '600' }}>({t(KIND_KEY[column.kind])})</Text>
+    </Text>
+  )
+  if (column.kind === 'flag') {
+    const checked = value !== ''
+    return (
+      <Pressable
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked }}
+        accessibilityLabel={column.name}
+        onPress={() => onCommit(checked ? '' : (column.levels[0] ?? flagMark))}
+        style={(st: { pressed: boolean; hovered?: boolean }) => [
+          { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44, paddingHorizontal: 10, borderRadius: 12, borderWidth: 1, borderColor: checked ? C.primary : C.border },
+          { backgroundColor: checked ? C.primarySoft : st.pressed || st.hovered ? C.hover : C.card },
+        ]}
+      >
+        <Ionicons name={checked ? 'checkbox' : 'square-outline'} size={24} color={checked ? C.primary : C.muted} />
+        <Text style={{ flex: 1, fontSize: 15, fontWeight: '700', color: C.text }}>{column.name}</Text>
+      </Pressable>
+    )
   }
+  if (column.kind === 'degree')
+    return (
+      <View>
+        {label}
+        <View style={styles.wrap}>
+          {DEGREE_LEVELS.map((l) => (
+            <Chip key={l} label={l} selected={value === l} onPress={() => onCommit(value === l ? '' : l)} />
+          ))}
+        </View>
+      </View>
+    )
+  if (column.kind === 'category')
+    return (
+      <View>
+        {label}
+        {/* 単一選択: 選んでいるものをもう一度押すと空欄に戻る */}
+        <View style={styles.wrap}>
+          {column.levels.map((l) => (
+            <Chip key={l} label={l} selected={value === l} onPress={() => onCommit(value === l ? '' : l)} />
+          ))}
+          {adding ? null : <Chip label="＋" accessibilityLabel={t('addOptionChip')} onPress={() => setAdding(true)} />}
+        </View>
+        {adding ? (
+          <View style={[styles.row, { marginTop: 8 }]}>
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              value={option}
+              onChangeText={setOption}
+              onSubmitEditing={addOption}
+              autoFocus
+              returnKeyType="done"
+              placeholder={t('newValuePlaceholder')}
+              placeholderTextColor={C.muted}
+              accessibilityLabel={t('valueA11y', { col: column.name })}
+            />
+            <Btn small variant="soft" icon="add" accessibilityLabel={t('add')} disabled={!option.trim()} onPress={addOption} />
+            <Btn small icon="close" accessibilityLabel={t('cancel')} onPress={() => (setOption(''), setAdding(false))} />
+          </View>
+        ) : null}
+      </View>
+    )
   return (
     <View>
-      <Text style={styles.label}>
-        {column.name} <Text style={{ color: C.muted, fontWeight: '600' }}>({t(KIND_KEY[column.kind])})</Text>
-      </Text>
-      {column.kind === 'flag' ? (
-        <View style={styles.wrap}>
-          <Chip label={column.levels[0] ?? flagMark} selected={value !== ''} onPress={() => onCommit(value !== '' ? '' : (column.levels[0] ?? flagMark))} />
-          <Chip label={t('blank')} selected={value === ''} onPress={() => onCommit('')} />
-        </View>
-      ) : column.kind === 'category' ? (
-        <View style={{ gap: 8 }}>
-          <View style={styles.wrap}>
-            {column.levels.map((l) => (
-              <Chip key={l} label={l} selected={value === l} onPress={() => onCommit(l)} />
-            ))}
-            <Chip label={t('blank')} selected={value === ''} onPress={() => onCommit('')} />
-          </View>
-          <TextInput
-            style={styles.input}
-            value={text}
-            onChangeText={setText}
-            onBlur={() => commit(text)}
-            onSubmitEditing={() => commit(text)}
-            placeholder={t('newValuePlaceholder')}
-            accessibilityLabel={t('valueA11y', { col: column.name })}
-          />
-        </View>
-      ) : (
-        <TextInput
-          style={styles.input}
-          value={text}
-          onChangeText={setText}
-          onBlur={() => commit(text)}
-          onSubmitEditing={() => commit(text)}
-          keyboardType="decimal-pad"
-          placeholder={t('numberPlaceholder')}
-          accessibilityLabel={t('valueA11y', { col: column.name })}
-        />
-      )}
+      {label}
+      <NumberField column={column} value={value} onCommit={onCommit} />
     </View>
+  )
+}
+
+/** 数値の入力欄。入力中は手元に持ち、確定（Enter・フォーカスが外れたとき）で名簿へ反映する */
+function NumberField({ column, value, onCommit }: { column: ColumnSpec; value: string; onCommit: (v: string) => void }) {
+  const { t } = useI18n()
+  const [text, setText] = useState(value)
+  const [lastValue, setLastValue] = useState(value)
+  // 名簿側の値が変わったら手元の値も合わせる
+  if (value !== lastValue) {
+    setLastValue(value)
+    setText(value)
+  }
+  const commit = () => {
+    const v = text.trim()
+    if (v !== value) onCommit(v)
+  }
+  return (
+    <TextInput
+      style={styles.input}
+      value={text}
+      onChangeText={setText}
+      onBlur={commit}
+      onSubmitEditing={commit}
+      keyboardType="decimal-pad"
+      placeholder={t('numberPlaceholder')}
+      accessibilityLabel={t('valueA11y', { col: column.name })}
+    />
   )
 }

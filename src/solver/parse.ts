@@ -1,8 +1,8 @@
 import type { WorkBook } from 'xlsx-js-style'
 import XLSX from './xlsx'
-import { detectKind } from './columns'
+import { detectKind, withDeclaredKind } from './columns'
 import type { ColumnSpec, Problem, Student } from './types'
-import { isClassCountKey, isMaxPerClassKey, isNameHeader, isNoHeader, JA_PARSE_MESSAGES, SHEET_ALIASES, type ParseMessages } from './labels'
+import { isClassCountKey, isMaxPerClassKey, isNameHeader, isNoHeader, JA_PARSE_MESSAGES, kindFromName, SHEET_ALIASES, type ParseMessages } from './labels'
 
 type Row = (string | number | null)[]
 
@@ -98,8 +98,15 @@ export function parseWorkbook(data: ArrayBuffer, msg: ParseMessages = JA_PARSE_M
   }
   if (students.length === 0) throw new Error(msg.noStudents)
 
+  // 項目シート（このアプリが書き出した名簿にある）: 項目名 → 種類・リストの選択肢
+  const declared = new Map<string, { kind: ReturnType<typeof kindFromName>; options: string[] }>()
+  for (const row of (findSheet(wb, SHEET_ALIASES.attributes).rows ?? []).slice(1)) {
+    const name = cellStr(row[0])
+    if (name) declared.set(name, { kind: kindFromName(cellStr(row[1])), options: [...new Set(row.slice(2).map(cellStr).filter((v) => v !== ''))] })
+  }
   const columns: ColumnSpec[] = attrCols.map(({ name, weight }) => {
-    const { kind, levels } = detectKind(students.map((s) => s.values[name]))
+    const d = declared.get(name)
+    const { kind, levels } = withDeclaredKind(detectKind(students.map((s) => s.values[name])), d?.kind, d?.options ?? [])
     return { name, weight, kind, levels, enabled: levels.length > 0 && weight > 0 }
   })
 
