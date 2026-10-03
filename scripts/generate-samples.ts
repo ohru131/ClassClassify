@@ -295,7 +295,7 @@ function build(lang: Lang, id: SampleId): Problem {
       if (c.kind === 'gender') {
         const t = c.third
         // 3つ目の選択肢は等間隔の count 人だけ（決定的）。ほかは交互
-        const isThird = t && i % Math.floor(def.n / t.count) === 5 && Math.floor(i / Math.floor(def.n / t.count)) < t.count
+        const isThird = t && Array.from({ length: t.count }, (_, j) => Math.floor(((j + 0.5) * def.n) / t.count)).includes(i)
         values[c.name] = isThird ? t.value : g === 'f' ? c.values[0] : c.values[1]
       }
       else if (c.kind === 'flag') values[c.name] = r() < c.rate ? (c.mark ?? TICK) : ''

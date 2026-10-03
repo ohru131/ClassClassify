@@ -48,8 +48,7 @@ export async function pickXlsx(): Promise<{ data: ArrayBuffer; name: string } | 
   }
 }
 
-/** ファイル名に使えない文字を落とす */
-export const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|\s]+/g, '_')
+export { safeFileName } from './solver'
 
 /** 中身（base64）を OS の保存ダイアログで好きな場所（Google ドライブ等）へ保存する。キャンセルなら false */
 export async function saveBase64As(fileName: string, mimeType: string, base64: string): Promise<boolean> {

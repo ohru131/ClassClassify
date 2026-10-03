@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { ArrowLeftRight, ChevronRight, Download, ExternalLink, Pencil, FileSpreadsheet, Loader2, Minus, Plus, Sparkles, Upload, Users } from 'lucide-react'
 import type { ColumnSpec, Problem } from '../solver/types'
+import { safeFileName } from '../solver/filename'
 import { Segmented, StepHeader } from './ui'
 import { useT } from '../i18n/web'
 import { sampleUrl, templateZipUrl } from '../copy/core'
@@ -13,7 +14,6 @@ const SAMPLES = [
 ] as const
 
 /** ファイル名に使えない文字を除く（サンプルの表示名をそのままダウンロード名にするため） */
-const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|]/g, '_').trim() || 'sample'
 
 export function DataStep({
   onLoad,

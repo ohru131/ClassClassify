@@ -177,6 +177,14 @@ export function findConflicts(p: Problem): [number, number][] {
 export const toCell = (v: string | undefined): string | number =>
   v === undefined || v === '' ? '' : String(Number(v)) === v ? Number(v) : v
 
+/** 項目シート（項目名・種類・リストの選択肢）。読み込みで種類と、誰も選んでいない選択肢を戻すのに使う */
+export function attributeRows(p: Problem, labels: { attrHead: { name: string; kind: string; options: string }; kindNames: Record<ColumnKind, string> }): string[][] {
+  return [
+    [labels.attrHead.name, labels.attrHead.kind, labels.attrHead.options],
+    ...p.columns.map((c) => [c.name, labels.kindNames[c.kind], ...(c.kind === 'category' ? c.levels : [])]),
+  ]
+}
+
 /** 出力用の元名簿シートを現在の内容から作り直す（見出しの語は labels、既定は日本語） */
 export function rosterRows(p: Problem, labels: { weight: string; no: string; name: string } = { weight: '重み', no: 'NO', name: '名前' }): (string | number | null)[][] {
   return [

@@ -17,3 +17,16 @@ export function detectKind(values: string[]): { kind: ColumnKind; levels: string
   if (allNumeric && levels.length > 6) return { kind: 'numeric', levels }
   return { kind: 'category', levels }
 }
+
+/**
+ * 項目シートに書いてあった種類・選択肢を、値から判定した結果に当てる。
+ * 値と合わない種類（数値の列に文字が入っている、など）は値からの判定を使う。
+ */
+export function withDeclaredKind(detected: { kind: ColumnKind; levels: string[] }, kind: ColumnKind | undefined, options: string[]): { kind: ColumnKind; levels: string[] } {
+  const { levels } = detected
+  if (kind === 'category') return { kind, levels: [...options, ...levels.filter((l) => !options.includes(l))] }
+  if (kind === 'degree' && levels.every(isDegreeValue)) return { kind, levels }
+  if (kind === 'numeric' && levels.every(isNum)) return { kind, levels }
+  if (kind === 'flag' && levels.length <= 1) return { kind, levels }
+  return detected
+}

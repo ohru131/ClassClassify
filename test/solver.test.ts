@@ -197,3 +197,28 @@ describe('createAnnealer', () => {
     expect(a.result().classOf.length).toBe(compiled.n)
   })
 })
+
+describe('項目シート（種類・リストの選択肢）の往復', async () => {
+  const r = await import('../src/solver/roster')
+  const { rosterWorkbook, writeXlsx } = await import('../src/solver/export')
+  const roundTrip = (p: ReturnType<typeof load>) => parseWorkbook(writeXlsx(rosterWorkbook(p, 4), 'array') as ArrayBuffer)
+  it('誰も選んでいない選択肢・1つしか使っていないリスト・数字のリストが戻る', () => {
+    let p = load('sample1.xlsx')
+    p = r.addColumn(p, '前回の班', 'category', ['1', '2', '3', '4', '5'])
+    p = r.addColumn(p, '通学', 'category', ['徒歩', 'バス', '？'])
+    p = r.setValueFor(p, [0, 1], '通学', '徒歩')
+    p = r.setValueFor(p, [0, 1, 2], '前回の班', '2')
+    const q = roundTrip(p)
+    expect(q.columns.find((c) => c.name === '通学')).toMatchObject({ kind: 'category', levels: ['徒歩', 'バス', '？'] })
+    expect(q.columns.find((c) => c.name === '前回の班')).toMatchObject({ kind: 'category', levels: ['1', '2', '3', '4', '5'] })
+    expect(q.columns).toEqual(p.columns)
+  })
+  it('結果の集計に誰も選んでいない選択肢の行を出さない', () => {
+    let p = load('sample1.xlsx')
+    p = r.addColumn(p, '通学', 'category', ['徒歩', 'バス', '？'])
+    p = r.setValueFor(p, [0, 1, 2, 3], '通学', '徒歩')
+    p = r.setValueFor(p, [4, 5], '通学', 'バス')
+    const rep = evaluate(p, p.students.map((_, i) => i % 4), 4)
+    expect(rep.columns.find((c) => c.column === '通学')!.levels).toEqual(['徒歩', 'バス'])
+  })
+})

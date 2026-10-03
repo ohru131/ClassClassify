@@ -3,12 +3,12 @@ import { useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 
 import { confirmAction } from '@/lib/confirm'
+import { KIND_KEY } from '@/lib/kind-labels'
 import { useI18n } from '@/lib/language-provider'
 import { DEGREE_LEVELS, roster, type ColumnSpec, type Problem } from '@/lib/solver'
 import { C } from './theme'
 import { Btn, Chip, styles } from './ui'
 
-const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', degree: 'kindDegree', numeric: 'kindNumeric' } as const
 
 /**
  * 生徒1人の編集。テキストは入力中は手元に持ち、確定（Enter・フォーカスが外れたとき）で名簿へ反映する
@@ -112,19 +112,8 @@ export function StudentEditor({ problem, index, onChange, onClose }: { problem: 
 
 function ValueField({ column, value, onCommit, onAddOption, flagMark }: { column: ColumnSpec; value: string; onCommit: (v: string) => void; onAddOption: (v: string) => void; flagMark: string }) {
   const { t } = useI18n()
-  const [text, setText] = useState(value)
-  const [lastValue, setLastValue] = useState(value)
   const [adding, setAdding] = useState(false)
   const [option, setOption] = useState('')
-  // 名簿側の値が変わったら手元の値も合わせる
-  if (value !== lastValue) {
-    setLastValue(value)
-    setText(value)
-  }
-  const commit = (v: string) => {
-    const t = v.trim()
-    if (t !== value) onCommit(t)
-  }
   const addOption = () => {
     const v = option.trim()
     if (v) {
@@ -202,16 +191,35 @@ function ValueField({ column, value, onCommit, onAddOption, flagMark }: { column
   return (
     <View>
       {label}
-      <TextInput
-        style={styles.input}
-        value={text}
-        onChangeText={setText}
-        onBlur={() => commit(text)}
-        onSubmitEditing={() => commit(text)}
-        keyboardType="decimal-pad"
-        placeholder={t('numberPlaceholder')}
-        accessibilityLabel={t('valueA11y', { col: column.name })}
-      />
+      <NumberField column={column} value={value} onCommit={onCommit} />
     </View>
+  )
+}
+
+/** 数値の入力欄。入力中は手元に持ち、確定（Enter・フォーカスが外れたとき）で名簿へ反映する */
+function NumberField({ column, value, onCommit }: { column: ColumnSpec; value: string; onCommit: (v: string) => void }) {
+  const { t } = useI18n()
+  const [text, setText] = useState(value)
+  const [lastValue, setLastValue] = useState(value)
+  // 名簿側の値が変わったら手元の値も合わせる
+  if (value !== lastValue) {
+    setLastValue(value)
+    setText(value)
+  }
+  const commit = () => {
+    const v = text.trim()
+    if (v !== value) onCommit(v)
+  }
+  return (
+    <TextInput
+      style={styles.input}
+      value={text}
+      onChangeText={setText}
+      onBlur={commit}
+      onSubmitEditing={commit}
+      keyboardType="decimal-pad"
+      placeholder={t('numberPlaceholder')}
+      accessibilityLabel={t('valueA11y', { col: column.name })}
+    />
   )
 }

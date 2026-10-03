@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 
 import { confirmAction } from '@/lib/confirm'
+import { KIND_KEY } from '@/lib/kind-labels'
 import { useI18n } from '@/lib/language-provider'
 import { roster, type ColumnKind, type ColumnSpec, type Problem } from '@/lib/solver'
 import { C } from './theme'
 import { Btn, Card, Segmented, Stepper, styles } from './ui'
 
-const KIND_KEY = { flag: 'kindFlag', category: 'kindCategory', degree: 'kindDegree', numeric: 'kindNumeric' } as const
 
 const levelsText = (c: ColumnSpec, blankOnly: string) =>
   c.kind === 'degree' ? '1–5' : c.levels.length === 0 ? blankOnly : c.kind === 'numeric' ? `${c.levels[0]}–${c.levels[c.levels.length - 1]}` : c.levels.join(' / ')

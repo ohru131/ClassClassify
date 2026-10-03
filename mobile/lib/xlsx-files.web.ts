@@ -2,7 +2,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import type { WorkBook } from 'xlsx-js-style'
 
 import { base64ToArrayBuffer } from './base64'
-import { writeXlsx } from './solver'
+import { safeFileName, writeXlsx } from './solver'
 
 const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
@@ -18,7 +18,7 @@ export const canSaveToFile = false
 export const saveXlsx = async (_wb: WorkBook, _fileName: string): Promise<boolean> => false
 export const saveBase64As = async (_fileName: string, _mimeType: string, _base64: string): Promise<boolean> => false
 
-export const safeFileName = (s: string) => s.replace(/[\\/:*?"<>|\s]+/g, '_')
+export { safeFileName } from './solver'
 
 /** Web（動作確認用）はダウンロードする */
 export const shareXlsx = async (wb: WorkBook, fileName: string, _unavailableMessage?: string): Promise<void> => download(new Blob([writeXlsx(wb, 'array')], { type: XLSX_MIME }), fileName)

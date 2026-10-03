@@ -17,18 +17,18 @@ const LANGS = Object.keys(FILE_LABELS) as FileLanguage[]
 describe('言語別のシート名・見出し', () => {
   it('既定（引数なし）の書き出しは従来どおり日本語', () => {
     const p = load('sample1.xlsx')
-    expect(rosterWorkbook(p, 4).SheetNames).toEqual(['設定', '生徒名簿', '同じ組ペア', '別の組ペア'])
+    expect(rosterWorkbook(p, 4).SheetNames).toEqual(['設定', '生徒名簿', '同じ組ペア', '別の組ペア', '項目'])
     const { compiled } = compile(p)
     const res = anneal(compiled, { timeMs: 200, seed: 1 })
     const wb = resultWorkbook(p, res.classOf, 4, evaluate(p, res.classOf, 4))
-    expect(wb.SheetNames).toEqual(['組分け', 'クラス別名簿', '1組', '2組', '3組', '4組', 'ペア指定', '集計', '組み合わせ失敗', '生徒名簿'])
+    expect(wb.SheetNames).toEqual(['組分け', 'クラス別名簿', '1組', '2組', '3組', '4組', 'ペア指定', '集計', '組み合わせ失敗', '生徒名簿', '項目'])
   })
 
   it.each(LANGS)('%s の名簿を書き出して読み戻すと同じ名簿になる', (lang) => {
     const p = load('sample1.xlsx')
     const wb = rosterWorkbook(p, 4, lang)
     const L = FILE_LABELS[lang]
-    expect(wb.SheetNames).toEqual([L.sheets.settings, L.sheets.roster, L.sheets.wanted, L.sheets.unwanted])
+    expect(wb.SheetNames).toEqual([L.sheets.settings, L.sheets.roster, L.sheets.wanted, L.sheets.unwanted, L.sheets.attributes])
     for (const n of wb.SheetNames) expect(n.length).toBeLessThanOrEqual(31)
     const q = parseWorkbook(writeXlsx(wb, 'array'))
     expect(q.students).toEqual(p.students)

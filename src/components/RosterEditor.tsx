@@ -176,6 +176,20 @@ function StudentsTab({ problem, onChange, openGroups }: { problem: Problem; onCh
   const desktop = useIsDesktop()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { wanted, unwanted } = useMemo(() => groupsOf(problem), [problem])
+  // 項目や選択肢を消した・名前を変えたら、もう無い値の絞り込みを外す（外せなくなって生徒が隠れたままにならないように）
+  useEffect(() => {
+    setFilters((f) => {
+      let changed = false
+      const next: Filters = {}
+      for (const [name, set] of Object.entries(f)) {
+        const col = problem.columns.find((c) => c.name === name)
+        const kept = new Set([...set].filter((v) => col && (v === EMPTY || col.levels.includes(v))))
+        if (!col || kept.size !== set.size) changed = true
+        if (col && kept.size) next[name] = kept
+      }
+      return changed ? next : f
+    })
+  }, [problem.columns])
 
   // 絞り込み・並べ替えは条件を変えたときだけ適用する（編集中の行が消えたり動いたりしないように）
   const problemRef = useRef(problem)

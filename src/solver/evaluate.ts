@@ -61,9 +61,12 @@ export function evaluate(p: Problem, classOf: number[], k: number): Report {
       })
       continue
     }
-    const rows = col.levels.map(() => new Array(k).fill(0))
+    // 誰も選んでいないリストの選択肢は表に出さない（compile も使っていない）
+    const levels = col.levels.filter((l) => p.students.some((s) => s.values[col.name] === l))
+    if (levels.length === 0) continue
+    const rows = levels.map(() => new Array(k).fill(0))
     p.students.forEach((s, i) => {
-      const l = col.levels.indexOf(s.values[col.name])
+      const l = levels.indexOf(s.values[col.name])
       if (l >= 0) rows[l][classOf[i]]++
     })
     let excess = 0
@@ -77,7 +80,7 @@ export function evaluate(p: Problem, classOf: number[], k: number): Report {
     // 帯外れは「移動が必要な人数」相当に揃えるため半分にする
     excess /= 2
     totalExcess += excess * (col.weight > 0 ? 1 : 0)
-    columns.push({ column: col.name, kind: col.kind, weight: col.weight, levels: col.levels, rows, ideal, excess })
+    columns.push({ column: col.name, kind: col.kind, weight: col.weight, levels, rows, ideal, excess })
   }
 
   const violations: Violation[] = []
