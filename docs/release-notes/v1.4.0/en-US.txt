@@ -1,0 +1,1 @@
+- "Mix up from last time" can now use an Excel file exported from the Results tab as last time's placement — even one you didn't save in the app, or one made in the web version or on another device.

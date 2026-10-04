@@ -6,6 +6,8 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-05
+
 - 「前回とできるだけ入れ替える」で、結果画面から書き出した Excel ファイルも前回の編成として選べるようにした（アプリに保存していない編成・Web 版や別の端末で作った編成・どの言語で書き出したファイルでも使える）。
 
 ## [1.3.0] - 2026-10-03
@@ -38,7 +40,8 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 - 結果の Excel 書き出し・印刷・PDF 共有は Pro（買い切り）で提供する。
 - 日本語・英語・ドイツ語・スペイン語・韓国語・ポルトガル語に対応する。
 
-[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/ohru131/ClassClassify/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/ohru131/ClassClassify/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ohru131/ClassClassify/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/ohru131/ClassClassify/compare/v1.0.0...v1.1.0
