@@ -1,7 +1,7 @@
 import { COPY } from './copy'
 import type { AppLanguage } from './i18n'
 import { LANGUAGE_META } from './i18n'
-import type { ColumnSpec, Problem } from './solver'
+import type { ColumnSpec, Placement, Problem } from './solver'
 import { isObj, isProblem } from './stored-project'
 
 // 名前を付けて端末に保存した編成結果（あとで一覧から開く・削除する・「前回の組」の元にする）。
@@ -71,21 +71,28 @@ export function defaultSaveName(lang: AppLanguage, d: Date, rosterName: string |
 
 const norm = (s: string) => s.replace(/\s+/g, '').normalize('NFKC')
 
+/** 保存した編成の組分け（組の名前は表示中の言語で） */
+export const placementOfSaved = (saved: SavedResult, className: (c: number) => string): Placement => ({
+  students: saved.problem.students,
+  classNames: saved.classOf.map(className),
+  order: Array.from({ length: saved.k }, (_, c) => className(c)),
+})
+
 /**
- * 今の名簿の各生徒について、保存した編成で何組だったか（組の名前）。見つからない生徒は ''。
+ * 今の名簿の各生徒について、前回の組分け（保存した編成・書き出した Excel）で何組だったか（組の名前）。見つからない生徒は ''。
  * 名前で照らし合わせる（どちらかの名簿に同じ名前が2人以上いる名前は使わない）。
  * 名前で見つからない生徒は、名簿が続いている（名前で見つかった生徒の大半が同じ NO のまま）ときだけ
  * NO で照らす。年度が変わって NO を振り直した名簿で、別の子に前回の組を付けないように。
  */
-export function previousClassValues(current: Problem, saved: SavedResult, className: (c: number) => string): { values: string[]; matched: number } {
+export function previousClassValues(current: Problem, prev: Placement): { values: string[]; matched: number } {
   const unique = <K,>(keys: K[]) => {
     const m = new Map<K, number | null>()
     keys.forEach((k, i) => m.set(k, m.has(k) ? null : i))
     return m
   }
-  const savedByName = unique(saved.problem.students.map((s) => norm(s.name)))
+  const savedByName = unique(prev.students.map((s) => norm(s.name)))
   const currentByName = unique(current.students.map((s) => norm(s.name)))
-  const savedByNo = unique(saved.problem.students.map((s) => s.no))
+  const savedByNo = unique(prev.students.map((s) => s.no))
 
   const found: (number | null)[] = current.students.map((s) => {
     const key = norm(s.name)
@@ -93,7 +100,7 @@ export function previousClassValues(current: Problem, saved: SavedResult, classN
     return savedByName.get(key) ?? null
   })
   const byName = found.flatMap((i, j) => (i === null ? [] : [[i, j] as const]))
-  const sameNo = byName.filter(([i, j]) => saved.problem.students[i].no === current.students[j].no).length
+  const sameNo = byName.filter(([i, j]) => prev.students[i].no === current.students[j].no).length
   // 1〜2人の一致では「同じ名簿」と言えない（NO を振り直した名簿で、たまたま同じ NO の子がいるだけのことがある）
   const continuous = byName.length >= 3 && sameNo >= byName.length * 0.8
   if (continuous) {
@@ -110,7 +117,7 @@ export function previousClassValues(current: Problem, saved: SavedResult, classN
   const values = found.map((i) => {
     if (i === null) return ''
     matched++
-    return className(saved.classOf[i])
+    return prev.classNames[i]
   })
   return { values, matched }
 }

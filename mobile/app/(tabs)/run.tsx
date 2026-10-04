@@ -8,19 +8,21 @@ import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { defaultStarts } from '@/lib/runner'
-import { findPreviousClassColumn, previousClassValues, setColumnEnabled, withPreviousClass } from '@/lib/saved-results'
+import { findPreviousClassColumn, placementOfSaved, previousClassValues, setColumnEnabled, withPreviousClass } from '@/lib/saved-results'
 import { useSavedResults } from '@/lib/saved-results-store'
+import { parsePlacement, type Placement } from '@/lib/solver'
+import { pickXlsx } from '@/lib/xlsx-files'
 
 export default function RunScreen() {
   const { problem, numClasses, setNumClasses, stepMaxPerClass, timeSec, setTimeSec, run, cancel, running, progress, solution, error, setError, modifyProblem } = useProject()
   const router = useRouter()
   const { isWide } = useLayout()
-  const { t, num, className } = useI18n()
+  const { t, num, className, file } = useI18n()
   const saved = useSavedResults()
-  // 「前回とできるだけ入れ替える」の元にした保存済みの編成と、前回の組が分かった人数
-  const [source, setSource] = useState<{ id: string; name: string; matched: number; students: unknown } | null>(null)
-  // 保存した編成を読んでいる間は編成を始めない（読み終えて名簿を変えると、編成の結果が捨てられる）
-  const [applying, setApplying] = useState(false)
+  // 「前回とできるだけ入れ替える」の元にした編成（保存済みの id、書き出した Excel なら null）と、前回の組が分かった人数
+  const [source, setSource] = useState<{ id: string | null; name: string; matched: number; students: unknown } | null>(null)
+  // 前回の編成を読んでいる間は編成を始めない（読み終えて名簿を変えると、編成の結果が捨てられる）
+  const [applying, setApplying] = useState<null | 'saved' | 'file'>(null)
   // 実行中に別のタブへ移った人を、終わった瞬間に結果画面へ引き戻さない
   const focusedRef = useRef(true)
   useFocusEffect(
@@ -55,32 +57,58 @@ export default function RunScreen() {
   const mixOn = !!prev && prev.enabled && prev.weight > 0
   // 選んだ編成の表示は、それを入れた名簿のときだけ（別の名簿を開いたら出さない）
   const shownSource = source && source.students === problem.students ? source : null
-  // 保存した編成から各生徒の前回の組を名簿に入れ、その列を均等に散らす（前回同じ組だった子が重ならないように）
+  // 前回の組分けから各生徒の前回の組を名簿に入れ、その列を均等に散らす（前回同じ組だった子が重ならないように）
+  const applyPlacement = (placement: Placement, id: string | null, name: string) => {
+    let matched = 0
+    let students: unknown = null
+    modifyProblem((p) => {
+      const r = previousClassValues(p, placement)
+      matched = r.matched
+      const next = withPreviousClass(p, prevCol, r.values, placement.order)
+      students = next.students
+      return next
+    })
+    setSource({ id, name, matched, students })
+  }
   const applyFrom = async (id: string) => {
     // 編成中に名簿を変えると、終わった結果が捨てられる
     if (running || applying) return
-    setApplying(true)
+    setApplying('saved')
     try {
       const s = await saved.load(id)
       if (!s) {
         setError(t('openFailed'))
         return
       }
-      const order = Array.from({ length: s.k }, (_, c) => className(c))
-      let matched = 0
-      let students: unknown = null
-      modifyProblem((p) => {
-        const r = previousClassValues(p, s, className)
-        matched = r.matched
-        const next = withPreviousClass(p, prevCol, r.values, order)
-        students = next.students
-        return next
-      })
-      setSource({ id, name: s.name, matched, students })
+      applyPlacement(placementOfSaved(s, className), id, s.name)
     } catch {
       setError(t('openFailed'))
     } finally {
-      setApplying(false)
+      setApplying(null)
+    }
+  }
+  // 結果画面から書き出した Excel（Web 版・どの言語のものでも）の「組分け」シートを前回の組分けとして読む
+  const applyFromFile = async () => {
+    if (running || applying) return
+    setApplying('file')
+    try {
+      const f = await pickXlsx()
+      if (!f) return
+      let placement: Placement | null = null
+      try {
+        placement = parsePlacement(f.data)
+      } catch {
+        placement = null
+      }
+      if (!placement) {
+        setError(t('mixFileInvalid', { sheet: file.sheets.assign }))
+        return
+      }
+      applyPlacement(placement, null, f.name)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setApplying(null)
     }
   }
   const toggleMix = (on: boolean) => {
@@ -88,6 +116,7 @@ export default function RunScreen() {
     if (!on) modifyProblem((p) => setColumnEnabled(p, prevCol, false))
     else if (prev) modifyProblem((p) => setColumnEnabled(p, prevCol, true))
     else if (saved.list[0]) void applyFrom(saved.list[0].id)
+    else void applyFromFile()
   }
 
   const start = async () => {
@@ -156,19 +185,23 @@ export default function RunScreen() {
       <Card style={{ gap: 8 }}>
         <View style={[styles.row, { justifyContent: 'space-between' }]}>
           <Text style={{ fontSize: 16, fontWeight: '800', color: C.text, flexShrink: 1 }}>{t('mixTitle')}</Text>
-          <Switch value={mixOn} onValueChange={toggleMix} disabled={running || applying || (!prev && saved.list.length === 0)} accessibilityLabel={t('mixTitle')} />
+          <Switch value={mixOn} onValueChange={toggleMix} disabled={running || !!applying} accessibilityLabel={t('mixTitle')} />
         </View>
         <Text style={{ fontSize: 13, color: C.sub, lineHeight: 19 }}>{t('mixHelp')}</Text>
         {!prev && saved.list.length === 0 ? <Text style={{ fontSize: 12, color: C.muted }}>{t('mixNoSaved')}</Text> : null}
+        {mixOn ? <Text style={[styles.label, { marginTop: 4 }]}>{t('mixPick')}</Text> : null}
         {mixOn && saved.list.length > 0 ? (
-          <>
-            <Text style={[styles.label, { marginTop: 4 }]}>{t('mixPick')}</Text>
-            <View style={styles.wrap} accessibilityRole="radiogroup">
-              {saved.list.map((m) => (
-                <Chip key={m.id} label={m.name} selected={shownSource?.id === m.id} onPress={() => void applyFrom(m.id)} />
-              ))}
-            </View>
-          </>
+          <View style={styles.wrap} accessibilityRole="radiogroup">
+            {saved.list.map((m) => (
+              <Chip key={m.id} label={m.name} selected={shownSource?.id === m.id} onPress={() => void applyFrom(m.id)} />
+            ))}
+          </View>
+        ) : null}
+        {/* 結果画面から書き出した Excel も前回の編成として選べる（保存していなくても、別の端末・Web 版で作ったものでも） */}
+        {mixOn || (!prev && saved.list.length === 0) ? (
+          <View style={styles.wrap}>
+            <Btn small icon="document-attach-outline" label={t('mixPickFile')} busy={applying === 'file'} disabled={running || applying === 'saved'} onPress={() => void applyFromFile()} />
+          </View>
         ) : null}
         {mixOn && shownSource ? (
           <Text style={{ fontSize: 12, color: C.muted }}>
@@ -190,7 +223,7 @@ export default function RunScreen() {
           </>
         ) : (
           <>
-            <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} disabled={applying} onPress={start} />
+            <Btn variant="primary" icon="play" label={solution ? t('rerun') : t('runBtn')} disabled={!!applying} onPress={start} />
             {/* 保存した編成を開いただけのときは、編成の記録（案の数など）が無いので出さない */}
             {solution && solution.starts > 0 ? (
               <Text style={{ fontSize: 12, color: C.muted }}>
