@@ -2,7 +2,7 @@ import type { WorkBook } from 'xlsx-js-style'
 import XLSX from './xlsx'
 import { detectKind, withDeclaredKind } from './columns'
 import type { ColumnSpec, Problem, Student } from './types'
-import { isClassCountKey, isMaxPerClassKey, isNameHeader, isNoHeader, JA_PARSE_MESSAGES, kindFromName, SHEET_ALIASES, type ParseMessages } from './labels'
+import { isClassCountKey, isClassHeader, isMaxPerClassKey, isNameHeader, isNoHeader, JA_PARSE_MESSAGES, kindFromName, SHEET_ALIASES, type ParseMessages } from './labels'
 
 type Row = (string | number | null)[]
 
@@ -49,6 +49,22 @@ function readGroups(rows: Row[] | null, noToIndex: Map<number, number>, label: s
 }
 
 /**
+ * NO と名前の列（無ければ -1）。まず従来どおりの完全一致（NO / 名前 / 氏名）を列全体から探し、
+ * 見つからないときだけ他の言語の見出しを見る。1回の findIndex で両方を見ると、「NO | Name | 氏名」の
+ * ようなファイルで左にある Name が勝ってしまい、日本語のファイルの読み方が変わる
+ */
+function findNoNameCols(headerRow: string[]): { noCol: number; nameCol: number } {
+  const findCol = (legacy: (h: string) => boolean, other: (h: string) => boolean) => {
+    const i = headerRow.findIndex(legacy)
+    return i >= 0 ? i : headerRow.findIndex(other)
+  }
+  return {
+    noCol: findCol((h) => h.toUpperCase().replace(/[.．]/g, '') === 'NO', isNoHeader),
+    nameCol: findCol((h) => h === '名前' || h === '氏名', isNameHeader),
+  }
+}
+
+/**
  * msg: 警告・エラーの文言（既定は日本語）。シート名・見出しは全言語の別名を受け付ける
  * （src/solver/labels.ts。日本語の名前を最初に探すので、日本語のファイルの読み方は変わらない）。
  */
@@ -61,15 +77,7 @@ export function parseWorkbook(data: ArrayBuffer, msg: ParseMessages = JA_PARSE_M
 
   const weightRow = roster[0]
   const headerRow = roster[1].map(cellStr)
-  // まず従来どおりの完全一致（NO / 名前 / 氏名）を列全体から探し、見つからないときだけ他の言語の見出しを見る。
-  // 1回の findIndex で両方を見ると、「NO | Name | 氏名」のようなファイルで左にある Name が勝ってしまい、
-  // 日本語のファイルの読み方が変わる
-  const findCol = (legacy: (h: string) => boolean, other: (h: string) => boolean) => {
-    const i = headerRow.findIndex(legacy)
-    return i >= 0 ? i : headerRow.findIndex(other)
-  }
-  const noCol = findCol((h) => h.toUpperCase().replace(/[.．]/g, '') === 'NO', isNoHeader)
-  const nameCol = findCol((h) => h === '名前' || h === '氏名', isNameHeader)
+  const { noCol, nameCol } = findNoNameCols(headerRow)
   const c0 = noCol >= 0 ? noCol : 0
   const c1 = nameCol >= 0 ? nameCol : 1
 
@@ -140,4 +148,47 @@ export function parseWorkbook(data: ArrayBuffer, msg: ParseMessages = JA_PARSE_M
   const unwantedGroups = readGroups(unwanted.rows, noToIndex, unwanted.name, warnings, msg)
 
   return { students, columns, numClasses, maxPerClass, wantedGroups, unwantedGroups, warnings }
+}
+
+/** 書き出した結果から読み取った組分け（各生徒の組の名前） */
+export interface Placement {
+  students: { no: number; name: string }[]
+  /** students と同じ並びの組の名前 */
+  classNames: string[]
+  /** 組の名前（1組・2組…の順） */
+  order: string[]
+}
+
+/**
+ * このアプリ（Web 版・スマホ版）が書き出した結果の Excel から組分けを読む（「組分け」シートの NO・名前・組）。
+ * どの言語で書き出したファイルも読める。Excel として読めない・組分けのシートが無い・NO／名前／組の列が無いときは null
+ */
+export function parsePlacement(data: ArrayBuffer): Placement | null {
+  let wb: WorkBook
+  try {
+    // 使うのは組分けのシートだけ（各組・集計などのシートは読まない）
+    wb = XLSX.read(data, { type: 'array', sheets: SHEET_ALIASES.assign })
+  } catch {
+    return null
+  }
+  const rows = findSheet(wb, SHEET_ALIASES.assign).rows
+  if (!rows || rows.length < 2) return null
+  const header = rows[0].map(cellStr)
+  const { noCol, nameCol } = findNoNameCols(header)
+  const classCol = header.findIndex(isClassHeader)
+  // 照らし合わせは名前が先（名前が無いと NO でも照らさない）ので、名前の列は必須
+  if (noCol < 0 || nameCol < 0 || classCol < 0) return null
+
+  const students: Placement['students'] = []
+  const classNames: string[] = []
+  for (const row of rows.slice(1)) {
+    const no = toNumber(row[noCol])
+    const cls = cellStr(row[classCol])
+    if (no === null || cls === '') continue
+    students.push({ no: Math.trunc(no), name: cellStr(row[nameCol]) })
+    classNames.push(cls)
+  }
+  if (students.length === 0) return null
+  const order = [...new Set(classNames)].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  return { students, classNames, order }
 }

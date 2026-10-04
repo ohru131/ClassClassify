@@ -281,6 +281,7 @@ export const SHEET_ALIASES = {
   wanted: Object.values(FILE_LABELS).map((l) => l.sheets.wanted),
   unwanted: Object.values(FILE_LABELS).map((l) => l.sheets.unwanted),
   attributes: Object.values(FILE_LABELS).map((l) => l.sheets.attributes),
+  assign: Object.values(FILE_LABELS).map((l) => l.sheets.assign),
 }
 
 const KINDS: ColumnKind[] = ['flag', 'category', 'degree', 'numeric']
@@ -291,11 +292,14 @@ export const kindFromName = (s: string): ColumnKind | undefined => KIND_NAMES.ge
 // 素の「N」「#」は入れない（属性の列名として使われうるので、番号の列と取り違える）
 const NO_HEADERS = new Set([...all('no'), 'NO', 'NUM', 'NÚM', 'NUMERO', 'NÚMERO', 'NUMMER', 'NR'].map(norm))
 const NAME_HEADERS = new Set([...all('name'), '名前', '氏名', 'Nombre', 'Nome', 'Name', '이름', '성명'].map(norm))
+const CLASS_HEADERS = new Set(all('classCol').map(norm))
 const CLASS_COUNT_KEYS = new Set([...all('classCount'), 'Number of groups', '학급 수', 'Anzahl der Klassen', 'Número de turmas'].map(norm))
 const MAX_KEYS = new Set([...all('maxPerClass'), 'Max class size', 'Maximum per class'].map(norm))
 
 export const isNoHeader = (h: string) => NO_HEADERS.has(norm(h))
 export const isNameHeader = (h: string) => NAME_HEADERS.has(norm(h))
+/** 結果の「組分け」シートの組の列の見出し */
+export const isClassHeader = (h: string) => CLASS_HEADERS.has(norm(h))
 export const isClassCountKey = (k: string) => CLASS_COUNT_KEYS.has(norm(k))
 export const isMaxPerClassKey = (k: string) => MAX_KEYS.has(norm(k))
 

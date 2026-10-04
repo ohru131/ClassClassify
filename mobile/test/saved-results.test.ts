@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import XLSX from 'xlsx-js-style'
 import { makeI18n } from '../lib/i18n-core'
 import { runSliced } from '../lib/runner'
 import { loadSample } from '../lib/samples'
@@ -11,13 +12,14 @@ import {
   isSavedResult,
   readSavedMetaList,
   metaOf,
+  placementOfSaved,
   previousClassValues,
   PREVIOUS_CLASS_WEIGHT,
   setColumnEnabled,
   withPreviousClass,
   type SavedResult,
 } from '../lib/saved-results'
-import { compile, evaluate, type Problem } from '../lib/solver'
+import { compile, evaluate, parsePlacement, resultWorkbook, rosterWorkbook, writeXlsx, type Problem } from '../lib/solver'
 
 const ja = makeI18n('ja')
 const saved = (problem: Problem, classOf: number[], k: number): SavedResult => ({ version: 1, id: 'x', name: 'テスト', savedAt: '2026-03-20T09:00:00.000Z', problem, classOf, k })
@@ -70,7 +72,7 @@ describe('保存した編成', () => {
     const s = saved(problem, classOf, 4)
     // 並び順を変え、1人は名前を変える（NO で見つかる）、1人は名簿に無い生徒にする
     const students = [...problem.students].reverse().map((st, i) => (i === 0 ? { ...st, name: '改名' } : i === 1 ? { ...st, name: '転入生', no: 999 } : st))
-    const { values, matched } = previousClassValues({ ...problem, students }, s, ja.className)
+    const { values, matched } = previousClassValues({ ...problem, students }, placementOfSaved(s, ja.className))
     expect(matched).toBe(students.length - 1)
     expect(values[1]).toBe('')
     const last = problem.students.length - 1
@@ -82,7 +84,7 @@ describe('保存した編成', () => {
     const s = saved(problem, classOf, 4)
     // 全員の NO をずらし、1人だけ名前を変える → 名簿が続いていないので、その子は空欄
     const students = problem.students.map((st, i) => ({ ...st, no: st.no + 100, name: i === 0 ? '別の子' : st.name }))
-    const { values, matched } = previousClassValues({ ...problem, students }, s, ja.className)
+    const { values, matched } = previousClassValues({ ...problem, students }, placementOfSaved(s, ja.className))
     expect(values[0]).toBe('')
     expect(matched).toBe(students.length - 1)
   })
@@ -91,7 +93,7 @@ describe('保存した編成', () => {
     const s = saved(problem, classOf, 4)
     // NO はそのままだが、名前が一致するのは1人だけ → 残りの子を NO で照らさない
     const students = problem.students.map((st, i) => (i === 0 ? st : { ...st, name: `新入生${i}` }))
-    const { matched } = previousClassValues({ ...problem, students }, s, ja.className)
+    const { matched } = previousClassValues({ ...problem, students }, placementOfSaved(s, ja.className))
     expect(matched).toBe(1)
   })
 
@@ -100,7 +102,7 @@ describe('保存した編成', () => {
     const dup = problem.students[1].name
     // NO も振り直す（名簿が続いていない）ので、同じ名前の2人はどちらも空欄
     const students = problem.students.map((st, i) => ({ ...st, no: st.no + 100, name: i === 2 ? dup : st.name }))
-    const { values } = previousClassValues({ ...problem, students }, s, ja.className)
+    const { values } = previousClassValues({ ...problem, students }, placementOfSaved(s, ja.className))
     expect(values[1]).toBe('')
     expect(values[2]).toBe('')
     expect(values[3]).toBe(ja.className(classOf[3]))
@@ -108,7 +110,7 @@ describe('保存した編成', () => {
 
   it('「前回の組」をカテゴリの列として入れ、チェックを外すと無効にする', () => {
     const s = saved(problem, classOf, 4)
-    const { values } = previousClassValues(problem, s, ja.className)
+    const { values } = previousClassValues(problem, placementOfSaved(s, ja.className))
     const order = [0, 1, 2, 3].map(ja.className)
     const p = withPreviousClass(problem, '前回の組', values, order)
     const col = p.columns.find((c) => c.name === '前回の組')!
@@ -129,7 +131,7 @@ describe('保存した編成', () => {
   it('前回の組を入れて編成すると、前回同じ組だった2人が同じ組になる組み合わせが減る', async () => {
     const first = await solve(problem, 1)
     const plain = await solve(problem, 2)
-    const { values } = previousClassValues(problem, saved(problem, first, 4), ja.className)
+    const { values } = previousClassValues(problem, placementOfSaved(saved(problem, first, 4), ja.className))
     const mixed = withPreviousClass(problem, '前回の組', values, [0, 1, 2, 3].map(ja.className))
     const next = await solve(mixed, 2)
     expect(pairsAgain(first, next)).toBeLessThan(pairsAgain(first, plain))
@@ -139,4 +141,32 @@ describe('保存した編成', () => {
     const prevCol = report.columns.find((c) => c.column === '前回の組')!
     expect(prevCol).toBeDefined()
   }, 20000)
+
+  it('書き出した結果の Excel（どの言語でも）から前回の組を読み、保存した編成と同じように使える', () => {
+    // 10組以上でも「1組・2組…10組・11組」の順に並べる
+    const k = 11
+    const cls = problem.students.map((_, i) => i % k)
+    const xlsx = (lang: 'ja' | 'en') => writeXlsx(resultWorkbook(problem, cls, k, evaluate(problem, cls, k), lang), 'array')
+    const fromSaved = previousClassValues(problem, placementOfSaved(saved(problem, cls, k), ja.className))
+
+    const pja = parsePlacement(xlsx('ja'))!
+    expect(pja.order).toEqual(Array.from({ length: k }, (_, c) => ja.className(c)))
+    expect(previousClassValues(problem, pja)).toEqual(fromSaved)
+
+    // 英語で書き出したファイルは組の名前が英語のまま（散らすのに名前の言語は関係ない）
+    const pen = parsePlacement(xlsx('en'))!
+    expect(pen.order[0]).toBe('Class 1')
+    expect(pen.order[10]).toBe('Class 11')
+    const en = previousClassValues(problem, pen)
+    expect(en.matched).toBe(problem.students.length)
+    expect(en.values[12]).toBe('Class 2')
+
+    // 名簿だけのファイル（組分けのシートが無い）は読めない
+    expect(parsePlacement(writeXlsx(rosterWorkbook(problem, 4), 'array'))).toBeNull()
+    // Excel でないデータ・名前の列を消した組分けのシートも読めない（誰とも照らせないので）
+    expect(parsePlacement(new TextEncoder().encode('not an excel file').buffer as ArrayBuffer)).toBeNull()
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['NO', '組'], [1, '1組'], [2, '2組']]), '組分け')
+    expect(parsePlacement(writeXlsx(wb, 'array'))).toBeNull()
+  })
 })
