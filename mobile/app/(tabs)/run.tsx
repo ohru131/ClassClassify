@@ -17,12 +17,14 @@ export default function RunScreen() {
   const { problem, numClasses, setNumClasses, stepMaxPerClass, timeSec, setTimeSec, run, cancel, running, progress, solution, error, setError, modifyProblem } = useProject()
   const router = useRouter()
   const { isWide } = useLayout()
-  const { t, num, className, file } = useI18n()
+  const { t, num, className } = useI18n()
   const saved = useSavedResults()
   // 「前回とできるだけ入れ替える」の元にした編成（保存済みの id、書き出した Excel なら null）と、前回の組が分かった人数
   const [source, setSource] = useState<{ id: string | null; name: string; matched: number; students: unknown } | null>(null)
   // 前回の編成を読んでいる間は編成を始めない（読み終えて名簿を変えると、編成の結果が捨てられる）
   const [applying, setApplying] = useState<null | 'saved' | 'file'>(null)
+  // 二度押し対策（applying は再描画後にしか効かないので、ファイル選択が2つ開きうる）
+  const lockRef = useRef(false)
   // 実行中に別のタブへ移った人を、終わった瞬間に結果画面へ引き戻さない
   const focusedRef = useRef(true)
   useFocusEffect(
@@ -59,6 +61,11 @@ export default function RunScreen() {
   const shownSource = source && source.students === problem.students ? source : null
   // 前回の組分けから各生徒の前回の組を名簿に入れ、その列を均等に散らす（前回同じ組だった子が重ならないように）
   const applyPlacement = (placement: Placement, id: string | null, name: string) => {
+    // 今の名簿の誰も見つからない（別の学年・別の名簿の編成）なら、空の列を入れて有効にしない
+    if (previousClassValues(problem, placement).matched === 0) {
+      setError(t('mixNoMatch', { name }))
+      return
+    }
     let matched = 0
     let students: unknown = null
     modifyProblem((p) => {
@@ -72,7 +79,8 @@ export default function RunScreen() {
   }
   const applyFrom = async (id: string) => {
     // 編成中に名簿を変えると、終わった結果が捨てられる
-    if (running || applying) return
+    if (running || lockRef.current) return
+    lockRef.current = true
     setApplying('saved')
     try {
       const s = await saved.load(id)
@@ -84,30 +92,28 @@ export default function RunScreen() {
     } catch {
       setError(t('openFailed'))
     } finally {
+      lockRef.current = false
       setApplying(null)
     }
   }
   // 結果画面から書き出した Excel（Web 版・どの言語のものでも）の「組分け」シートを前回の組分けとして読む
   const applyFromFile = async () => {
-    if (running || applying) return
+    if (running || lockRef.current) return
+    lockRef.current = true
     setApplying('file')
     try {
       const f = await pickXlsx()
       if (!f) return
-      let placement: Placement | null = null
-      try {
-        placement = parsePlacement(f.data)
-      } catch {
-        placement = null
-      }
+      const placement = parsePlacement(f.data)
       if (!placement) {
-        setError(t('mixFileInvalid', { sheet: file.sheets.assign }))
+        setError(t('mixFileInvalid'))
         return
       }
       applyPlacement(placement, null, f.name)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
+      lockRef.current = false
       setApplying(null)
     }
   }

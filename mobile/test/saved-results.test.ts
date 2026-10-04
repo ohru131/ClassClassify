@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import XLSX from 'xlsx-js-style'
 import { makeI18n } from '../lib/i18n-core'
 import { runSliced } from '../lib/runner'
 import { loadSample } from '../lib/samples'
@@ -162,5 +163,10 @@ describe('保存した編成', () => {
 
     // 名簿だけのファイル（組分けのシートが無い）は読めない
     expect(parsePlacement(writeXlsx(rosterWorkbook(problem, 4), 'array'))).toBeNull()
+    // Excel でないデータ・名前の列を消した組分けのシートも読めない（誰とも照らせないので）
+    expect(parsePlacement(new TextEncoder().encode('not an excel file').buffer as ArrayBuffer)).toBeNull()
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['NO', '組'], [1, '1組'], [2, '2組']]), '組分け')
+    expect(parsePlacement(writeXlsx(wb, 'array'))).toBeNull()
   })
 })
