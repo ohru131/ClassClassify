@@ -6,20 +6,20 @@
 - 字数は Python の `len()`（Unicode 文字数）で実測した値。Play の上限はアプリ名 30・短い説明 80・詳しい説明 4000。
 - **法的な保証と読める表現は書かない**（「FERPA/DSGVO/LGPD に準拠」とは書かず、「データを送信しない」という事実だけを書く）。
 - 価格はストア側で設定する（アプリはストアのローカライズ済みの価格をそのまま表示する）。各ロケールの「価格」は `docs/play-console/pricing.csv`（国別価格の唯一の情報源。根拠は `docs/play-console/pricing.md`）の値で、【推定】を含む。
-- 掲載文で言ってよいこと（アプリの実態と一致させる）: 広告なし・アカウント／登録なし、読み込み・編集・編成・手直しは無料、Pro は**買い切り（one-time purchase）**で Excel への書き出しと印刷・PDF、保存した編成の無制限（無料は3件まで）、名簿は端末の外へ出ない（外へ出るのは購入確認のための匿名 ID とレシートだけ）、スマホ・Android タブレット・Chromebook 対応。
+- 掲載文で言ってよいこと（アプリの実態と一致させる）: 広告なし・アカウント／登録なし、読み込み・編集・編成・手直しは無料、Pro は**買い切り（one-time purchase）**で Excel への書き出しと印刷・PDF、保存した編成の無制限（無料は3件まで）、名簿は端末の外へ出ない（アプリ自体は何も送信しない。Pro の決済は Google Play が行う）、スマホ・Android タブレット・Chromebook 対応。
 - **Play Console ではタブレット（7インチ・10インチ）と Chromebook 用のスクリーンショットも登録する**（`submission-assets/screenshots/` の phone 1080×1920・tablet7 1296×2304・tablet10 1920×1080・chromebook 1920×1080。タブレット・Chromebook は 16:9 / 9:16。上げる順は `submission-assets/README.md`）。
 
 | Play のロケール | アプリ名 | 短い説明 | 詳しい説明 |
 |---|---|---|---|
-| en-US | 26 | 79 | 3175 |
-| en-AU | 26 | 80 | 3132 |
-| en-GB | 25 | 80 | 3054 |
-| ko-KR | 14 | 67 | 1561 |
-| es-419 | 23 | 80 | 3331 |
-| es-ES | 28 | 80 | 3442 |
-| de-DE | 27 | 80 | 3782 |
-| pt-BR | 24 | 76 | 3274 |
-| ja-JP | 22 | 60 | 1367 |
+| en-US | 26 | 79 | 3160 |
+| en-AU | 26 | 80 | 3117 |
+| en-GB | 25 | 80 | 3039 |
+| ko-KR | 14 | 67 | 1571 |
+| es-419 | 23 | 80 | 3340 |
+| es-ES | 28 | 80 | 3449 |
+| de-DE | 27 | 80 | 3778 |
+| pt-BR | 24 | 76 | 3282 |
+| ja-JP | 22 | 60 | 1372 |
 
 ## en-US（英語・米国）
 
@@ -41,7 +41,7 @@ FairClass: Class Placement
 Balanced classes and groups in seconds, all year. Free, no sign-up, no uploads.
 ```
 
-### 詳しい説明（3175字 / 4000）
+### 詳しい説明（3160字 / 4000）
 
 ```
 Every spring, the same puzzle: next year's class lists. You want a fair mix of boys and girls and of reading and math levels in every room, students with IEPs, 504 plans and English learners spread thoughtfully, and the parent requests and "please don't put these two together" notes all remembered. FairClass gives you a balanced first draft in seconds, so your team can spend the meeting talking about kids instead of shuffling sticky notes. Every final decision stays with you.
@@ -73,7 +73,7 @@ FAIRCLASS PRO (ONE-TIME PURCHASE)
 
 Prefer a bigger screen? FairClass also comes as a free web app, and your Excel files open in both.
 
-Privacy: rosters and results are saved only on your device. To confirm a Pro purchase, Google Play and our purchase service (RevenueCat) receive an anonymous ID and the receipt — never student names or roster data.
+Privacy: rosters and results are saved only on your device. The app itself sends no data anywhere — Pro payments are handled by Google Play, and student names and roster data never leave your device.
 ```
 
 ## en-AU（英語・オーストラリア）
@@ -96,7 +96,7 @@ FairClass: Class Placement
 Classes and groups, balanced in seconds, all year. Free, no sign-up, data local.
 ```
 
-### 詳しい説明（3132字 / 4000）
+### 詳しい説明（3117字 / 4000）
 
 ```
 Term 4 means class placements. Before the new school year starts in late January or February, you're juggling an even spread of girls and boys, learning levels and behaviour, students on the NCCD or with adjustments in place, EAL/D learners, and the friendship requests from families. FairClass gives you a balanced first draft of next year's classes in seconds, so the planning meeting can focus on the kids, not the sticky notes. Every final decision stays with you.
@@ -128,7 +128,7 @@ FAIRCLASS PRO (ONE-OFF PURCHASE)
 
 Prefer a bigger screen? FairClass also comes as a free web app, and your Excel files open in both.
 
-Privacy: class lists and results are saved only on your device. To confirm a Pro purchase, Google Play and our purchase service (RevenueCat) receive an anonymous ID and the receipt — never student names or class list data.
+Privacy: class lists and results are saved only on your device. The app itself sends no data anywhere — Pro payments are handled by Google Play, and student names and class list data never leave your device.
 ```
 
 ## en-GB（英語・英国）
@@ -151,7 +151,7 @@ FairClass: Mixing Classes
 Mix classes and groups fairly, all year. Free, no sign-up, data stays on device.
 ```
 
-### 詳しい説明（3054字 / 4000）
+### 詳しい説明（3039字 / 4000）
 
 ```
 Mixing classes is one of the trickiest jobs of the summer term, especially in a two- or three-form entry school. Before transition you're weighing up girls and boys, attainment, behaviour, pupils with SEND or an EHCP, EAL learners, and the friendship groups parents ask about. FairClass gives you a balanced first draft of the new class lists in seconds, so your Year group team can spend the meeting talking about the children, not shuffling sticky notes. Every final decision stays with you.
@@ -183,7 +183,7 @@ FAIRCLASS PRO (ONE-OFF PURCHASE)
 
 Prefer a bigger screen? FairClass also comes as a free web app, and your Excel files open in both.
 
-Privacy: class lists and results are saved only on your device. To confirm a Pro purchase, Google Play and our purchase service (RevenueCat) receive an anonymous ID and the receipt — never pupil names or class list data.
+Privacy: class lists and results are saved only on your device. The app itself sends no data anywhere — Pro payments are handled by Google Play, and pupil names and class list data never leave your device.
 ```
 
 ## ko-KR（韓国語）
@@ -205,7 +205,7 @@ FairClass 반 편성
 2월 반 편성부터 수업 모둠 편성까지. 남녀·학업·지원 필요 학생을 고르게, 분리 배정도 최대한 반영합니다. 가입 없음.
 ```
 
-### 詳しい説明（1561字 / 4000）
+### 詳しい説明（1571字 / 4000）
 
 ```
 매년 2월이면 담임 선생님들이 모여 다음 학년 반 편성을 준비합니다. 남녀 비율, 학업 성취도, 도움이 필요한 학생, 출신 학교, 같은 반이 되면 안 되는 학생까지 하나하나 맞추다 보면 며칠이 금방 지나갑니다. FairClass는 고르게 나눈 반 편성안을 몇 초 만에 만들어 드립니다. 최종 결정은 언제나 선생님께서 내리십니다.
@@ -238,7 +238,7 @@ FairClass Pro(1회 구매)
 
 무료 웹 버전 FairClass와 똑같은 방식으로 반을 나누며, 엑셀 파일은 양쪽에서 그대로 열립니다.
 
-개인정보: 명단과 결과는 기기에만 저장됩니다. Pro 구매 확인을 위해 스토어와 RevenueCat이 익명 식별자와 영수증만 받으며, 학생 이름이나 명단 내용은 보내지 않습니다.
+개인정보: 명단과 결과는 기기에만 저장됩니다. 앱은 어떤 데이터도 외부로 보내지 않으며, Pro 결제는 Google Play가 처리합니다. 학생 이름이나 명단 내용은 기기 밖으로 나가지 않습니다.
 ```
 
 ## es-419（スペイン語・中南米）
@@ -260,7 +260,7 @@ FairClass: armar grupos
 Arma grupos y equipos equilibrados todo el ciclo escolar. Gratis y sin registro.
 ```
 
-### 詳しい説明（3331字 / 4000）
+### 詳しい説明（3340字 / 4000）
 
 ```
 Sea en febrero, en marzo o en agosto, antes del inicio del ciclo escolar hay que armar los grupos: que queden parejos en niñas y niños y en desempeño, que los estudiantes con NEE estén bien repartidos, que los amigos que se apoyan sigan juntos y que algunos compañeros no coincidan. Hacerlo a mano, con listas y papelitos, puede llevar días. FairClass te propone una distribución de estudiantes en grupos en segundos, y la última palabra siempre es tuya.
@@ -292,7 +292,7 @@ FAIRCLASS PRO (PAGO ÚNICO)
 
 ¿Ya usas la versión web gratuita de FairClass? Arma los grupos de la misma manera, y tus archivos de Excel funcionan en las dos.
 
-Privacidad: tus listas y resultados se guardan solo en tu dispositivo. Para confirmar la compra de Pro, la tienda y RevenueCat reciben solo un identificador anónimo y el recibo, nunca nombres de estudiantes ni datos de la lista.
+Privacidad: tus listas y resultados se guardan solo en tu dispositivo. La app no envía ningún dato a ningún lugar: el pago de Pro lo procesa Google Play, y los nombres de estudiantes y los datos de la lista nunca salen de tu dispositivo.
 ```
 
 ## es-ES（スペイン語・スペイン）
@@ -314,7 +314,7 @@ FairClass: reparto en grupos
 Reparte al alumnado en grupos equilibrados todo el curso. Gratis y sin registro.
 ```
 
-### 詳しい説明（3442字 / 4000）
+### 詳しい説明（3449字 / 4000）
 
 ```
 Al terminar el curso, o justo antes de que empiece el siguiente en septiembre, toca hacer los grupos siguiendo los criterios de agrupamiento del alumnado del centro: equilibrio entre niñas y niños, un desempeño equilibrado entre los grupos, el alumnado con NEAE repartido de forma justa y las incompatibilidades que conoce el equipo docente. Con papel, pósits y hojas de cálculo se van tardes enteras. FairClass hace ese reparto en grupos en segundos, y la última palabra la tiene siempre el profesorado.
@@ -346,7 +346,7 @@ FAIRCLASS PRO (PAGO ÚNICO)
 
 ¿Ya usas la versión web gratuita de FairClass? Hace los grupos de la misma forma, y los archivos de Excel sirven en las dos.
 
-Privacidad: las listas y los resultados se guardan solo en el dispositivo. Para confirmar la compra de Pro, la tienda y RevenueCat reciben solo un identificador anónimo y el recibo, nunca nombres del alumnado ni datos de la lista.
+Privacidad: las listas y los resultados se guardan solo en el dispositivo. La app no envía ningún dato a ningún sitio: el pago de Pro lo procesa Google Play, y los nombres del alumnado y los datos de la lista nunca salen del dispositivo.
 ```
 
 ## de-DE（ドイツ語）
@@ -368,7 +368,7 @@ FairClass Klasseneinteilung
 Klassen und Gruppen fair einteilen, das ganze Jahr. Daten bleiben auf dem Gerät.
 ```
 
-### 詳しい説明（3782字 / 4000）
+### 詳しい説明（3778字 / 4000）
 
 ```
 Alle Daten bleiben auf dem Gerät. Keine Cloud, kein Konto, keine Registrierung: Die Schülerliste verlässt Ihr Smartphone, Tablet oder Chromebook nicht – auch die Klasseneinteilung selbst entsteht direkt dort.
@@ -403,7 +403,7 @@ FAIRCLASS PRO (EINMALKAUF)
 
 FairClass teilt die Klassen genauso ein wie die kostenlose Webversion; Ihre Excel-Dateien können Sie in beiden verwenden.
 
-Datenschutz: Schülerlisten und Ergebnisse werden nur auf dem Gerät gespeichert. Zur Prüfung eines Pro-Kaufs erhalten der Store und RevenueCat eine anonyme Kennung und den Beleg – niemals Namen oder Inhalte der Schülerliste. Ob der Einsatz an Ihrer Schule zulässig ist, entscheiden Schule und Land.
+Datenschutz: Schülerlisten und Ergebnisse werden nur auf dem Gerät gespeichert. Die App selbst überträgt keinerlei Daten – den Pro-Kauf wickelt Google Play ab, Namen und Inhalte der Schülerliste verlassen das Gerät nie. Ob der Einsatz an Ihrer Schule zulässig ist, entscheiden Schule und Land.
 ```
 
 ## pt-BR（ポルトガル語・ブラジル）
@@ -425,7 +425,7 @@ FairClass: montar turmas
 Monte turmas e grupos equilibrados o ano letivo todo. Grátis e sem cadastro.
 ```
 
-### 詳しい説明（3274字 / 4000）
+### 詳しい説明（3282字 / 4000）
 
 ```
 Todo ano é a mesma coisa: antes do início do ano letivo, em fevereiro, é preciso montar as turmas. Equilibrar meninas e meninos, desempenho e comportamento, distribuir com cuidado os alunos com deficiência ou atendidos pelo AEE, manter juntos os amigos que se apoiam e separar quem não deve ficar junto. Fazer a enturmação à mão, com listas e papeizinhos, leva dias. O FairClass faz a distribuição de alunos nas turmas em segundos, e a decisão final é sempre sua.
@@ -457,7 +457,7 @@ FAIRCLASS PRO (COMPRA ÚNICA)
 
 Já usa a versão web gratuita do FairClass? Ela monta as turmas do mesmo jeito, e os arquivos do Excel funcionam nas duas.
 
-Privacidade: as listas e os resultados ficam só no aparelho. Para confirmar a compra do Pro, a loja e o RevenueCat recebem apenas um identificador anônimo e o recibo, nunca nomes de alunos nem dados da lista. Sobre a LGPD: a lista de alunos não sai do aparelho; se o uso é adequado à sua escola, quem decide é a própria escola.
+Privacidade: as listas e os resultados ficam só no aparelho. O app não envia nenhum dado para lugar nenhum: o pagamento do Pro é processado pelo Google Play, e nomes de alunos e dados da lista nunca saem do aparelho. Sobre a LGPD: a lista de alunos não sai do aparelho; se o uso é adequado à sua escola, quem decide é a própria escola.
 ```
 
 ## ja-JP（日本語）
@@ -479,7 +479,7 @@ FairClass（フェアクラス）クラス編成
 クラス編成にも、授業の班分けにも。男女・学力・支援の必要な子を均等に。一年中使えて、名簿は端末の中だけ、登録も不要です。
 ```
 
-### 詳しい説明（1367字 / 4000）
+### 詳しい説明（1372字 / 4000）
 
 ```
 3月、新年度に向けたクラス編成、本当におつかれさまです。男女比、学力、支援の必要な子、同じクラスにしたい子・離したい子……いくつもの条件を見比べながら、名前カードや付箋を何度も並べ替える。学年会で何日もかかることも珍しくありません。
@@ -511,5 +511,5 @@ FairClass Pro（買い切り）
 
 無料の Web 版 FairClass と同じしくみでクラスを分けるので、Excel ファイルはどちらでもそのまま使えます。
 
-プライバシー: 名簿と結果は端末の中だけに保存されます。Pro の購入確認のため、ストアと RevenueCat が匿名の識別子とレシートを受け取りますが、生徒の名前や名簿の内容は送りません。
+プライバシー: 名簿と結果は端末の中だけに保存されます。アプリからはどんなデータも送信しません。Pro の決済は Google Play が行い、生徒の名前や名簿の内容が端末の外へ出ることはありません。
 ```

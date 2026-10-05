@@ -24,7 +24,7 @@
 
 - [x] **アプリ ID（パッケージ名）は `com.ohru131.mosaic` で確定**（`mobile/app.config.ts` の `APP_ID`）。製品名は FairClass に改名したが、
   Play のアプリが改名前のこの ID で登録済みで、変えられない（`com.ohru131.fairclass` では既存アプリへ上げられない）。
-  直す場所は `mobile/app.config.ts`・`scripts/push-play-*.mjs` の `DEFAULT_PACKAGE`・RevenueCat のアプリ設定の3つ。
+  直す場所は `mobile/app.config.ts`・`scripts/push-play-*.mjs` の `DEFAULT_PACKAGE` の2つ。
 - [ ] **【要決定】デベロッパー名・連絡先メール**（ストアに公開される）。プライバシーポリシーは問い合わせ先を GitHub Issues にしているが、
   **Play はメールアドレスが必須**。公開してよいアドレスを決める（Gmail のエイリアス等）。
 - [ ] **【要確認】デベロッパー アカウントの種類と作成日**: 2023-11-13 以降に作った**個人**アカウントなら、本番公開の前に
@@ -56,8 +56,8 @@
 - [ ] **ニュースアプリ**: いいえ
 - [ ] **COVID-19 接触確認・健康状態アプリ**: 該当なし
 - [ ] **データセーフティ**: [`data-safety.md`](data-safety.md)
-  （収集＝購入履歴・デバイスまたはその他の ID の2つだけ、RevenueCat の購入確認のため。名簿は端末外へ出ないので収集に当たらない。
-  転送時の暗号化＝はい、アカウント無し、削除＝アプリ内の「この端末の名簿と結果を消去」）
+  （収集・共有＝**いいえ**。課金は Google Play Billing を直接使い、購入の状態は端末の Play ストアから読むだけでアプリからは何も送らない。
+  名簿は端末外へ出ないので収集に当たらない。アカウント無し、端末内のデータはアプリ内の「この端末の名簿と結果を消去」で消える）
 - [ ] **政府機関のアプリ**: いいえ
 - [ ] **金融取引の機能**: 「アプリに金融関連の機能は含まれていません」
 - [ ] **健康アプリ**: 該当なし
@@ -99,26 +99,19 @@
   - 購入オプション: 「購入（Buy）」1つ。**基準価格 US$5.99** を入れて保存・有効化
   - 国別価格: [`pricing.csv`](pricing.csv) を `node scripts/push-play-pricing.mjs --commit` で反映（[`pricing.md`](pricing.md)）
   - **定期購入（サブスクリプション）は作らない。**
-  - Google Play の一回限りの商品は、**消費（consume）されると再び買える＝買い切りではなくなる**。消費するかどうかを決めるのは
-    アプリのコードではなく **RevenueCat**: SDK は購入を RevenueCat に送り、返ってきた商品ごとの `should_consume` に従って consume する
-    （`react-native-purchases` が内部で使う purchases-android の `PostReceiptHelper`。RevenueCat の SDK のメッセージも
-    「ダッシュボードで一回限りの商品を消費型か非消費型か正しく設定せよ」と案内している）。**RevenueCat は Google Play の
-    一回限りの商品を既定で消費型として扱う**ので、下の「非消費型の設定」をしないと Pro が consume され、復元できない・再購入できてしまう。
-- [ ] **RevenueCat**（`mobile/README.md` の「RevenueCat の設定」）
-  - [ ] RevenueCat のプロジェクトに Android アプリ（パッケージ名＝上の App ID）を作る
-  - [ ] **Play のサービス アカウントの認証情報**を RevenueCat に登録（購入の検証に要る。権限が反映されるまで最大 36 時間かかることがある【要確認】）
-  - [ ] （推奨）リアルタイム デベロッパー通知（Pub/Sub）を RevenueCat の案内どおりに設定（返金の反映が早くなる）
-  - [ ] 商品 `fairclass_pro` を取り込み、**Entitlement `pro`** に紐付ける（紐付け忘れると支払っても Pro にならない）
-  - [ ] **RevenueCat のダッシュボードで商品 `fairclass_pro` の種類を「Non-consumable（非消費型）」に設定する（必須）**。
-    **Lifetime パッケージに入れるだけでは非消費型にならない**（パッケージの種類は offering の中の並べ方で、consume するかどうかとは別の設定）
-  - [ ] Offering（current）に **Lifetime パッケージ**として入れる
-  - [ ] 内部テストでライセンステスターとして購入 → アプリを入れ直して「購入を復元」で Pro が戻ること、もう一度「購入」しようとすると「購入済み」になることを確かめる（consume されていればどちらも失敗する）
-  - [ ] Android の公開 SDK キー（`goog_…`）を EAS の環境変数 `EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY` に登録してからビルド
+  - Google Play の一回限りの商品は、**消費（consume）されると再び買える＝買い切りではなくなる**。消費するかどうかは
+    **アプリのコードが決める**（Play Console に消費型・非消費型の設定は無い）。アプリは Google Play Billing を直接使い（`expo-iap`）、
+    `fairclass_pro` を**決して consume せず、acknowledge だけする**（`finishTransaction({ isConsumable: false })`。`mobile/lib/pro-provider.tsx`・`mobile/lib/play-billing.ts`）。
+    acknowledge は購入の直後に加え、起動時・前面に戻ったとき・復元時にも未処理のものを済ませる（**3日以内に acknowledge されない購入は Play が自動で払い戻す**）。
+  - 外部の課金サービスの設定・サービス アカウントの登録・SDK キーの環境変数は**要らない**（アプリは端末の Play ストアに購入を問い合わせるだけ）。
 - [ ] **ライセンス テスト**: 「設定」→「ライセンス テスト」に自分とテスターの Google アカウントを追加（課金されずに購入を試せる）
+- [ ] 内部テストでライセンステスターとして購入 → アプリを入れ直して「購入を復元」で Pro が戻ること、もう一度「購入」しようとすると
+  「購入済み」になる（アプリは復元として扱い Pro に戻す）ことを確かめる（consume されていればどちらも失敗する）。
+  **debug ビルド（`com.ohru131.mosaic.debug`）では課金を試せない**（商品はパッケージ名に紐づく）。upload key で署名した release ビルドか、テストトラックから入れたアプリで確かめる
 
 ## 6. ビルドと署名
 
-- [ ] `npx eas init`（`extra.eas.projectId` が入る）→ 環境変数を登録 → `npx eas build --profile production --platform android`
+- [ ] `npx eas init`（`extra.eas.projectId` が入る）→ `npx eas build --profile production --platform android`（課金のための環境変数は要らない）
 - [ ] **Play アプリ署名**を使う（既定。EAS が管理するアップロード鍵で署名した AAB を上げ、配信用の鍵は Google が持つ）
 - [ ] `eas.json` は `appVersionSource: "remote"`・`autoIncrement: true`。**初回は versionCode 1 から始まるのでそのままでよい**
   （既存の Play アプリに上書きするときだけ `eas build:version:set`）
@@ -180,7 +173,7 @@
 1. ~~App ID を確定~~（`com.ohru131.mosaic` で確定済み。0 節）。
 2. 公開する連絡先メール・デベロッパー名を決める。
 3. お支払いプロファイル・税務情報・本人確認。
-4. EAS プロジェクトの作成、RevenueCat のプロジェクト・Android アプリ・`pro` entitlement・**商品を非消費型に設定**・Lifetime の offering、SDK キーを EAS へ。
+4. EAS プロジェクトの作成（課金の外部サービス・SDK キーの設定は無い）。
 5. Play Console でアプリ作成 → アプリのコンテンツの各申告（このフォルダの回答を写す）→ ストアの設定・掲載情報（`docs/store-listing.md`・`submission-assets/`）。
 6. `fairclass_pro` を作成し、`pricing.csv` を `scripts/push-play-pricing.mjs` で反映（サービスアカウントの鍵は手元だけに置く）。
 7. 内部テストで実機確認（購入・復元・印刷・Excel 共有・タブレット・Chromebook）→ クローズドテスト（12人 × 14日）→ 本番申請。

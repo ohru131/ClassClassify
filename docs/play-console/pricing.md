@@ -10,9 +10,10 @@
 
 ## 先に: 商品と前提
 
-- 商品: **一回限りの商品（One-time product）**、商品 ID **`fairclass_pro`**（RevenueCat に登録し、entitlement `pro` に紐付ける。
-  `mobile/README.md` の「RevenueCat の設定」）。**RevenueCat のダッシュボードで非消費型（Non-consumable）に設定しないと、RevenueCat が購入を consume して買い切りでなくなる**（`submission-checklist.md` 5節）。
-- **サブスクリプションは作らない**（`mobile/lib/purchase-offering.ts` がサブスクを売らないよう弾いている）。
+- 商品: **一回限りの商品（One-time product）**、商品 ID **`fairclass_pro`**。アプリは Google Play Billing を直接使い（`expo-iap`）、
+  この ID の商品だけを取りに行く（`mobile/lib/play-billing.ts` の `PRO_PRODUCT_ID`。`mobile/README.md` の「課金（Google Play Billing）の設定」）。
+  **アプリは購入を consume せず acknowledge だけする**ので買い切りのまま（`submission-checklist.md` 5節）。
+- **サブスクリプションは作らない**（アプリは `fairclass_pro` を一回限りの商品（`type: 'in-app'`）としてだけ取得・購入する）。
 - **Play Console の価格 CSV インポートと価格テンプレートは 2025 年に廃止された**。まとめて入れる手段は
   Play Developer API（`monetization.onetimeproducts`）だけで、`scripts/push-play-pricing.mjs` はそれを使う。
   手で入れるなら商品ページで国ごとに入力する。

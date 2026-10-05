@@ -16,9 +16,14 @@ const { withAppBuildGradle, withDangerousMod } = require("expo/config-plugins");
 // このプラグインが壊すことはない。
 
 const marker = "// fairclass: local release signing from credentials.json";
-const DEBUG_SIGNING_LINE = "            signingConfig signingConfigs.debug\n";
+// expo-iap のプラグインはテンプレートの `signingConfig signingConfigs.debug` を代入の形
+// （`signingConfig = signingConfigs.debug`）に書き換えるので、どちらの形でも見つける
+const DEBUG_SIGNING_LINES = [
+  "            signingConfig signingConfigs.debug\n",
+  "            signingConfig = signingConfigs.debug\n",
+];
 const RELEASE_SIGNING_LINE =
-  '            signingConfig rootProject.file("keystore.properties").exists() ? signingConfigs.release : signingConfigs.debug\n';
+  '            signingConfig = rootProject.file("keystore.properties").exists() ? signingConfigs.release : signingConfigs.debug\n';
 
 const readCredentials = (projectRoot) => {
   const file = path.join(projectRoot, "credentials.json");
@@ -90,11 +95,15 @@ module.exports = function withLocalReleaseSigning(config) {
     const releaseAt = buildTypes.indexOf("        release {");
     if (releaseAt < 0) throw new Error("withLocalReleaseSigning could not find the release buildType");
     const releaseBody = buildTypes.slice(releaseAt);
-    if (!releaseBody.includes(DEBUG_SIGNING_LINE)) {
+    // release ブロックの中で最初に出てくる方（後ろの別ブロックの行を拾わない）
+    const found = DEBUG_SIGNING_LINES.map((line) => ({ line, at: releaseBody.indexOf(line) }))
+      .filter((f) => f.at >= 0)
+      .sort((a, b) => a.at - b.at)[0];
+    if (!found) {
       throw new Error("withLocalReleaseSigning could not find the release signingConfig line");
     }
     contents =
-      head + buildTypes.slice(0, releaseAt) + releaseBody.replace(DEBUG_SIGNING_LINE, RELEASE_SIGNING_LINE);
+      head + buildTypes.slice(0, releaseAt) + releaseBody.replace(found.line, RELEASE_SIGNING_LINE);
 
     // 3) そのうえで signingConfigs に release を足す。
     const signingHeader = "    signingConfigs {\n";

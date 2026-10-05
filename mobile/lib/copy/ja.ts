@@ -218,12 +218,10 @@ export const JA_COPY: Record<CopyKey, string> = {
   clearBody: 'この端末に保存している名簿・編成結果・保存した編成をすべて削除します。元には戻せません。',
   footer: 'FairClass · クラス編成のお手伝い（Web 版は無料・https://ohru131.github.io/ClassClassify/）',
 
-  purchaseStoreOnly: '購入は iOS / Android のアプリ版でご利用いただけます。',
-  revenueCatKeyMissing: '購入の準備がまだできていません。時間をおいてもう一度お試しください。',
-  customerInfoFetchFailed: '購入の情報を確かめられませんでした。少し時間をおいて、もう一度お試しください。',
+  purchaseStoreOnly: '購入は Android のアプリ版（Google Play）でご利用いただけます。',
+  purchaseStatusFailed: '購入の情報を確かめられませんでした。少し時間をおいて、もう一度お試しください。',
   purchaseSucceeded: 'ご購入ありがとうございます。Pro が有効になりました（買い切りのため、今後の請求はありません）。',
-  purchaseNotApplied:
-    'お支払いは完了しましたが、Pro をまだ有効にできていません。「購入を復元」を押してください。それでも有効にならない場合はサポートへご連絡ください（二重に請求されることはありません）。',
+  purchasePending: 'お支払いの完了を待っています。支払いが済むと Pro が自動で有効になります（コンビニ払いなどは時間がかかることがあります）。',
   purchaseFailed: '購入を完了できませんでした。もう一度お試しください。',
   productLoadFailed: 'ストアから Pro の情報を読み込めませんでした。インターネットにつながっているか確かめて、もう一度お試しください。',
   proRestored: 'Pro の購入を復元しました。',

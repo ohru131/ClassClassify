@@ -219,12 +219,10 @@ export const KO_COPY: Record<CopyKey, string> = {
   clearBody: '이 기기에 저장된 명단, 편성 결과, 저장한 편성을 모두 삭제합니다. 되돌릴 수 없습니다.',
   footer: 'FairClass · 반 편성 도우미(웹 버전 무료: https://ohru131.github.io/ClassClassify/)',
 
-  purchaseStoreOnly: '구매는 iOS / Android 앱에서 이용할 수 있습니다.',
-  revenueCatKeyMissing: '구매 준비가 아직 되지 않았습니다. 잠시 후 다시 시도하십시오.',
-  customerInfoFetchFailed: '구매 정보를 불러오지 못했습니다. 잠시 후 다시 시도하십시오.',
+  purchaseStoreOnly: '구매는 Android 앱(Google Play)에서 이용할 수 있습니다.',
+  purchaseStatusFailed: '구매 정보를 불러오지 못했습니다. 잠시 후 다시 시도하십시오.',
   purchaseSucceeded: '구매해 주셔서 감사합니다. Pro가 활성화되었습니다(1회 구매라 추가 요금은 없습니다).',
-  purchaseNotApplied:
-    '결제는 완료되었지만 아직 Pro가 활성화되지 않았습니다. "구매 복원"을 눌러 주십시오. 그래도 활성화되지 않으면 지원팀에 문의하십시오(이중으로 청구되지 않습니다).',
+  purchasePending: '결제가 완료되기를 기다리고 있습니다. 결제가 끝나면 Pro가 자동으로 활성화됩니다(결제 수단에 따라 시간이 걸릴 수 있습니다).',
   purchaseFailed: '구매를 완료하지 못했습니다. 다시 시도하십시오.',
   productLoadFailed: '스토어에서 Pro 정보를 불러오지 못했습니다. 인터넷 연결을 확인하고 다시 시도하십시오.',
   proRestored: 'Pro 구매를 복원했습니다.',

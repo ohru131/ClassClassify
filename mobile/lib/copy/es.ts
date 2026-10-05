@@ -219,12 +219,10 @@ export const ES_COPY: Record<CopyKey, string> = {
   clearBody: 'Se eliminarán la lista, los resultados y las distribuciones guardadas en este dispositivo. No se puede deshacer.',
   footer: 'FairClass · ayuda para armar grupos (versión web gratuita: https://ohru131.github.io/ClassClassify/)',
 
-  purchaseStoreOnly: 'Las compras están disponibles en la app de iOS o Android.',
-  revenueCatKeyMissing: 'Las compras todavía no están listas. Inténtalo más tarde.',
-  customerInfoFetchFailed: 'No se pudo cargar la información de compra. Inténtalo más tarde.',
+  purchaseStoreOnly: 'Las compras están disponibles en la app de Android (Google Play).',
+  purchaseStatusFailed: 'No se pudo cargar la información de compra. Inténtalo más tarde.',
   purchaseSucceeded: '¡Gracias! Pro ya está activo. Es un pago único, así que no habrá más cobros.',
-  purchaseNotApplied:
-    'El pago se realizó, pero Pro todavía no está activo. Toca “Restaurar compra”. Si sigue sin activarse, contacta a soporte; no se te cobrará dos veces.',
+  purchasePending: 'Esperando a que se complete el pago. Pro se activará automáticamente cuando se confirme (algunos métodos de pago tardan un poco).',
   purchaseFailed: 'No se pudo completar la compra. Inténtalo de nuevo.',
   productLoadFailed: 'No se pudo cargar Pro desde la tienda. Revisa tu conexión e inténtalo de nuevo.',
   proRestored: 'Se restauró tu compra de Pro.',

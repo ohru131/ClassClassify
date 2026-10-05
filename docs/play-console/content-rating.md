@@ -19,7 +19,7 @@ Play Console →「アプリのコンテンツ」で回答する、レーティ�
 | ギャンブル・模擬ギャンブル | いいえ | 該当なし |
 | ユーザー同士のやり取り（チャット・投稿・ユーザー生成コンテンツの共有） | **いいえ** | アプリ内に他の利用者とつながる機能が無い。Excel・PDF の書き出しは OS の共有シートで利用者が自分の送り先へ渡すだけ（`mobile/lib/xlsx-files.ts`・`mobile/lib/print.ts`） |
 | 位置情報の共有 | いいえ | 位置情報の権限を宣言していない（`mobile/app.config.ts` の `permissions: []`） |
-| デジタル商品の購入 | **はい**（アプリ内購入：FairClass Pro の買い切り） | `mobile/lib/revenuecat-provider.tsx` |
+| デジタル商品の購入 | **はい**（アプリ内購入：FairClass Pro の買い切り） | `mobile/lib/pro-provider.tsx`（Google Play Billing） |
 | 制限の無いインターネットアクセス（ブラウザ等） | いいえ | アプリ内ブラウザ・WebView でのサイト閲覧は無い |
 | 個人情報の要求 | いいえ | 名前・メール等を尋ねない。生徒の名簿は端末内にだけ保存（`data-safety.md`） |
 

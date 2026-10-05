@@ -24,7 +24,7 @@
 
 同じソルバーを使う Expo / React Native アプリ（Android・iOS、学校の Chromebook・タブレット対応）。
 名簿の読み込み・編集・編成・手動移動は無料（広告なし）、Excel での書き出しと印刷・PDF は Pro（買い切り・サブスクなし）。
-名簿データは端末内だけに保存し、外部へ送るのは購入確認（RevenueCat）の匿名 ID とレシートだけ。セットアップ・ビルド・課金の設定は [mobile/README.md](mobile/README.md)。
+名簿データは端末内だけに保存し、アプリからは何も外部へ送らない（Pro の決済は Google Play Billing を直接使い、購入の状態は端末の Play ストアに問い合わせるだけ）。セットアップ・ビルド・課金の設定は [mobile/README.md](mobile/README.md)。
 日本語・英語・韓国語・スペイン語・ドイツ語・ポルトガル語（ブラジル）に対応（用語集は [docs/i18n-glossary.md](docs/i18n-glossary.md)、ストア掲載文は [docs/store-listing.md](docs/store-listing.md)）。Web 版はこれまでどおり無料のまま。
 
 Google Play への提出一式:
