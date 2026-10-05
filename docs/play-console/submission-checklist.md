@@ -102,7 +102,7 @@
   - Google Play の一回限りの商品は、**消費（consume）されると再び買える＝買い切りではなくなる**。消費するかどうかは
     **アプリのコードが決める**（Play Console に消費型・非消費型の設定は無い）。アプリは Google Play Billing を直接使い（`expo-iap`）、
     `fairclass_pro` を**決して consume せず、acknowledge だけする**（`finishTransaction({ isConsumable: false })`。`mobile/lib/pro-provider.tsx`・`mobile/lib/play-billing.ts`）。
-    acknowledge は購入の直後に加え、起動時・復元時にも未処理のものを済ませる（**3日以内に acknowledge されない購入は Play が自動で払い戻す**）。
+    acknowledge は購入の直後に加え、起動時・前面に戻ったとき・復元時にも未処理のものを済ませる（**3日以内に acknowledge されない購入は Play が自動で払い戻す**）。
   - 外部の課金サービスの設定・サービス アカウントの登録・SDK キーの環境変数は**要らない**（アプリは端末の Play ストアに購入を問い合わせるだけ）。
 - [ ] **ライセンス テスト**: 「設定」→「ライセンス テスト」に自分とテスターの Google アカウントを追加（課金されずに購入を試せる）
 - [ ] 内部テストでライセンステスターとして購入 → アプリを入れ直して「購入を復元」で Pro が戻ること、もう一度「購入」しようとすると

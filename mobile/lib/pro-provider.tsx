@@ -1,5 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Platform } from 'react-native'
+import { AppState, Platform } from 'react-native'
 
 import { useI18n } from './language-provider'
 import { hasPendingPro, ownsPro, PRO_PRODUCT_ID, purchaseErrorKind, unacknowledgedPro, type PurchaseLike } from './play-billing'
@@ -9,6 +10,9 @@ import { resolvePurchaseMessageKey } from './purchase-message'
 // Pro（買い切り）を Google Play Billing で直接扱う（expo-iap）。外部の課金サービスは使わず、
 // 購入の状態は端末の Play ストアに問い合わせるだけで、アプリからどこにも送信しない。
 // 判定は lib/play-billing.ts（買い切り1本・consume しない・acknowledge する）。
+//
+// Play の購入を読み直すのは、起動時・アプリが前面に戻ったとき・購入・復元のとき
+// （保留中だった支払いがバックグラウンドの間に済んだ、起動時に読めなかった などを拾う）。
 
 type PurchaseMessageKey =
   | 'purchaseStoreOnly'
@@ -40,10 +44,14 @@ type Iap = typeof import('expo-iap')
 let iapPromise: Promise<Iap> | null = null
 const loadIap = () => (iapPromise ??= import('expo-iap'))
 
+// 最後に Play で確かめた Pro の状態（Play の購入を読めないときに、買った人を無料版に戻さないため）。
+// 読み直せたら必ず上書きする（返金されていれば消える）
+const PRO_CACHE_KEY = 'fairclass.pro.v1'
+
 export function ProProvider({ children }: { children: ReactNode }) {
   // 文言は表示の直前に選択中の言語で引く（state にはキーだけを持つ）
   const { t } = useI18n()
-  const [isEntitled, setIsPro] = useState(false)
+  const [isEntitled, setIsEntitled] = useState(false)
   const [webPreview] = useState(() => isWebProPreview(Platform.OS, typeof window !== 'undefined' ? window.location?.search : undefined))
   const isPro = isEntitled || webPreview
   const [isNativeReady, setIsNativeReady] = useState(false)
@@ -53,8 +61,16 @@ export function ProProvider({ children }: { children: ReactNode }) {
   // state と Pressable の disabled はコミット後の値なので、同じフレームの二重タップをすり抜ける。
   // 課金 API を叩く経路なので同期フラグで直列化する（購入と復元で共有）。
   const purchaseLockRef = useRef(false)
-  // ストアとの接続（initConnection）が済んだか。済む前の購入・復元は接続から始める
+  // ストアとの接続（initConnection）。済む前の購入・復元は接続から始める
   const connectedRef = useRef<Promise<Iap> | null>(null)
+  // 購入の更新のリスナー（接続できたときに1つだけ登録する）
+  const listenerRef = useRef<{ remove: () => void } | null>(null)
+  // Pro にした回数。読み直しの最中に別の経路（リスナー・購入）で Pro になったら、
+  // 読み直しの古い一覧で Pro を外さない
+  const proSeqRef = useRef(0)
+  // Play で確かめた結果が出たら、端末のキャッシュ（起動直後に読む）で上書きしない
+  const checkedRef = useRef(false)
+  const mountedRef = useRef(true)
   const isNativePurchaseAvailable = Platform.OS === 'android'
 
   // Android 以外（Web）では購入できない。購入・復元はこの理由を出して受け付けない
@@ -63,42 +79,77 @@ export function ProProvider({ children }: { children: ReactNode }) {
   const messageKey = resolvePurchaseMessageKey(purchaseMessageKey, blockedReasonKey, isPro)
   const purchaseMessage = messageKey ? t(messageKey) : null
 
-  const connect = useCallback(() => {
-    connectedRef.current ??= loadIap().then(async (iap) => {
-      await iap.initConnection()
-      return iap
-    })
-    // 失敗したら次の操作で接続し直す
-    connectedRef.current.catch(() => {
-      connectedRef.current = null
-    })
-    return connectedRef.current
+  const setPro = useCallback((owned: boolean) => {
+    checkedRef.current = true
+    if (owned) proSeqRef.current++
+    setIsEntitled(owned)
+    void (owned ? AsyncStorage.setItem(PRO_CACHE_KEY, '1') : AsyncStorage.removeItem(PRO_CACHE_KEY)).catch(() => undefined)
   }, [])
 
   /**
-   * 購入の一覧を Pro の状態に反映する（起動時・購入・復元・リスナーのどこから来ても同じ処理）。
-   * acknowledge していない購入はここで済ませる（3日以内に済ませないと Play が払い戻す）。
-   * 戻り値は Pro か（保留中の支払いは Pro にしない）
+   * 購入の一覧を Pro の状態に反映する（起動時・前面に戻ったとき・購入・復元・リスナーのどこから来ても同じ処理）。
+   * 戻り値は Pro か（保留中の支払いは Pro にしない）。Pro にしてから acknowledge する
+   * （3日以内に済ませないと Play が払い戻す。失敗しても Pro は止めず、次に読み直したときにもう一度行う）
    */
-  const applyPurchases = useCallback(async (iap: Iap, purchases: readonly PurchaseLike[]) => {
-    for (const p of unacknowledgedPro(purchases)) {
-      // 失敗しても Pro の表示は止めない（次の起動・復元でもう一度 acknowledge する）
-      await iap.finishTransaction({ purchase: p as Parameters<Iap['finishTransaction']>[0]['purchase'], isConsumable: false }).catch(() => undefined)
-    }
-    const owned = ownsPro(purchases)
-    if (owned) setIsPro(true)
-    return owned
-  }, [])
+  const applyPurchases = useCallback(
+    async (iap: Iap, purchases: readonly PurchaseLike[]) => {
+      const owned = ownsPro(purchases)
+      if (owned) setPro(true)
+      for (const p of unacknowledgedPro(purchases)) {
+        await iap.finishTransaction({ purchase: p as Parameters<Iap['finishTransaction']>[0]['purchase'], isConsumable: false }).catch(() => undefined)
+      }
+      return owned
+    },
+    [setPro],
+  )
 
-  /** 端末の Play ストアにある購入を読み直す。返金されていれば Pro を外す */
-  const refresh = useCallback(
-    async (iap: Iap) => {
-      const purchases = await iap.getAvailablePurchases()
-      const owned = await applyPurchases(iap, purchases)
-      if (!owned) setIsPro(false)
-      return { owned, pending: hasPendingPro(purchases) }
+  const ensureListener = useCallback(
+    (iap: Iap) => {
+      if (listenerRef.current || !mountedRef.current) return
+      // 購入の画面の外で届く更新（保留中だった支払いが済んだ など）も Pro に反映する
+      listenerRef.current = iap.purchaseUpdatedListener((purchase) => {
+        if (!mountedRef.current) return
+        void applyPurchases(iap, [purchase]).then((owned) => {
+          if (mountedRef.current && owned) setPurchaseMessageKey('purchaseSucceeded')
+        })
+      })
     },
     [applyPurchases],
+  )
+
+  const connect = useCallback(() => {
+    if (!connectedRef.current) {
+      const p = loadIap().then(async (iap) => {
+        await iap.initConnection()
+        return iap
+      })
+      connectedRef.current = p
+      // 失敗したら次の操作で接続し直す（その間に作り直した接続は消さない）
+      p.catch(() => {
+        if (connectedRef.current === p) connectedRef.current = null
+      })
+    }
+    return connectedRef.current.then((iap) => {
+      ensureListener(iap)
+      return iap
+    })
+  }, [ensureListener])
+
+  /**
+   * 端末の Play ストアにある購入を読み直す。返金されていれば Pro を外す。
+   * keepPro: 外さない（Play が「購入済み」と言ったのに、まだ一覧に載っていないとき）
+   */
+  const refresh = useCallback(
+    async (iap: Iap, keepPro = false) => {
+      const seq = proSeqRef.current
+      const purchases = await iap.getAvailablePurchases()
+      const owned = await applyPurchases(iap, purchases)
+      if (!owned && !keepPro && proSeqRef.current === seq) setPro(false)
+      // 起動時に読めなかった案内は、読めたら消す
+      setPurchaseMessageKey((k) => (k === 'purchaseStatusFailed' ? null : k))
+      return { owned, pending: hasPendingPro(purchases) }
+    },
+    [applyPurchases, setPro],
   )
 
   const loadPrice = useCallback(async (iap: Iap) => {
@@ -110,9 +161,15 @@ export function ProProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    mountedRef.current = true
     if (blockedReasonKey !== null) return
     let active = true
-    const subs: { remove: () => void }[] = []
+    // Play を読めるまでは、最後に確かめた状態で始める
+    AsyncStorage.getItem(PRO_CACHE_KEY)
+      .then((v) => {
+        if (active && v === '1' && !checkedRef.current) setIsEntitled(true)
+      })
+      .catch(() => undefined)
     const start = async () => {
       let iap: Iap
       try {
@@ -125,15 +182,6 @@ export function ProProvider({ children }: { children: ReactNode }) {
         return
       }
       if (!active) return
-      // 購入の画面の外で届く更新（保留中だった支払いが済んだ など）も Pro に反映する
-      subs.push(
-        iap.purchaseUpdatedListener((purchase) => {
-          if (!active) return
-          void applyPurchases(iap, [purchase]).then((owned) => {
-            if (active && owned) setPurchaseMessageKey('purchaseSucceeded')
-          })
-        }),
-      )
       try {
         await refresh(iap)
       } catch {
@@ -149,11 +197,21 @@ export function ProProvider({ children }: { children: ReactNode }) {
       }
     }
     void start()
+    // 前面に戻ったら読み直す（購入・復元の最中は、その処理に任せる）
+    const appState = AppState.addEventListener('change', (state) => {
+      if (state !== 'active' || purchaseLockRef.current) return
+      connect()
+        .then((iap) => refresh(iap))
+        .catch(() => undefined)
+    })
     return () => {
       active = false
-      subs.forEach((s) => s.remove())
+      mountedRef.current = false
+      appState.remove()
+      listenerRef.current?.remove()
+      listenerRef.current = null
     }
-  }, [blockedReasonKey, connect, applyPurchases, refresh, loadPrice])
+  }, [blockedReasonKey, connect, refresh, loadPrice])
 
   const restoreWith = useCallback(
     async (iap: Iap) => {
@@ -192,10 +250,20 @@ export function ProProvider({ children }: { children: ReactNode }) {
         // 支払いが済んだことを確かめられたときだけ成功と言う（保留中の支払いはまだ Pro にしない）
         if (await applyPurchases(iap, purchases)) setPurchaseMessageKey('purchaseSucceeded')
         else if (hasPendingPro(purchases)) setPurchaseMessageKey('purchasePending')
+        else {
+          // 購入の画面から結果が返ってこなかった（後払いの経路など）。Play を読み直して確かめる
+          const { owned, pending } = await refresh(iap, true)
+          if (owned) setPurchaseMessageKey('purchaseSucceeded')
+          else if (pending) setPurchaseMessageKey('purchasePending')
+        }
       } catch (error) {
         const kind = purchaseErrorKind(error)
-        // 購入済み（別の端末で買った・入れ直した）なら、復元と同じように Pro に戻す
-        if (kind === 'alreadyOwned') await restoreWith(iap).catch(() => setPurchaseMessageKey('restoreFailed'))
+        if (kind === 'alreadyOwned') {
+          // 購入済み（別の端末で買った・入れ直した）。復元と同じように Pro に戻す。
+          // 一覧にまだ載っていなければ Pro は外さず、確かめられなかったと伝える
+          const { owned } = await refresh(iap, true).catch(() => ({ owned: false }))
+          setPurchaseMessageKey(owned ? 'proRestored' : 'purchaseStatusFailed')
+        }
         // ユーザーによるキャンセルはエラーではない（「失敗しました」を出さない）
         else if (kind !== 'cancelled') setPurchaseMessageKey('purchaseFailed')
       }
@@ -203,7 +271,7 @@ export function ProProvider({ children }: { children: ReactNode }) {
       purchaseLockRef.current = false
       setIsPurchasing(false)
     }
-  }, [blockedReasonKey, isReady, connect, loadPrice, applyPurchases, restoreWith])
+  }, [blockedReasonKey, isReady, connect, loadPrice, applyPurchases, refresh])
 
   const restorePurchases = useCallback(async () => {
     if (blockedReasonKey !== null) {

@@ -134,8 +134,8 @@ consume するかどうかは Play Console ではなく**アプリのコード�
 アプリ側の不変条件（`lib/pro-provider.tsx`・`lib/play-billing.ts`、判定は `test/play-billing.test.ts`）:
 
 - **サブスクリプションは絶対に売らない。** 取得・購入するのは `PRO_PRODUCT_ID`（`fairclass_pro`）の一回限りの商品（`type: 'in-app'`）だけ。
-- 起動時に `getAvailablePurchases()` で端末の Play ストアにある購入を読み、支払い済み（`purchased`）の `fairclass_pro` があれば Pro（`ownsPro`）。**保留中（`pending`。コンビニ払いなど）は支払いが済むまで Pro にしない**（`hasPendingPro`）。返金されて購入が消えていれば Pro を外す。
-- 購入は **consume せず acknowledge だけする**（`finishTransaction({ isConsumable: false })`）。購入の直後に加え、起動時・復元時にも未 acknowledge のもの（`unacknowledgedPro`）を済ませる（Play は3日以内に acknowledge されない購入を自動で払い戻す）。
+- 起動時と、アプリが前面に戻ったときに `getAvailablePurchases()` で端末の Play ストアにある購入を読み、支払い済み（`purchased`）の `fairclass_pro` があれば Pro（`ownsPro`）。**保留中（`pending`。コンビニ払いなど）は支払いが済むまで Pro にしない**（`hasPendingPro`）。返金されて購入が消えていれば Pro を外す。最後に確かめた状態を端末に1つだけ持ち（`fairclass.pro.v1`）、Play を読めない間はそれで始める（読めたら必ず上書きする）。
+- 購入は **consume せず acknowledge だけする**（`finishTransaction({ isConsumable: false })`）。購入の直後に加え、起動時・前面に戻ったとき・復元時にも未 acknowledge のもの（`unacknowledgedPro`）を済ませる（Play は3日以内に acknowledge されない購入を自動で払い戻す）。
 - 「購入を復元」は Play ストアの購入を読み直すだけ。購入時に「購入済み」（`already-owned`）が返ったら復元として扱う（`purchaseErrorKind`）。
 - 価格は Play が返すローカライズ済みの `displayPrice` をそのまま出す。商品が取れなければ購入させず理由を出す。
 - ユーザーのキャンセル（`user-cancelled`）はエラーとして扱わない。
