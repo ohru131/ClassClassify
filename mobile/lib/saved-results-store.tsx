@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
-import { isSavedResult, metaOf, newSavedId, readSavedMetaList, type SavedMeta, type SavedResult } from './saved-results'
+import { isSavedResult, metaOf, newSavedId, readSavedMetaList, type ExportedFrom, type SavedMeta, type SavedResult } from './saved-results'
 import type { Problem } from './solver'
 
 // 名前を付けて保存した編成の置き場所（端末内の AsyncStorage。Android では中身が SQLite）。
@@ -14,7 +14,8 @@ type SavedContextValue = {
   /** 新しい順 */
   list: SavedMeta[]
   loaded: boolean
-  save: (name: string, problem: Problem, classOf: number[], k: number) => Promise<SavedMeta>
+  /** exported: Excel に書き出したときに自動で残す場合の書き出し元 */
+  save: (name: string, problem: Problem, classOf: number[], k: number, exported?: ExportedFrom) => Promise<SavedMeta>
   load: (id: string) => Promise<SavedResult | null>
   remove: (id: string) => Promise<void>
   removeAll: () => Promise<void>
@@ -66,10 +67,10 @@ export function SavedResultsProvider({ children }: { children: ReactNode }) {
 
   const writeIndex = (next: SavedMeta[]) => AsyncStorage.setItem(INDEX_KEY, JSON.stringify(next))
 
-  const save = useCallback((name: string, problem: Problem, classOf: number[], k: number) => serial(async () => {
+  const save = useCallback((name: string, problem: Problem, classOf: number[], k: number, exported?: ExportedFrom) => serial(async () => {
     if (!loadedRef.current) throw new Error('saved results are not loaded yet')
     const now = new Date()
-    const item: SavedResult = { version: 1, id: newSavedId(now), name, savedAt: now.toISOString(), problem, classOf, k }
+    const item: SavedResult = { version: 1, id: newSavedId(now), name, savedAt: now.toISOString(), problem, classOf, k, ...(exported && { exported }) }
     // 本体を先に書く（一覧だけあって本体が無い状態を作らない）
     await AsyncStorage.setItem(itemKey(item.id), JSON.stringify(item))
     const meta = metaOf(item)

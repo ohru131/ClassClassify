@@ -60,8 +60,20 @@ export function useProExport() {
       })
   }
 
-  const exportXlsx = (build: () => WorkBook, baseName: string) => run('xlsx', () => shareXlsx(build(), `${baseName}_${today()}.xlsx`, messages.sharingUnavailable))
-  const saveToFile = (build: () => WorkBook, baseName: string) => run('save', async () => setFileSaved(await saveXlsx(build(), `${baseName}_${today()}.xlsx`)))
+  // onDone: 書き出したあと（共有シートを閉じた・ファイルに保存できた）にファイル名を渡す。保存をキャンセルしたら呼ばない
+  const exportXlsx = (build: () => WorkBook, baseName: string, onDone?: (fileName: string) => void) =>
+    run('xlsx', async () => {
+      const fileName = `${baseName}_${today()}.xlsx`
+      await shareXlsx(build(), fileName, messages.sharingUnavailable)
+      onDone?.(fileName)
+    })
+  const saveToFile = (build: () => WorkBook, baseName: string, onDone?: (fileName: string) => void) =>
+    run('save', async () => {
+      const fileName = `${baseName}_${today()}.xlsx`
+      const saved = await saveXlsx(build(), fileName)
+      setFileSaved(saved)
+      if (saved) onDone?.(fileName)
+    })
   const print = (build: () => string) => run('print', () => printHtml(build(), messages))
   const exportPdf = (build: () => string, baseName: string) => run('pdf', () => sharePdf(build(), `${baseName}_${today()}.pdf`, messages))
   const savePdfToFile = (build: () => string, baseName: string) => run('savePdf', async () => setFileSaved(await savePdf(build(), `${baseName}_${today()}.pdf`)))

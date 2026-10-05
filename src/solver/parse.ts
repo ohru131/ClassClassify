@@ -192,3 +192,51 @@ export function parsePlacement(data: ArrayBuffer): Placement | null {
   const order = [...new Set(classNames)].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
   return { students, classNames, order }
 }
+
+/** 書き出した結果の Excel から読み取った組分け（名簿の並びの組の index と組数） */
+export interface ResultPlacement {
+  classOf: number[]
+  k: number
+}
+
+/**
+ * 名簿の Excel・結果の Excel を読む。結果の Excel（組分けのシートがある）なら、名簿に加えて組分けも返す。
+ * 組分けは「組分け」シートの組の列から読むので、Excel 上で組を書き換えたものもそのまま戻る。
+ * - result: 全員の組が読めたときだけ。組分けのシートが無い（名簿の Excel）ときは null
+ * - unplaced: 組分けのシートはあるのに組が読めなかった生徒の数（このときは result が null で、名簿だけ使う）
+ */
+export function parseResultWorkbook(
+  data: ArrayBuffer,
+  msg: ParseMessages = JA_PARSE_MESSAGES,
+): { problem: Problem; result: ResultPlacement | null; unplaced: number } {
+  const problem = parseWorkbook(data, msg)
+  const placement = parsePlacement(data)
+  if (!placement) return { problem, result: null, unplaced: 0 }
+
+  // 同じファイルの名簿と組分けなので NO で照らす。組分けのシートは名簿と同じ並びなので、
+  // 同じ NO が2人以上いるときは出てきた順に照らす（名簿で2人目の NO 5 ↔ 組分けで2人目の NO 5）。
+  // Excel 上で書き換えた「３組」「3 組」も「3組」と同じ組にする
+  const norm = (n: string) => n.normalize('NFKC').replace(/\s+/g, '')
+  const byNo = new Map<number, string[]>()
+  placement.students.forEach((s, i) => byNo.set(s.no, [...(byNo.get(s.no) ?? []), norm(placement.classNames[i])]))
+  const names = problem.students.map((s) => byNo.get(s.no)?.shift())
+  const unplaced = names.filter((n) => n === undefined).length
+  if (unplaced) return { problem, result: null, unplaced }
+
+  // 組の名前（1組・Class 1 など、どの言語でも番号が入る）の番号から index を決める（同じ番号は同じ組。
+  // 「3」「3くみ」「Class 3」と書き換えても 3組）。「1年2組」のような名前は最後の番号を使う。
+  // 番号の無い名前がある・番号が生徒数より大きいときは、名前の並び順（1組・2組…の順）で決める
+  const n = problem.students.length
+  const order = [...new Set(placement.order.map(norm))]
+  const numOf = (name: string) => Number(/(\d+)\D*$/.exec(name)?.[1] ?? NaN)
+  const numbered = order.every((name) => Number.isInteger(numOf(name)) && numOf(name) >= 1 && numOf(name) <= n)
+  const index = new Map(order.map((name, i) => [name, numbered ? numOf(name) - 1 : i]))
+  const classOf = names.map((name) => index.get(name as string) as number)
+
+  // 設定シートが無い（古い結果の Excel）ときは推定したクラス数より組分けを優先し、推定の警告も外す
+  const estimated = problem.warnings.includes(msg.classCountUnknown(problem.numClasses))
+  const used = Math.max(...classOf) + 1
+  const k = Math.min(Math.max(2, used, estimated ? 0 : problem.numClasses), Math.max(2, used, n))
+  const warnings = estimated ? problem.warnings.filter((w) => w !== msg.classCountUnknown(problem.numClasses)) : problem.warnings
+  return { problem: { ...problem, numClasses: k, warnings }, result: { classOf, k }, unplaced: 0 }
+}

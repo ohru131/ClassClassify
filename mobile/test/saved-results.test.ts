@@ -5,12 +5,14 @@ import { runSliced } from '../lib/runner'
 import { loadSample } from '../lib/samples'
 import {
   canSaveMore,
+  countedSaves,
   defaultSaveName,
   findPreviousClassColumn,
   FREE_SAVE_LIMIT,
   isSavedMetaList,
   isSavedResult,
   readSavedMetaList,
+  resultFingerprint,
   metaOf,
   placementOfSaved,
   previousClassValues,
@@ -48,6 +50,27 @@ describe('保存した編成', () => {
     // 1件壊れていても、ほかの保存は一覧に残す。配列でなければ読めなかった扱い
     expect(readSavedMetaList([metaOf(s), { id: 1 }])).toEqual([metaOf(s)])
     expect(readSavedMetaList({})).toBeNull()
+  })
+
+  it('Excel に書き出したときに残したものは書き出し元を持ち、件数の上限に数えない', () => {
+    const s: SavedResult = { ...saved(problem, classOf, 4), exported: { fileName: 'クラス編成結果_2026-10-05.xlsx', fingerprint: resultFingerprint(problem, classOf, 4) } }
+    expect(isSavedResult(s)).toBe(true)
+    expect(isSavedResult({ ...s, exported: { fileName: 1 } })).toBe(false)
+    expect(metaOf(s).exported).toEqual(s.exported)
+    expect(isSavedResult({ ...s, exported: { fileName: 'a.xlsx' } })).toBe(false)
+    expect(isSavedMetaList([metaOf(s)])).toBe(true)
+    expect(readSavedMetaList([metaOf(s), { ...metaOf(s), exported: 'x' }])).toEqual([metaOf(s)])
+    // 書き出し元の無い古い保存はそのまま読める
+    expect('exported' in metaOf(saved(problem, classOf, 4))).toBe(false)
+    expect(countedSaves([metaOf(s), metaOf(saved(problem, classOf, 4)), metaOf(s)])).toBe(1)
+  })
+
+  it('指紋は名簿と組分けの中身で決まる（読み込み時の警告は見ない）', () => {
+    const fp = resultFingerprint(problem, classOf, 4)
+    expect(resultFingerprint(structuredClone({ ...problem, warnings: ['x'] }), [...classOf], 4)).toBe(fp)
+    expect(resultFingerprint(problem, classOf.map((c, i) => (i === 0 ? (c + 1) % 4 : c)), 4)).not.toBe(fp)
+    expect(resultFingerprint(problem, classOf, 5)).not.toBe(fp)
+    expect(resultFingerprint({ ...problem, wantedGroups: [] }, classOf, 4)).not.toBe(fp)
   })
 
   it('無料版は3件まで、Pro は無制限に保存できる', () => {

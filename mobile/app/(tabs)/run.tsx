@@ -199,7 +199,7 @@ export default function RunScreen() {
         {mixOn && saved.list.length > 0 ? (
           <View style={styles.wrap} accessibilityRole="radiogroup">
             {saved.list.map((m) => (
-              <Chip key={m.id} label={m.name} selected={shownSource?.id === m.id} onPress={() => void applyFrom(m.id)} />
+              <Chip key={m.id} label={m.exported ? t('savedExcelChip', { name: m.name }) : m.name} selected={shownSource?.id === m.id} onPress={() => void applyFrom(m.id)} />
             ))}
           </View>
         ) : null}

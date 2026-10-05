@@ -16,6 +16,26 @@ export interface SavedResult {
   problem: Problem
   classOf: number[]
   k: number
+  /** Excel に書き出したときに自動で残したもの（書き出したファイル名つき）。無ければ「アプリに保存」で残したもの */
+  exported?: ExportedFrom
+}
+
+export interface ExportedFrom {
+  /** 書き出したときのファイル名（保存先の画面で名前を変えていれば、実際の名前とは違う） */
+  fileName: string
+  /** 名簿と組分けの中身の指紋（同じ中身を書き出し直しても、もう1件残さないため） */
+  fingerprint: string
+}
+
+const isExportedFrom = (v: unknown): v is ExportedFrom => isObj(v) && typeof v.fileName === 'string' && typeof v.fingerprint === 'string'
+
+/** 名簿（読み込み時の警告を除く）と組分けの中身の指紋（FNV-1a 32bit の16進） */
+export function resultFingerprint(p: Problem, classOf: number[], k: number): string {
+  const { students, columns, wantedGroups, unwantedGroups, maxPerClass } = p
+  const text = JSON.stringify([students, columns, wantedGroups, unwantedGroups, maxPerClass, classOf, k])
+  let h = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193)
+  return `${(h >>> 0).toString(16)}:${text.length}`
 }
 
 /** 一覧に出す分だけ（本体を全部読まずに一覧を出すため、別のキーにまとめて置く） */
@@ -25,19 +45,27 @@ export interface SavedMeta {
   savedAt: string
   n: number
   k: number
+  exported?: ExportedFrom
 }
 
 export function isSavedResult(v: unknown): v is SavedResult {
   if (!isObj(v) || v.version !== 1) return false
   if (typeof v.id !== 'string' || typeof v.name !== 'string' || typeof v.savedAt !== 'string') return false
   if (!isProblem(v.problem) || !Number.isInteger(v.k) || (v.k as number) < 2) return false
+  if (v.exported !== undefined && !isExportedFrom(v.exported)) return false
   const k = v.k as number
   const { classOf } = v
   return Array.isArray(classOf) && classOf.length === v.problem.students.length && classOf.every((c) => Number.isInteger(c) && c >= 0 && c < k)
 }
 
 export const isSavedMeta = (m: unknown): m is SavedMeta =>
-  isObj(m) && typeof m.id === 'string' && typeof m.name === 'string' && typeof m.savedAt === 'string' && Number.isInteger(m.n) && Number.isInteger(m.k)
+  isObj(m) &&
+  typeof m.id === 'string' &&
+  typeof m.name === 'string' &&
+  typeof m.savedAt === 'string' &&
+  Number.isInteger(m.n) &&
+  Number.isInteger(m.k) &&
+  (m.exported === undefined || isExportedFrom(m.exported))
 
 export function isSavedMetaList(v: unknown): v is SavedMeta[] {
   return Array.isArray(v) && v.every(isSavedMeta)
@@ -46,7 +74,14 @@ export function isSavedMetaList(v: unknown): v is SavedMeta[] {
 /** 端末の一覧から読めるものだけを残す（1件壊れていても、ほかの保存を一覧から消さない）。配列でなければ null */
 export const readSavedMetaList = (v: unknown): SavedMeta[] | null => (Array.isArray(v) ? v.filter(isSavedMeta) : null)
 
-export const metaOf = (s: SavedResult): SavedMeta => ({ id: s.id, name: s.name, savedAt: s.savedAt, n: s.problem.students.length, k: s.k })
+export const metaOf = (s: SavedResult): SavedMeta => ({
+  id: s.id,
+  name: s.name,
+  savedAt: s.savedAt,
+  n: s.problem.students.length,
+  k: s.k,
+  ...(s.exported && { exported: s.exported }),
+})
 
 /** 「2026年10月」「October 2026」のような年月（Intl が使えなければ 2026-10） */
 export function yearMonth(lang: AppLanguage, d: Date): string {
@@ -154,5 +189,8 @@ export function setColumnEnabled(p: Problem, column: string, enabled: boolean, d
 export const FREE_SAVE_LIMIT = 3
 
 export const canSaveMore = (isPro: boolean, count: number) => isPro || count < FREE_SAVE_LIMIT
+
+/** 件数の上限に数える保存（「アプリに保存」で残したもの）。Excel の書き出し（Pro）で自動で残したものは数えない */
+export const countedSaves = (list: SavedMeta[]) => list.filter((m) => !m.exported).length
 
 export const newSavedId = (d: Date) => `${d.getTime().toString(36)}${Math.random().toString(36).slice(2, 8)}`
