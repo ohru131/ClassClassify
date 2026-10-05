@@ -5,6 +5,7 @@ import { runSliced } from '../lib/runner'
 import { loadSample } from '../lib/samples'
 import {
   canSaveMore,
+  countedSaves,
   defaultSaveName,
   findPreviousClassColumn,
   FREE_SAVE_LIMIT,
@@ -48,6 +49,18 @@ describe('保存した編成', () => {
     // 1件壊れていても、ほかの保存は一覧に残す。配列でなければ読めなかった扱い
     expect(readSavedMetaList([metaOf(s), { id: 1 }])).toEqual([metaOf(s)])
     expect(readSavedMetaList({})).toBeNull()
+  })
+
+  it('Excel に書き出したときに残したものは書き出し元を持ち、件数の上限に数えない', () => {
+    const s: SavedResult = { ...saved(problem, classOf, 4), exported: { fileName: 'クラス編成結果_2026-10-05.xlsx' } }
+    expect(isSavedResult(s)).toBe(true)
+    expect(isSavedResult({ ...s, exported: { fileName: 1 } })).toBe(false)
+    expect(metaOf(s).exported).toEqual({ fileName: 'クラス編成結果_2026-10-05.xlsx' })
+    expect(isSavedMetaList([metaOf(s)])).toBe(true)
+    expect(readSavedMetaList([metaOf(s), { ...metaOf(s), exported: 'x' }])).toEqual([metaOf(s)])
+    // 書き出し元の無い古い保存はそのまま読める
+    expect('exported' in metaOf(saved(problem, classOf, 4))).toBe(false)
+    expect(countedSaves([metaOf(s), metaOf(saved(problem, classOf, 4)), metaOf(s)])).toBe(1)
   })
 
   it('無料版は3件まで、Pro は無制限に保存できる', () => {

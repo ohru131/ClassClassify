@@ -6,14 +6,14 @@ import { useI18n } from '@/lib/language-provider'
 import { useLayout } from '@/lib/layout'
 import { useProject } from '@/lib/project-store'
 import { blankProblem, loadSample, sampleFile, samplesFor } from '@/lib/samples'
-import { parseWorkbook, rosterWorkbook } from '@/lib/solver'
+import { parseResultWorkbook, rosterWorkbook } from '@/lib/solver'
 import { pickXlsx, safeFileName, shareXlsx, shareXlsxBase64 } from '@/lib/xlsx-files'
 import { C } from './theme'
 import { Btn, Card, styles, Title } from './ui'
 
 /** 名簿の読み込み（Excel・サンプル・新規作成）と、ひな形の入手（無料） */
 export function LoadPanel({ onDone }: { onDone?: () => void }) {
-  const { loadProblem, setError } = useProject()
+  const { loadProblem, openResult, setError } = useProject()
   const { lang, t, parseMessages, fileLang } = useI18n()
   const { isWide } = useLayout()
   const router = useRouter()
@@ -29,7 +29,15 @@ export function LoadPanel({ onDone }: { onDone?: () => void }) {
     try {
       const f = await pickXlsx()
       if (!f) return
-      loadProblem(parseWorkbook(f.data, parseMessages), f.name)
+      // 結果画面で書き出した Excel なら、組分けごと開いて結果画面へ（Excel 上で組を直したものもそのまま）
+      const { problem, result, unplaced } = parseResultWorkbook(f.data, parseMessages)
+      if (result) {
+        openResult(problem, result.classOf, result.k, f.name)
+        onDone?.()
+        router.navigate('/results')
+        return
+      }
+      loadProblem(unplaced ? { ...problem, warnings: [...problem.warnings, t('resultUnplaced', { n: unplaced })] } : problem, f.name)
       onDone?.()
     } catch (e) {
       fail(e)

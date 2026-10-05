@@ -4,7 +4,7 @@ import type { Problem } from './types'
 import type { Report } from './evaluate'
 import { attributeRows, rosterRows, toCell } from './roster'
 import { pairStatus, rowColor, tagText, UNWANTED_COLOR, VIOLATION_COLOR, type PairTag } from './pairs'
-import { FILE_LABELS, violationText, type FileLanguage } from './labels'
+import { FILE_LABELS, violationText, type FileLabels, type FileLanguage } from './labels'
 
 export type Cell = string | number | null
 
@@ -174,7 +174,10 @@ export function exportWorkbook(p: Problem, classOf: number[], k: number, report:
   return new Blob([writeXlsx(resultWorkbook(p, classOf, k, report, lang), 'array')], { type: XLSX_MIME })
 }
 
-/** 結果のブック（組分け・クラス別名簿・各組・ペア指定・集計・組み合わせ失敗・生徒名簿） */
+/**
+ * 結果のブック（組分け・クラス別名簿・各組・ペア指定・集計・組み合わせ失敗・生徒名簿・設定・同じ組ペア・別の組ペア・項目）。
+ * 生徒名簿〜項目は名簿の Excel と同じ形なので、読み込むと名簿・組数・ペア指定・組分けがそのまま戻る
+ */
 export function resultWorkbook(p: Problem, classOf: number[], k: number, report: Report, lang: FileLanguage = 'ja'): WorkBook {
   const L = FILE_LABELS[lang]
   const wb = XLSX.utils.book_new()
@@ -189,9 +192,25 @@ export function resultWorkbook(p: Problem, classOf: number[], k: number, report:
   add(summary)
   add(failed)
   add({ name: L.sheets.roster, rows: rosterRows(p, L) })
+  add({ name: L.sheets.settings, rows: settingsRows(p, k, L) })
+  add({ name: L.sheets.wanted, rows: groupRows(p, p.wantedGroups) })
+  add({ name: L.sheets.unwanted, rows: groupRows(p, p.unwantedGroups) })
   add({ name: L.sheets.attributes, rows: attributeRows(p, L) })
   return wb
 }
+
+/** 設定シート（人数・1クラスの最大人数・クラス数） */
+function settingsRows(p: Problem, numClasses: number, L: FileLabels): (string | number)[][] {
+  const n = p.students.length
+  return [
+    [L.studentCount, n],
+    [L.maxPerClass, p.maxPerClass !== null && p.maxPerClass * numClasses >= n ? p.maxPerClass : Math.ceil(n / numClasses)],
+    [L.classCount, numClasses],
+  ]
+}
+
+/** ペア指定のシート（1行に1組、出席番号を並べる） */
+const groupRows = (p: Problem, groups: number[][]) => groups.map((g) => g.map((i) => p.students[i].no))
 
 /** 現在の名簿を、ひな形と同じ形式の Excel（再読み込み可能）にする */
 export function exportRoster(p: Problem, numClasses: number, lang: FileLanguage = 'ja'): Blob {
@@ -202,16 +221,10 @@ export function rosterWorkbook(p: Problem, numClasses: number, lang: FileLanguag
   const L = FILE_LABELS[lang]
   const wb = XLSX.utils.book_new()
   const add = (name: string, rows: unknown[][]) => XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), name)
-  const n = p.students.length
-  add(L.sheets.settings, [
-    [L.studentCount, n],
-    [L.maxPerClass, p.maxPerClass !== null && p.maxPerClass * numClasses >= n ? p.maxPerClass : Math.ceil(n / numClasses)],
-    [L.classCount, numClasses],
-  ])
+  add(L.sheets.settings, settingsRows(p, numClasses, L))
   add(L.sheets.roster, rosterRows(p, L))
-  const nos = (groups: number[][]) => groups.map((g) => g.map((i) => p.students[i].no))
-  add(L.sheets.wanted, nos(p.wantedGroups))
-  add(L.sheets.unwanted, nos(p.unwantedGroups))
+  add(L.sheets.wanted, groupRows(p, p.wantedGroups))
+  add(L.sheets.unwanted, groupRows(p, p.unwantedGroups))
   add(L.sheets.attributes, attributeRows(p, L))
   return wb
 }

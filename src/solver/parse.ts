@@ -192,3 +192,50 @@ export function parsePlacement(data: ArrayBuffer): Placement | null {
   const order = [...new Set(classNames)].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
   return { students, classNames, order }
 }
+
+/** 書き出した結果の Excel から読み取った組分け（名簿の並びの組の index と組数） */
+export interface ResultPlacement {
+  classOf: number[]
+  k: number
+}
+
+/**
+ * 名簿の Excel・結果の Excel を読む。結果の Excel（組分けのシートがある）なら、名簿に加えて組分けも返す。
+ * 組分けは「組分け」シートの組の列から読むので、Excel 上で組を書き換えたものもそのまま戻る。
+ * - result: 全員の組が読めたときだけ。組分けのシートが無い（名簿の Excel）ときは null
+ * - unplaced: 組分けのシートはあるのに組が読めなかった生徒の数（このときは result が null で、名簿だけ使う）
+ */
+export function parseResultWorkbook(
+  data: ArrayBuffer,
+  msg: ParseMessages = JA_PARSE_MESSAGES,
+): { problem: Problem; result: ResultPlacement | null; unplaced: number } {
+  const problem = parseWorkbook(data, msg)
+  const placement = parsePlacement(data)
+  if (!placement) return { problem, result: null, unplaced: 0 }
+
+  // 同じファイルの名簿と組分けなので NO で照らす（NO が重なる生徒は先の行の組）。
+  // Excel 上で書き換えた「３組」「3 組」も「3組」と同じ組にする
+  const norm = (n: string) => n.normalize('NFKC').replace(/\s+/g, '')
+  const byNo = new Map<number, string>()
+  placement.students.forEach((s, i) => {
+    if (!byNo.has(s.no)) byNo.set(s.no, norm(placement.classNames[i]))
+  })
+  const names = problem.students.map((s) => byNo.get(s.no))
+  const unplaced = names.filter((n) => n === undefined).length
+  if (unplaced) return { problem, result: null, unplaced }
+
+  // 組の名前（1組・Class 1 など、どの言語でも番号が入る）の番号から index を決める。
+  // 番号が無い・重なる名前に書き換えてあるときは、名前の並び順（1組・2組…の順）で決める
+  const order = [...new Set(placement.order.map(norm))]
+  const nums = order.map((n) => Number(/\d+/.exec(n)?.[0] ?? NaN))
+  const numbered = nums.every((x) => Number.isInteger(x) && x >= 1) && new Set(nums).size === nums.length
+  const index = new Map(order.map((n, i) => [n, numbered ? nums[i] - 1 : i]))
+  const classOf = names.map((n) => index.get(n as string) as number)
+
+  // 設定シートが無い（古い結果の Excel）ときは推定したクラス数より組分けを優先し、推定の警告も外す
+  const estimated = problem.warnings.includes(msg.classCountUnknown(problem.numClasses))
+  const used = Math.max(...classOf) + 1
+  const k = Math.max(2, used, estimated ? 0 : problem.numClasses)
+  const warnings = estimated ? problem.warnings.filter((w) => w !== msg.classCountUnknown(problem.numClasses)) : problem.warnings
+  return { problem: { ...problem, numClasses: k, warnings }, result: { classOf, k }, unplaced: 0 }
+}

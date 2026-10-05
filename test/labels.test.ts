@@ -21,7 +21,7 @@ describe('言語別のシート名・見出し', () => {
     const { compiled } = compile(p)
     const res = anneal(compiled, { timeMs: 200, seed: 1 })
     const wb = resultWorkbook(p, res.classOf, 4, evaluate(p, res.classOf, 4))
-    expect(wb.SheetNames).toEqual(['組分け', 'クラス別名簿', '1組', '2組', '3組', '4組', 'ペア指定', '集計', '組み合わせ失敗', '生徒名簿', '項目'])
+    expect(wb.SheetNames).toEqual(['組分け', 'クラス別名簿', '1組', '2組', '3組', '4組', 'ペア指定', '集計', '組み合わせ失敗', '生徒名簿', '設定', '同じ組ペア', '別の組ペア', '項目'])
   })
 
   it.each(LANGS)('%s の名簿を書き出して読み戻すと同じ名簿になる', (lang) => {

@@ -222,3 +222,70 @@ describe('項目シート（種類・リストの選択肢）の往復', async (
     expect(rep.columns.find((c) => c.column === '通学')!.levels).toEqual(['徒歩', 'バス'])
   })
 })
+
+describe('結果の Excel の読み込み', () => {
+  const XLSX_P = import('xlsx-js-style')
+  const buf = (wb: import('xlsx-js-style').WorkBook, X: typeof import('xlsx-js-style')) => X.write(wb, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
+
+  it('結果の Excel から名簿・組数・ペア指定・組分けがそのまま戻る（どの言語でも）', async () => {
+    const { parseResultWorkbook } = await import('../src/solver/parse')
+    const { resultWorkbook } = await import('../src/solver/export')
+    const X = (await XLSX_P).default
+    const p = { ...load('sample1.xlsx'), maxPerClass: null }
+    const k = 5
+    const classOf = p.students.map((_, i) => (i * 3) % k)
+    for (const lang of ['ja', 'en', 'de'] as const) {
+      const { problem, result, unplaced } = parseResultWorkbook(buf(resultWorkbook(p, classOf, k, evaluate(p, classOf, k), lang), X))
+      expect(unplaced).toBe(0)
+      expect(result).toEqual({ classOf, k })
+      expect(problem.numClasses).toBe(k)
+      expect(problem.students).toEqual(p.students)
+      expect(problem.wantedGroups).toEqual(p.wantedGroups)
+      expect(problem.unwantedGroups).toEqual(p.unwantedGroups)
+      expect(problem.columns.map((c) => [c.name, c.kind, c.levels])).toEqual(p.columns.map((c) => [c.name, c.kind, c.levels]))
+      expect(problem.warnings).toEqual([])
+    }
+  })
+
+  it('Excel 上で組を書き換えたものはその組で読む。名簿の Excel は組分けなし', async () => {
+    const { parseResultWorkbook } = await import('../src/solver/parse')
+    const { resultWorkbook, rosterWorkbook } = await import('../src/solver/export')
+    const X = (await XLSX_P).default
+    const p = load('sample1.xlsx')
+    const k = 3
+    const classOf = p.students.map((_, i) => i % k)
+    const wb = resultWorkbook(p, classOf, k, evaluate(p, classOf, k))
+    // 2人目を 3組へ（全角数字でも読む）
+    wb.Sheets['組分け']['C3'] = { t: 's', v: '３組' }
+    const { result } = parseResultWorkbook(buf(wb, X))
+    expect(result!.classOf[1]).toBe(2)
+    expect(result!.classOf.filter((c, i) => c !== classOf[i])).toHaveLength(1)
+
+    expect(parseResultWorkbook(buf(rosterWorkbook(p, k), X)).result).toBeNull()
+  })
+
+  it('組が読めない生徒がいれば組分けは使わない。設定シートの無い古い結果の Excel は組分けから組数を決める', async () => {
+    const { parseResultWorkbook } = await import('../src/solver/parse')
+    const { resultWorkbook } = await import('../src/solver/export')
+    const X = (await XLSX_P).default
+    const p = load('sample1.xlsx')
+    const k = 4
+    const classOf = p.students.map((_, i) => i % k)
+
+    const missing = resultWorkbook(p, classOf, k, evaluate(p, classOf, k))
+    missing.Sheets['組分け']['C2'] = { t: 's', v: '' }
+    const r1 = parseResultWorkbook(buf(missing, X))
+    expect(r1.result).toBeNull()
+    expect(r1.unplaced).toBe(1)
+
+    const old = resultWorkbook(p, classOf, k, evaluate(p, classOf, k))
+    for (const name of ['設定', '同じ組ペア', '別の組ペア']) {
+      delete old.Sheets[name]
+      old.SheetNames = old.SheetNames.filter((s) => s !== name)
+    }
+    const r2 = parseResultWorkbook(buf(old, X))
+    expect(r2.result).toEqual({ classOf, k })
+    expect(r2.problem.numClasses).toBe(k)
+    expect(r2.problem.warnings).toEqual([])
+  })
+})

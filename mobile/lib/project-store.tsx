@@ -33,6 +33,8 @@ type ProjectContextValue = {
   loadProblem: (p: Problem, name: string) => void
   /** 名前を付けて保存した編成を開く（名簿と結果をそのまま戻す） */
   openSaved: (saved: SavedResult) => void
+  /** 名簿と組分けを開く（結果の Excel を読み込んだとき） */
+  openResult: (p: Problem, classOf: number[], k: number, name: string) => void
   updateProblem: (next: Problem) => void
   /** 最新の名簿に対して変更を当てる（続けて編集しても古い名簿から上書きしない） */
   modifyProblem: (f: (p: Problem) => Problem) => void
@@ -120,16 +122,18 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     setError(null)
   }, [])
 
-  const openSaved = useCallback((saved: SavedResult) => {
+  const openResult = useCallback((p: Problem, classOf: number[], k: number, name: string) => {
     cancelRef.current()
-    problemRef.current = saved.problem
-    numClassesRef.current = saved.k
-    setProblem(saved.problem)
-    setFileName(saved.name)
-    setNumClassesState(saved.k)
-    setSolution({ classOf: saved.classOf, original: saved.classOf, k: saved.k, iterations: 0, starts: 0 })
+    problemRef.current = p
+    numClassesRef.current = k
+    setProblem(p)
+    setFileName(name)
+    setNumClassesState(k)
+    setSolution({ classOf, original: classOf, k, iterations: 0, starts: 0 })
     setError(null)
   }, [])
+
+  const openSaved = useCallback((saved: SavedResult) => openResult(saved.problem, saved.classOf, saved.k, saved.name), [openResult])
 
   const updateProblem = useCallback((next: Problem) => {
     const prev = problemRef.current
@@ -251,6 +255,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       error,
       loadProblem,
       openSaved,
+      openResult,
       updateProblem,
       modifyProblem,
       updateColumn,
@@ -265,7 +270,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       resetMoves,
       setError,
     }),
-    [hydrated, problem, fileName, numClasses, timeSec, solution, report, edited, running, progress, error, loadProblem, openSaved, updateProblem, modifyProblem, updateColumn, setNumClasses, stepMaxPerClass, dismissWarnings, clearProject, run, cancel, moveStudent, resetMoves],
+    [hydrated, problem, fileName, numClasses, timeSec, solution, report, edited, running, progress, error, loadProblem, openSaved, openResult, updateProblem, modifyProblem, updateColumn, setNumClasses, stepMaxPerClass, dismissWarnings, clearProject, run, cancel, moveStudent, resetMoves],
   )
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
 }
