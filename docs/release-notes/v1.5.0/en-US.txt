@@ -1,0 +1,3 @@
+- Exporting results to Excel now also keeps that placement in Saved placements (shown as "Data as exported to Excel").
+- Choosing an exported results file with "Choose an Excel file" opens it with its placement, including any class changes you made in Excel.
+- Pro purchases now go directly through Google Play billing. The app does not send your purchase information anywhere.

@@ -9,7 +9,7 @@ const config: ExpoConfig = {
   name: 'FairClass',
   // EAS のプロジェクトと一致している必要があるので旧名のまま（利用者には見えない）
   slug: 'mosaic-class-classify',
-  version: '1.4.0',
+  version: '1.5.0',
   // 学校のタブレット・Chromebook では横向き・分割画面で使うので、向きを固定しない。
   orientation: 'default',
   icon: './assets/icon.png',
@@ -26,7 +26,7 @@ const config: ExpoConfig = {
     // plugins/withLocalReleaseSigning.js が release を本番鍵で署名するので、ローカルでも
     // Play に出せる AAB が作れる。Play は同じ versionCode の AAB を二度受け付けないので、
     // リリースのたびに Play で未使用の値へ上げる（EAS の autoIncrement とは別系統）。
-    versionCode: 5,
+    versionCode: 6,
     adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#6366F1' },
     // 追加の権限は宣言しない（通知・カメラ・マイク等は使わない）。
     // ネイティブ依存（課金 = expo-iap の Play Billing）が持つ BILLING 権限はマニフェストのマージで自動的に入る。

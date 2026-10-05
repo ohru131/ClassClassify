@@ -6,6 +6,8 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-05
+
 - 結果画面で Excel に書き出すと、その時点の編成を「保存した編成」にも残すようにした（「Excel 書き出し時のデータ」と表示。無料版の保存件数には数えない）。書き出した結果の Excel は「Excel ファイルを選ぶ」で組分けごと開ける（Excel 上で組を直したものもそのまま）。結果の Excel に「設定」「同じ組ペア」「別の組ペア」のシートを足し、組数・ペア指定も戻るようにした。
 - Pro の購入に使っていた RevenueCat をやめ、Google Play の課金を直接使うようにした（購入の状態は端末の Play ストアに問い合わせるだけで、アプリからはどこにも送信しない）。既に購入済みの Pro はそのまま使え、入れ直したときは「購入を復元」で戻る。プライバシーポリシーもこれに合わせて改めた。
 
@@ -43,7 +45,8 @@ Play の「このバージョンの新機能」はここから写す（`node scr
 - 結果の Excel 書き出し・印刷・PDF 共有は Pro（買い切り）で提供する。
 - 日本語・英語・ドイツ語・スペイン語・韓国語・ポルトガル語に対応する。
 
-[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/ohru131/ClassClassify/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/ohru131/ClassClassify/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/ohru131/ClassClassify/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/ohru131/ClassClassify/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ohru131/ClassClassify/compare/v1.1.0...v1.2.0
