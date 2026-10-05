@@ -29,7 +29,7 @@ const config: ExpoConfig = {
     versionCode: 5,
     adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#6366F1' },
     // 追加の権限は宣言しない（通知・カメラ・マイク等は使わない）。
-    // ネイティブ依存（課金 = Play Billing）が持つ権限はマニフェストのマージで自動的に入る。
+    // ネイティブ依存（課金 = expo-iap の Play Billing）が持つ BILLING 権限はマニフェストのマージで自動的に入る。
     permissions: [],
     // 名簿は端末の外へ出さない。Android の自動バックアップ（Google ドライブへのアプリデータの
     // バックアップ）に AsyncStorage の名簿が含まれないよう、アプリのバックアップを無効にする。
@@ -64,6 +64,8 @@ const config: ExpoConfig = {
     'expo-localization',
     'expo-sharing',
     'expo-document-picker',
+    // 課金（Google Play Billing を直接使う。買い切り1本）
+    'expo-iap',
     ['expo-build-properties', { android: { minSdkVersion: 24 } }],
   ],
   experiments: {

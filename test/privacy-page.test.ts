@@ -46,7 +46,10 @@ describe('公開用プライバシーポリシー', () => {
     const html = readFileSync(file, 'utf8')
     expect(html).not.toContain('<!--PRIVACY_CONTENT-->')
     expect(html.match(/<article /g)?.length).toBe(APP_LANGUAGES.length)
-    expect(html).toContain('RevenueCat')
+    // 決済は Google Play が行う（外部の課金サービスは使っていない）ことを本文に書いてある
+    expect(html).toContain('Google Play')
+    expect(html).toContain('href="https://policies.google.com/privacy"')
+    expect(html).not.toMatch(/RevenueCat/i)
     // 相対パス（GitHub Pages のサブパス /ClassClassify/ で動く）
     expect(html).toMatch(/src="\.\.\/assets\/privacy-[^"]+\.js"/)
     expect(existsSync(join(outDir, 'index.html'))).toBe(true)

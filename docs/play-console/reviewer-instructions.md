@@ -36,12 +36,13 @@ The app shows no ads and has no account. Privacy policy: https://ohru131.github.
 
 | 方法 | 使いどころ | 手順 |
 |---|---|---|
-| **ライセンステスター** | 審査員・クローズドテストの参加者・自分の実機確認 | Play Console →「設定」→「ライセンス テスト」に Google アカウント（Gmail）を追加。その端末で購入すると「テスト用のカード」が選べ、課金されない。RevenueCat には sandbox の購入として届き、`pro` entitlement が付く |
+| **ライセンステスター** | 審査員・クローズドテストの参加者・自分の実機確認 | Play Console →「設定」→「ライセンス テスト」に Google アカウント（Gmail）を追加。その端末で購入すると「テスト用のカード」が選べ、課金されない。テスト購入でも Play の購入として端末に残るので、Pro が開き、入れ直しても「購入を復元」で戻る |
 | **プロモーション コード** | 先行して使ってもらう先生・レビュー依頼 | Play Console →「収益化」→「プロモーション」で `fairclass_pro` のコードを発行（四半期ごとの上限あり）。Play ストアのアプリで「コードを利用」 |
 
 - **買い切りには無料トライアルを設定できない**（Play の無料試用期間は定期購入だけの機能）。審査員にはライセンステスターかプロモコードを使ってもらう。
-- 審査用・テスト用のビルドにも RevenueCat の Android 公開 SDK キー（`EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY`）を入れておく。
-  入っていないと購入・復元ボタンが「キーが設定されていません」と出て Pro を確かめられない（`mobile/lib/revenuecat-provider.tsx`）。
+- 課金は Google Play Billing を直接使う（`mobile/lib/pro-provider.tsx`）ので、ビルドに入れておく SDK キー・環境変数は無い。
+  Play Console で `fairclass_pro` が有効になっていないと、購入ボタンは「ストアから Pro の情報を読み込めませんでした」（`productLoadFailed`）を出して購入させない。
+- **debug ビルド（`com.ohru131.mosaic.debug`）では購入を試せない**（商品はパッケージ名に紐づく）。テストトラックから入れたアプリか、upload key で署名した release ビルドを使う。
 
 ## Excel の読み込みを試す
 

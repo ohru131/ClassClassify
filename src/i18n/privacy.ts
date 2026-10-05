@@ -1,13 +1,13 @@
 import type { AppLanguage } from './languages'
 
-// プライバシーポリシー本文。実態と食い違わないこと（外部へ送るのは購入確認のため RevenueCat が
-// 受け取る匿名の識別子とレシートだけ）。変えたら6言語とも、ストアのデータセーフティの申告も直す。
+// プライバシーポリシー本文。実態と食い違わないこと（アプリ自体は何も外部へ送らない。Pro の決済は
+// Google Play が行い、購入の状態は端末の Play ストアに問い合わせるだけ）。変えたら6言語とも、ストアのデータセーフティの申告も直す。
 export type PrivacySection = { title: string; body: string[] }
 
-const RC = 'https://www.revenuecat.com/privacy'
+const GOOGLE_PRIVACY = 'https://policies.google.com/privacy'
 
 /** 最終更新日（本文を変えたら更新する）。Web で公開しているページ（privacy/index.html）にも出す */
-export const PRIVACY_UPDATED = '2026-10-01'
+export const PRIVACY_UPDATED = '2026-10-05'
 
 /**
  * 公開ページ（https://ohru131.github.io/ClassClassify/privacy/）の冒頭に出す「このポリシーの対象」。
@@ -48,9 +48,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       title: '購入（Pro）と外部への送信',
       body: [
         '広告は表示しません（広告 SDK を組み込んでいません）。',
-        'Pro は買い切り（非消費型）の購入です。決済は Apple App Store または Google Play が行い、購入状態の管理に RevenueCat を利用しています。',
-        'RevenueCat は、購入を確認するために端末で生成された匿名の識別子と、購入・レシートの情報を受け取ります。このアプリから名前やメールアドレス、名簿の内容を送ることはありません。購入の確認以外の目的（広告・行動分析など）で外部へ情報を送ることもありません。',
-        `RevenueCat のプライバシーポリシー: ${RC}`,
+        'Pro は買い切り（非消費型）の購入です。決済は Google Play が行い、支払いの情報は Google のプライバシーポリシーに従って扱われます。',
+        '購入済みかどうかは、端末の Play ストアに問い合わせて確認します。このアプリ自体は、購入の情報や識別子も含め、開発者のサーバーやその他の外部へ何も送信しません。名前やメールアドレス、名簿の内容を送ることも、広告・行動分析などの目的で情報を送ることもありません。',
+        `Google のプライバシーポリシー: ${GOOGLE_PRIVACY}`,
       ],
     },
   ],
@@ -69,9 +69,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       title: 'Purchases (Pro) and what is sent',
       body: [
         'The app shows no ads and contains no advertising SDK.',
-        'Pro is a one-time (non-consumable) purchase. Payment is handled by the Apple App Store or Google Play, and RevenueCat is used to manage purchase status.',
-        'To verify your purchase, RevenueCat receives an anonymous identifier generated on your device and the purchase/receipt information. The app never sends your name, email address or any roster data, and sends nothing for any other purpose (such as advertising or analytics).',
-        `RevenueCat privacy policy: ${RC}`,
+        'Pro is a one-time (non-consumable) purchase. Payment is handled by Google Play, and your payment information is processed under Google’s privacy policy.',
+        'Whether you own Pro is checked by asking the Play Store on your device. The app itself sends nothing to the developer’s servers or anywhere else, including purchase information or identifiers. It never sends your name, email address or any roster data, and sends nothing for advertising, analytics or any other purpose.',
+        `Google privacy policy: ${GOOGLE_PRIVACY}`,
       ],
     },
   ],
@@ -90,9 +90,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       title: '구매(Pro)와 외부 전송',
       body: [
         '광고를 표시하지 않으며 광고 SDK도 포함하지 않습니다.',
-        'Pro는 1회 구매(비소모성) 상품입니다. 결제는 Apple App Store 또는 Google Play가 처리하고, 구매 상태 관리에 RevenueCat을 사용합니다.',
-        'RevenueCat은 구매를 확인하기 위해 기기에서 생성한 익명 식별자와 구매·영수증 정보를 받습니다. 앱은 이름, 이메일 주소, 명단 내용을 보내지 않으며, 구매 확인 외의 목적(광고, 행동 분석 등)으로 정보를 보내지 않습니다.',
-        `RevenueCat 개인정보 처리방침: ${RC}`,
+        'Pro는 1회 구매(비소모성) 상품입니다. 결제는 Google Play가 처리하며, 결제 정보는 Google 개인정보처리방침에 따라 처리됩니다.',
+        '구매 여부는 기기의 Play 스토어에 조회해 확인합니다. 앱 자체는 구매 정보나 식별자를 포함해 어떤 정보도 개발자 서버나 그 밖의 외부로 보내지 않습니다. 이름, 이메일 주소, 명단 내용을 보내지 않으며, 광고·행동 분석 등의 목적으로 정보를 보내지도 않습니다.',
+        `Google 개인정보처리방침: ${GOOGLE_PRIVACY}`,
       ],
     },
   ],
@@ -111,9 +111,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       title: 'Compras (Pro) y lo que se envía',
       body: [
         'La app no muestra anuncios ni incluye ningún SDK de publicidad.',
-        'Pro es una compra de pago único (no consumible). El pago lo gestiona Apple App Store o Google Play, y se usa RevenueCat para administrar el estado de la compra.',
-        'Para verificar la compra, RevenueCat recibe un identificador anónimo generado en tu dispositivo y la información de compra y recibo. La app nunca envía tu nombre, tu correo ni los datos de la lista, ni envía información con otros fines (como publicidad o análisis).',
-        `Política de privacidad de RevenueCat: ${RC}`,
+        'Pro es una compra de pago único (no consumible). El pago lo gestiona Google Play, y tus datos de pago se tratan según la política de privacidad de Google.',
+        'Para saber si ya tienes Pro, la app lo consulta a Play Store en tu dispositivo. La app en sí no envía nada a los servidores del desarrollador ni a ningún otro lugar, tampoco datos de compra ni identificadores. Nunca envía tu nombre, tu correo ni los datos de la lista, ni envía información con fines de publicidad, análisis u otros.',
+        `Política de privacidad de Google: ${GOOGLE_PRIVACY}`,
       ],
     },
   ],
@@ -132,9 +132,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       title: 'Kauf (Pro) und übertragene Daten',
       body: [
         'Die App zeigt keine Werbung und enthält kein Werbe-SDK.',
-        'Pro ist ein Einmalkauf (nicht verbrauchbar). Die Zahlung wickelt der Apple App Store oder Google Play ab; zur Verwaltung des Kaufstatus wird RevenueCat genutzt.',
-        'Zur Prüfung des Kaufs erhält RevenueCat eine auf Ihrem Gerät erzeugte anonyme Kennung sowie die Kauf- bzw. Belegdaten. Die App überträgt weder Ihren Namen noch Ihre E-Mail-Adresse noch Inhalte der Schülerliste und sendet keine Daten zu anderen Zwecken (z. B. Werbung oder Analyse).',
-        `Datenschutzerklärung von RevenueCat: ${RC}`,
+        'Pro ist ein Einmalkauf (nicht verbrauchbar). Die Zahlung wickelt Google Play ab; Ihre Zahlungsdaten werden gemäß der Datenschutzerklärung von Google verarbeitet.',
+        'Ob Sie Pro bereits gekauft haben, fragt die App beim Play Store auf Ihrem Gerät ab. Die App selbst überträgt nichts an Server des Entwicklers oder an Dritte – auch keine Kaufdaten oder Kennungen. Sie überträgt weder Ihren Namen noch Ihre E-Mail-Adresse noch Inhalte der Schülerliste und sendet keine Daten zu Werbe-, Analyse- oder anderen Zwecken.',
+        `Datenschutzerklärung von Google: ${GOOGLE_PRIVACY}`,
       ],
     },
   ],
@@ -153,9 +153,9 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
       title: 'Compras (Pro) e o que é enviado',
       body: [
         'O app não exibe anúncios nem inclui SDK de publicidade.',
-        'O Pro é uma compra única (não consumível). O pagamento é processado pela Apple App Store ou pelo Google Play, e o RevenueCat é usado para gerenciar o status da compra.',
-        'Para verificar a compra, o RevenueCat recebe um identificador anônimo gerado no seu aparelho e as informações da compra e do recibo. O app nunca envia seu nome, e-mail ou dados da lista, nem envia informações para outros fins (como publicidade ou análise).',
-        `Política de privacidade do RevenueCat: ${RC}`,
+        'O Pro é uma compra única (não consumível). O pagamento é processado pelo Google Play, e seus dados de pagamento são tratados conforme a política de privacidade do Google.',
+        'Para saber se você já tem o Pro, o app consulta a Play Store do seu aparelho. O próprio app não envia nada aos servidores do desenvolvedor nem a qualquer outro lugar, nem mesmo dados de compra ou identificadores. Ele nunca envia seu nome, e-mail ou dados da lista, nem envia informações para publicidade, análise ou qualquer outro fim.',
+        `Política de privacidade do Google: ${GOOGLE_PRIVACY}`,
       ],
     },
   ],

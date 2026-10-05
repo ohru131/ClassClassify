@@ -8,26 +8,26 @@ describe("resolvePurchaseMessageKey", () => {
   });
 
   it("メッセージが無ければ購入できない理由を出す", () => {
-    expect(resolvePurchaseMessageKey(null, "revenueCatKeyMissing", false)).toBe("revenueCatKeyMissing");
+    expect(resolvePurchaseMessageKey(null, "purchaseStatusFailed", false)).toBe("purchaseStatusFailed");
   });
 
   it("メッセージも理由も無ければnullを返す", () => {
     expect(resolvePurchaseMessageKey(null, null, false)).toBeNull();
   });
 
-  // ここがこのモジュールを作った理由。決済は通ったがentitlementが付いてこなかった直後に
-  // 案内を出し、その後リスナー経由でProが有効になったとき、案内が残ると
-  // 「Pro利用中」カードと「Proを有効にできていません」が同時に並んでしまう。
-  it("Proが有効になったら purchaseNotApplied を出さない", () => {
-    expect(resolvePurchaseMessageKey("purchaseNotApplied", null, true)).toBeNull();
+  // ここがこのモジュールを作った理由。支払いが保留中の案内を出したあと、
+  // 購入の更新のリスナー経由でProが有効になったとき、案内が残ると
+  // 「Pro利用中」カードと「支払いの完了を待っています」が同時に並んでしまう。
+  it("Proが有効になったら purchasePending を出さない", () => {
+    expect(resolvePurchaseMessageKey("purchasePending", null, true)).toBeNull();
   });
 
   it("Proが有効になったら noRestorablePurchase を出さない", () => {
     expect(resolvePurchaseMessageKey("noRestorablePurchase", null, true)).toBeNull();
   });
 
-  it("Proが有効でないうちは purchaseNotApplied を出し続ける", () => {
-    expect(resolvePurchaseMessageKey("purchaseNotApplied", null, false)).toBe("purchaseNotApplied");
+  it("Proが有効でないうちは purchasePending を出し続ける", () => {
+    expect(resolvePurchaseMessageKey("purchasePending", null, false)).toBe("purchasePending");
   });
 
   it("Proが有効でないうちは noRestorablePurchase を出し続ける", () => {
@@ -42,7 +42,7 @@ describe("resolvePurchaseMessageKey", () => {
   it("Proが有効で古いメッセージを落とすときは購入できない理由へフォールバックする", () => {
     // Web版でProを持っているユーザーには「ストア版で購入できます」が残るが、
     // これはメッセージが未設定のときと同じ既存の振る舞い。
-    expect(resolvePurchaseMessageKey("purchaseNotApplied", "purchaseStoreOnly", true)).toBe("purchaseStoreOnly");
+    expect(resolvePurchaseMessageKey("purchasePending", "purchaseStoreOnly", true)).toBe("purchaseStoreOnly");
   });
 
   it("購入の失敗・商品の読み込み失敗はProの有無で消さない", () => {

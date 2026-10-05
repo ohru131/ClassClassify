@@ -31,7 +31,7 @@ mobile/
     solver.ts           共有ソルバーへの唯一の入口（../../src/solver を re-export）
     runner.ts           時間を区切って焼きなましを進めるランナー（Web Worker の代わり）
     project-store.tsx   名簿・設定・結果の状態と AsyncStorage への保存
-    revenuecat-provider.tsx / purchase-offering.ts / purchase-message.ts   課金（買い切りのみ）
+    pro-provider.tsx / play-billing.ts / purchase-message.ts   課金（Google Play Billing を expo-iap で直接。買い切りのみ）
     print-html.ts       印刷・PDF 用の結果の HTML（純関数・テストあり。利用者の入力は必ずエスケープ）
     print(.web).ts      ネイティブ: expo-print（printAsync / printToFileAsync → 共有）、Web: 新しいウィンドウで window.print()
     pro-preview.ts      Web 限定の Pro 表示プレビュー（?pro=preview。スクリーンショット用、ネイティブでは無効）
@@ -75,7 +75,7 @@ npm run check       # tsc --noEmit
 npx expo export --platform web   # Web で動作確認用に書き出す（課金は無効。?pro=preview で Pro の画面を確認できる）
 ```
 
-課金（react-native-purchases）と印刷（expo-print）はネイティブモジュールなので
+課金（expo-iap）と印刷（expo-print）はネイティブモジュールなので
 **Expo Go では動かない**。実機では開発ビルドを使う:
 
 ```bash
@@ -87,19 +87,13 @@ npx expo start --dev-client
 
 ## 環境変数
 
-`.env`（コミットしない）か EAS の環境変数（`eas env:create`）に設定する。
-
-| 変数 | 内容 | 未設定のとき |
-| --- | --- | --- |
-| `EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY` | RevenueCat の Android 公開 SDK キー（`goog_…`） | 購入・復元ボタンは「キーが設定されていません」と出す |
-| `EXPO_PUBLIC_REVENUECAT_IOS_API_KEY` | RevenueCat の iOS 公開 SDK キー（`appl_…`） | 同上 |
+ビルドに要る環境変数は無い（課金は Google Play Billing を直接使うので、外部サービスの SDK キーも要らない）。
 
 ## EAS ビルド
 
 1. `npx eas login` → `npx eas init`（`app.config.ts` に `extra.eas.projectId` が追加される）
-2. 上の環境変数を EAS に登録
-3. `npx eas build --profile production --platform android`（`autoIncrement` で versionCode を EAS が採番）
-4. `npx eas submit --platform android`、または AAB を Play Console に手動でアップロード
+2. `npx eas build --profile production --platform android`（`autoIncrement` で versionCode を EAS が採番）
+3. `npx eas submit --platform android`、または AAB を Play Console に手動でアップロード
 
 `eas.json` の `appVersionSource: "remote"` は、EAS 側のカウンタが未初期化だと versionCode 1 から始まる。
 既存の Play アプリへ上書きする場合は、先に `eas build:version:set` で合わせる。
@@ -114,7 +108,7 @@ npx expo prebuild -p android --no-install          # android/ を作り直す（
 cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 ```
 
-- **debug は `com.ohru131.mosaic.debug`（ホーム画面の名前は「FairClass dev」）の別アプリとして入る**（`plugins/withDebugPackageSuffix.js`）。Play 版と署名が違っても上書きにならないので、Play 版の名簿を消さずに試せる。引き換えに debug では課金を試せない（RevenueCat の商品はパッケージ名に紐づく）。
+- **debug は `com.ohru131.mosaic.debug`（ホーム画面の名前は「FairClass dev」）の別アプリとして入る**（`plugins/withDebugPackageSuffix.js`）。Play 版と署名が違っても上書きにならないので、Play 版の名簿を消さずに試せる。引き換えに debug では課金を試せない（Play の商品 `fairclass_pro` はパッケージ名に紐づくので、`.debug` は商品の無い別アプリになる）。購入まわりは upload key で署名した release ビルドか、テストトラックから入れたアプリで確かめる。
 - 実機の ABI だけビルドすれば速い: `./gradlew.bat installDebug -PreactNativeArchitectures=arm64-v8a`。
 - JS だけの変更なら debug APK の作り直しは要らない（dev-client が Metro から読む）。作り直すのは依存・`app.config.ts`・`plugins/` が変わったときだけ。
 - Metro は `npx expo start --dev-client --port 8082`（この開発機は 8081 を別プロセスが占有している）→ `adb reverse tcp:8081 tcp:8082` と `adb reverse tcp:8082 tcp:8082` → `adb shell am start -a android.intent.action.VIEW -d "'fairclass://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8082'" com.ohru131.mosaic.debug`。
@@ -125,25 +119,29 @@ cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 - **`react-native-gesture-handler` / `react-native-reanimated` / `react-native-worklets` は Expo SDK の推奨版を直接の依存に置く**（`npx expo install` で入れる）。直接の依存に無いと expo-router 経由で新しすぎる版が入り、gesture-handler 3.x では release の C++ 中間ファイルのパスが Windows の 260 文字上限を超えて `Filename longer than 260 characters` で落ちる（debug は中間フォルダ名が短いので通ってしまう）。worklets も expo-modules-core の対応範囲外になる。
 - **ネイティブの依存の版を変えたら、`node_modules/*/android/.cxx` と `node_modules/*/android/build` を消してからビルドする。** prebuild は `android/` しか作り直さないので、ライブラリ側に古い CMake のキャッシュが残り、`libworklets.so ... missing and no known rule to make it` のように消えた出力先を参照して落ちる。
 
-## RevenueCat の設定（買い切りのみ）
+## 課金（Google Play Billing）の設定
 
-1. Play Console で **一回限りの商品（定期購入ではない）** を作る（例: `fairclass_pro`）。iOS も出すなら App Store Connect で「非消費型」。
-2. RevenueCat でプロジェクト・アプリを作り、その商品を登録する。
-3. **Entitlement `pro`** を作り、商品を紐付ける（紐付け忘れると、支払っても Pro にならない。アプリはその場合「復元」とサポートへ案内する）。
-4. **RevenueCat のダッシュボードでその商品を Non-consumable（非消費型）に設定する（必須）。** Google Play の一回限りの商品を
-   consume するかどうかは RevenueCat の商品設定で決まり（SDK は RevenueCat が返す `should_consume` に従う）、既定は消費型。
-   設定しないと Pro が consume され、復元できず再購入できてしまう。**Lifetime パッケージに入れるだけでは非消費型にならない。**
-5. Offering（current）に **Lifetime パッケージ**としてその商品を入れる。
-6. 内部テストで購入 → 入れ直して「購入を復元」で Pro が戻ることを確かめる（`../docs/play-console/submission-checklist.md` 5節）。
+Pro は Google Play の**一回限りの商品 `fairclass_pro`**（非消費型として扱う）1本だけ。アプリは `expo-iap`（OpenIAP）で
+Google Play Billing を直接使い、外部の課金サービスは使わない。購入の状態は端末の Play ストアに問い合わせるだけで、アプリからどこにも送らない。
 
-アプリ側の不変条件（既存アプリ UnitCalc と同じ）:
+1. Play Console →「収益化」→「商品」→「一回限りの商品」で **`fairclass_pro`** を作る（定期購入ではない）。購入オプションは「購入（Buy）」1つ、**基準価格 US$5.99**。
+2. 国別価格は `../docs/play-console/pricing.csv` を `node ../scripts/push-play-pricing.mjs --commit` で反映（`../docs/play-console/pricing.md`）。
+3. 「設定」→「ライセンス テスト」に自分とテスターの Google アカウントを追加する（課金されずに購入を試せる）。
+4. 内部テストで購入 → 入れ直して「購入を復元」で Pro が戻ること、もう一度「購入」しようとすると「購入済み」になる（アプリは復元として扱う）ことを確かめる（`../docs/play-console/submission-checklist.md` 5節）。**debug ビルドでは試せない**（上の「ローカルビルド」）。
 
-- **サブスクリプションは絶対に売らない。** `lib/purchase-offering.ts` が `SUBSCRIPTION` と `subscriptionPeriod` を持つ商品を、lifetime 枠に入っていても弾く（`test/purchase-offering.test.ts`）。
-- **RevenueCatUI のペイウォールは使わない**（offering に残ったサブスクをそのまま売ってしまう）。買い切り商品が取れなければ購入させず理由を出す。
-- ユーザーのキャンセル（`userCancelled`）はエラーとして扱わない。
+consume するかどうかは Play Console ではなく**アプリのコードが決める**。アプリは `fairclass_pro` を決して consume しない（consume すると再び買える＝買い切りでなくなり、復元もできなくなる）。
+
+アプリ側の不変条件（`lib/pro-provider.tsx`・`lib/play-billing.ts`、判定は `test/play-billing.test.ts`）:
+
+- **サブスクリプションは絶対に売らない。** 取得・購入するのは `PRO_PRODUCT_ID`（`fairclass_pro`）の一回限りの商品（`type: 'in-app'`）だけ。
+- 起動時に `getAvailablePurchases()` で端末の Play ストアにある購入を読み、支払い済み（`purchased`）の `fairclass_pro` があれば Pro（`ownsPro`）。**保留中（`pending`。コンビニ払いなど）は支払いが済むまで Pro にしない**（`hasPendingPro`）。返金されて購入が消えていれば Pro を外す。
+- 購入は **consume せず acknowledge だけする**（`finishTransaction({ isConsumable: false })`）。購入の直後に加え、起動時・復元時にも未 acknowledge のもの（`unacknowledgedPro`）を済ませる（Play は3日以内に acknowledge されない購入を自動で払い戻す）。
+- 「購入を復元」は Play ストアの購入を読み直すだけ。購入時に「購入済み」（`already-owned`）が返ったら復元として扱う（`purchaseErrorKind`）。
+- 価格は Play が返すローカライズ済みの `displayPrice` をそのまま出す。商品が取れなければ購入させず理由を出す。
+- ユーザーのキャンセル（`user-cancelled`）はエラーとして扱わない。
 - 購入・復元は同期フラグ（`purchaseLockRef`）で直列化する（二重タップで二重に課金 API を叩かない）。
-- `purchasePackage()` の後に `pro` entitlement を確認できたときだけ「ありがとうございます」を出す。
-- SDK キー未設定・Web では購入・復元を受け付けず、理由を出す。
+- 支払い済みの購入を確認できたときだけ「ありがとうございます」を出す。
+- 課金は Android だけ。Web では購入・復元を受け付けず、理由（`purchaseStoreOnly`）を出す。
 - 審査員向けには Play のプロモコード（ライセンステスター）を使う（買い切りに無料トライアルは無い）。
 
 ## 印刷・PDF（Pro）
@@ -172,18 +170,18 @@ cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 
 - 名簿・設定・結果は AsyncStorage（端末内）にだけ保存し、端末の外へは送らない。「Pro・設定」から消去できる（書き出した Excel・PDF とファイル選択時のコピーもキャッシュから消す）。
 - **Android はアプリのバックアップを無効にしている**（`android.allowBackup: false`）。有効のままだと AsyncStorage の名簿が Google ドライブへの自動バックアップに含まれる。iOS は、利用者が管理する端末自体のバックアップ（iCloud・パソコン）に含まれうる（プライバシーポリシーにもそう書いてある）。
-- 外部へ送るのは **RevenueCat（購入検証のための端末生成の匿名 ID とレシート）だけ**。広告・解析 SDK は入れていない（`app/privacy.tsx`）。
+- **アプリからは何も外部へ送らない**。Pro の決済は Google Play が行い、購入の状態は端末の Play ストアに問い合わせるだけ（識別子・レシートをどこにも送らない）。広告・解析 SDK・外部の課金サービスは入れていない（`app/privacy.tsx`）。
 - ストアの掲載に使うプライバシーポリシーの URL は **https://ohru131.github.io/ClassClassify/privacy/**。この画面と同じ `lib/copy/privacy.ts` から Web 版のビルドで作る（`../privacy/index.html`・`../src/privacy/render.ts`）ので、**本文を変えたらアプリと公開ページの両方が変わる**（公開ページは main へのマージでデプロイされる）。
 
 ### Play Console のデータセーフティ（申告の目安）
 
 回答の全文と根拠のコードは `../docs/play-console/data-safety.md`。要点:
 
-- 「データの収集」: **購入履歴**（アプリの機能＝購入の確認のため、RevenueCat 経由）と、**アプリ情報と動作 > その他の ID**（RevenueCat の匿名のアプリユーザー ID）。どちらも「任意ではない（購入時）」「暗号化して送信」。
-- 名簿（生徒の名前・特性）は端末外へ送らないので「収集」に当たらない。「共有」（第三者への提供）は無し。Android の自動バックアップも無効（`allowBackup: false`）なので、名簿が Google のバックアップ経由で端末外へ出ることもない。
+- 「データの収集・共有」: **いいえ**（端末の外へ送るデータが無い）。決済と購入の記録は Google Play が扱い、アプリは端末の Play ストアから読むだけ。
+- 名簿（生徒の名前・特性）は端末外へ送らないので「収集」に当たらない。「共有」（第三者への提供）も無し。Android の自動バックアップも無効（`allowBackup: false`）なので、名簿が Google のバックアップ経由で端末外へ出ることもない。
 - 広告 ID は使わない（「広告 ID を使用しますか」→ いいえ）。広告は表示しない。
 - データ削除: アプリ内の「この端末の名簿と結果を消去」またはアンインストール。
-- 申告前に RevenueCat のドキュメント（データセーフティ／App Privacy の案内）で、SDK の収集項目が変わっていないか確認すること。
+- 申告前に、通信する SDK（解析・クラッシュ報告・外部の課金サービスなど）が `package.json` に増えていないか、リリース AAB の権限が想定どおりか確認すること（`data-safety.md` の「提出前の確認」）。
 
 ## 検証状況
 
@@ -198,7 +196,7 @@ cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 
 実機（moto g52j 5G・Android。debug ビルド＋ Metro と、upload key で署名した release APK）で確認済み:
 
-- 起動 → サンプル（80名・4組）の読み込み → 実行（標準10秒）→ 結果で人数差0・バランス完全・条件違反0。Pro 画面の表示（SDK キー未設定の案内）。
+- 起動 → サンプル（80名・4組）の読み込み → 実行（標準10秒）→ 結果で人数差0・バランス完全・条件違反0。Pro 画面の表示（課金を Google Play Billing に移す前のビルドで確認）。
 - **探索時間が実時間に対して大幅に延びていた**のを直した。24ms 計算するたびに UI へ返していたが、UI 側（進捗の再描画）の時間は探索時間に数えないため、「10秒」で実時間が約95秒かかっていた。`lib/runner.ts` が UI に返した時間を測り、計算が実時間の8割を占めるよう1回の計算時間を 24〜200ms で伸ばす。進捗は1%刻みに丸めて、値が変わらない再描画を省く。debug ビルドで約26秒、**release ビルドで約13秒**（10秒で76%・12秒で90%・14秒で結果画面。結果は人数差0・バランス完全・違反0）。
 - 英数字がセリフ体に見えるのは端末のシステムフォント設定（この端末は Roboto Slab）に従っているため。アプリはフォントを指定していない。
 
@@ -207,7 +205,7 @@ cd android && ./gradlew.bat installDebug --console=plain    # 初回は約15分
 - 240名規模で違反0に届くか（release の実時間は80名で確認済み）。
 - 結果画面の左右スワイプ（Android の横向き `FlatList` の `pagingEnabled` と、画面全体の縦スクロールとの振り分け）。
 - `expo-document-picker` で .xlsx が選べるか（端末によって MIME が違う。`application/octet-stream` も受け付けている）、共有シートから Excel・Google ドライブ・Gmail へ .xlsx が渡るか。
-- 購入・復元・Pro の反映（本番の RevenueCat 設定が必要）。
+- 購入・復元・acknowledge・Pro の反映（Play Console で `fairclass_pro` を有効にし、テストトラックから入れたアプリか upload key で署名した release ビルドで確かめる）。
 - `expo-print` の印刷画面・PDF の見た目（Android の WebView / iOS の WKWebView で組版がブラウザと違うことがある。日本語フォント、改ページ、背景色の印刷）。
 - Chromebook（タッチなし機を含む）・Android タブレットでの表示、フリーフォーム窓のリサイズ、物理キーボードでの Tab 移動・Enter 確定、戻るキー。
 - iOS 版（`supportsTablet` 含む）は一度もビルドしていない。

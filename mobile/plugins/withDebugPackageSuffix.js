@@ -11,8 +11,8 @@ const { withAppBuildGradle, withDangerousMod } = require("expo/config-plugins");
 // **android/ は .gitignore 済みの生成物なので、build.gradle を直に書き換えても
 // 次の prebuild で消える。** この設定を残すために config plugin にしてある。
 //
-// 引き換えに、デバッグ側では課金（RevenueCat）のテストができない。RevenueCat の
-// Android アプリはパッケージ名に紐づくので、".debug" は別アプリとして扱われる。
+// 引き換えに、デバッグ側では課金のテストができない。Play の商品（fairclass_pro）は
+// パッケージ名に紐づくので、".debug" は商品の無い別アプリとして扱われる。
 // 購入まわりを実機で確かめるときは release ビルド（applicationId はそのまま）を使う。
 
 const marker = "// fairclass: debug builds install alongside the Play build";

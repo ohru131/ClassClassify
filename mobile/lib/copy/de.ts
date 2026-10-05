@@ -219,12 +219,10 @@ export const DE_COPY: Record<CopyKey, string> = {
   clearBody: 'Die Liste, die Einteilung und die gespeicherten Einteilungen auf diesem Gerät werden gelöscht. Das lässt sich nicht rückgängig machen.',
   footer: 'FairClass · Hilfe bei der Klasseneinteilung (kostenlose Webversion: https://ohru131.github.io/ClassClassify/)',
 
-  purchaseStoreOnly: 'Käufe sind in der iOS- oder Android-App möglich.',
-  revenueCatKeyMissing: 'Der Kauf ist gerade noch nicht möglich. Bitte versuchen Sie es später erneut.',
-  customerInfoFetchFailed: 'Kaufinformationen konnten nicht geladen werden. Bitte später erneut versuchen.',
+  purchaseStoreOnly: 'Käufe sind in der Android-App (Google Play) möglich.',
+  purchaseStatusFailed: 'Kaufinformationen konnten nicht geladen werden. Bitte später erneut versuchen.',
   purchaseSucceeded: 'Vielen Dank! Pro ist jetzt freigeschaltet. Es ist ein Einmalkauf, weitere Kosten fallen nicht an.',
-  purchaseNotApplied:
-    'Die Zahlung war erfolgreich, Pro ist aber noch nicht aktiv. Tippen Sie auf „Kauf wiederherstellen“. Falls es weiterhin nicht klappt, wenden Sie sich an den Support – Ihnen wird nichts doppelt berechnet.',
+  purchasePending: 'Die Zahlung ist noch nicht abgeschlossen. Pro wird automatisch freigeschaltet, sobald sie eingegangen ist (bei manchen Zahlungsarten dauert das etwas).',
   purchaseFailed: 'Der Kauf konnte nicht abgeschlossen werden. Bitte erneut versuchen.',
   productLoadFailed: 'Pro konnte nicht aus dem Store geladen werden. Bitte prüfen Sie die Internetverbindung und versuchen Sie es erneut.',
   proRestored: 'Ihr Pro-Kauf wurde wiederhergestellt.',

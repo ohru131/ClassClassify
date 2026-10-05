@@ -219,12 +219,10 @@ export const EN_COPY = {
   clearBody: 'This deletes the roster, results and saved placements on this device. It cannot be undone.',
   footer: 'FairClass · class placement helper (free web version: https://ohru131.github.io/ClassClassify/)',
 
-  purchaseStoreOnly: 'Purchases are available in the iOS or Android app.',
-  revenueCatKeyMissing: 'Purchases aren’t ready yet. Please try again later.',
-  customerInfoFetchFailed: 'Could not load your purchase information. Please try again later.',
+  purchaseStoreOnly: 'Purchases are available in the Android app (Google Play).',
+  purchaseStatusFailed: 'Could not load your purchase information. Please try again later.',
   purchaseSucceeded: 'Thank you! Pro is now unlocked. It is a one-time purchase, so there are no further charges.',
-  purchaseNotApplied:
-    'Your payment went through, but Pro is not active yet. Tap "Restore purchase". If it still does not activate, please contact support — you will not be charged twice.',
+  purchasePending: 'Waiting for your payment to complete. Pro will turn on automatically once it goes through (some payment methods take a while).',
   purchaseFailed: 'The purchase could not be completed. Please try again.',
   productLoadFailed: 'Could not load Pro from the store. Check your connection and try again.',
   proRestored: 'Your Pro purchase has been restored.',

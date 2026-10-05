@@ -5,7 +5,7 @@ import type { WorkBook } from 'xlsx-js-style'
 import { useI18n } from './language-provider'
 import { printHtml, savePdf, sharePdf } from './print'
 import { useProject } from './project-store'
-import { usePro } from './revenuecat-provider'
+import { usePro } from './pro-provider'
 import { canSaveToFile, saveXlsx, shareXlsx } from './xlsx-files'
 
 const today = () => {

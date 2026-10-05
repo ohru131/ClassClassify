@@ -8,7 +8,7 @@ import { confirmAction } from '@/lib/confirm'
 import { APP_LANGUAGES, LANGUAGE_META } from '@/lib/i18n'
 import { useI18n } from '@/lib/language-provider'
 import { useProject } from '@/lib/project-store'
-import { usePro } from '@/lib/revenuecat-provider'
+import { usePro } from '@/lib/pro-provider'
 import { FREE_SAVE_LIMIT } from '@/lib/saved-results'
 import { useSavedResults } from '@/lib/saved-results-store'
 
