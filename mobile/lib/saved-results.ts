@@ -23,9 +23,20 @@ export interface SavedResult {
 export interface ExportedFrom {
   /** 書き出したときのファイル名（保存先の画面で名前を変えていれば、実際の名前とは違う） */
   fileName: string
+  /** 名簿と組分けの中身の指紋（同じ中身を書き出し直しても、もう1件残さないため） */
+  fingerprint: string
 }
 
-const isExportedFrom = (v: unknown): v is ExportedFrom => isObj(v) && typeof v.fileName === 'string'
+const isExportedFrom = (v: unknown): v is ExportedFrom => isObj(v) && typeof v.fileName === 'string' && typeof v.fingerprint === 'string'
+
+/** 名簿（読み込み時の警告を除く）と組分けの中身の指紋（FNV-1a 32bit の16進） */
+export function resultFingerprint(p: Problem, classOf: number[], k: number): string {
+  const { students, columns, wantedGroups, unwantedGroups, maxPerClass } = p
+  const text = JSON.stringify([students, columns, wantedGroups, unwantedGroups, maxPerClass, classOf, k])
+  let h = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193)
+  return `${(h >>> 0).toString(16)}:${text.length}`
+}
 
 /** 一覧に出す分だけ（本体を全部読まずに一覧を出すため、別のキーにまとめて置く） */
 export interface SavedMeta {

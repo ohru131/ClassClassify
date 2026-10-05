@@ -12,7 +12,7 @@ import { pairStatus, resultWorkbook, rowColor, violationText, type ColumnReport,
 import { clampPage, offsetForPage, pageFromOffset, pageLayout, resolvePagerScroll, stepPage } from '@/lib/class-pager'
 import { canSharePdf } from '@/lib/print'
 import { buildResultPrintHtml } from '@/lib/print-html'
-import { canSaveMore, countedSaves, defaultSaveName, FREE_SAVE_LIMIT } from '@/lib/saved-results'
+import { canSaveMore, countedSaves, defaultSaveName, FREE_SAVE_LIMIT, resultFingerprint } from '@/lib/saved-results'
 import { useSavedResults } from '@/lib/saved-results-store'
 import { useProExport } from '@/lib/use-pro-export'
 
@@ -37,9 +37,13 @@ export default function ResultsScreen() {
   // 無料版の保存件数の上限に達したときの案内
   const [limitHit, setLimitHit] = useState(false)
   const saved = useSavedResults()
-  // Excel に書き出したら、その時点の編成を「保存した編成」にも残す（同じ編成を何度書き出しても1件だけ）
-  const exportKeptRef = useRef<{ problem: Problem; classOf: number[] } | null>(null)
+  // Excel に書き出したら、その時点の編成を「保存した編成」にも残す（同じ中身を何度書き出しても1件だけ）
   const [exportKept, setExportKept] = useState(false)
+  // 表示中の名簿と組分け（書き出しの保存が済んだときに、まだ同じ結果を見ているか確かめる）
+  const shownRef = useRef<{ problem: Problem | null; classOf: number[] | undefined }>({ problem: null, classOf: undefined })
+  shownRef.current = { problem, classOf: solution?.classOf }
+  // 保存中の指紋（一覧に載る前に同じ中身をもう一度書き出しても、2件にしない）
+  const keepingRef = useRef(new Set<string>())
   // 編成し直した・生徒を移したら、表示中の結果はもう保存済みのものではない。
   // 「〜として保存しました」を残すと、新しい結果まで保存済みに見える
   useEffect(() => {
@@ -89,16 +93,21 @@ export default function ResultsScreen() {
   const buildXlsx = () => resultWorkbook(problem, solution.classOf, k, report, fileLang)
   // 書き出した時点の名簿と組分け（タップした時点の値。書き出しの間に生徒を移しても、書き出した中身と同じものを残す）
   const keepExported = (p: Problem, classOf: number[]) => (exportedFile: string) => {
-    const last = exportKeptRef.current
-    if (!saved.loaded || (last && last.problem === p && last.classOf === classOf)) return
-    exportKeptRef.current = { problem: p, classOf }
+    if (!saved.loaded) return
+    const shown = () => shownRef.current.problem === p && shownRef.current.classOf === classOf
+    const fingerprint = resultFingerprint(p, classOf, k)
+    if (keepingRef.current.has(fingerprint) || saved.list.some((m) => m.exported?.fingerprint === fingerprint)) {
+      if (shown()) setExportKept(true)
+      return
+    }
+    keepingRef.current.add(fingerprint)
     saved
-      .save(defaultSaveName(i18n.lang, new Date(), fileName), p, classOf, k, { fileName: exportedFile })
-      .then(() => setExportKept(true))
-      .catch(() => {
-        exportKeptRef.current = null
-        setError(t('saveFailed'))
+      .save(defaultSaveName(i18n.lang, new Date(), fileName), p, classOf, k, { fileName: exportedFile, fingerprint })
+      .then(() => {
+        if (shown()) setExportKept(true)
       })
+      .catch(() => setError(t('saveFailed')))
+      .finally(() => keepingRef.current.delete(fingerprint))
   }
   const printHtmlFor = () => buildResultPrintHtml({ problem, classOf: solution.classOf, k, report, createdAt: new Date(), i18n })
 

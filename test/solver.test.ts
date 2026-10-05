@@ -289,3 +289,45 @@ describe('結果の Excel の読み込み', () => {
     expect(r2.problem.warnings).toEqual([])
   })
 })
+
+describe('結果の Excel の組の名前の書き換え', () => {
+  it('番号が同じなら同じ組、番号が大きすぎる・無いときは並び順、同じ NO は出てきた順に照らす', async () => {
+    const { parseResultWorkbook } = await import('../src/solver/parse')
+    const { resultWorkbook } = await import('../src/solver/export')
+    const X = (await import('xlsx-js-style')).default
+    const buf = (wb: import('xlsx-js-style').WorkBook) => X.write(wb, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
+    const p = load('sample1.xlsx')
+    const k = 4
+    const classOf = p.students.map((_, i) => i % k)
+    const make = () => resultWorkbook(p, classOf, k, evaluate(p, classOf, k))
+
+    // 「3」「Class 3」「1年3組」はどれも 3組。ほかの生徒はずれない
+    const wb = make()
+    wb.Sheets['組分け']['C2'] = { t: 's', v: '3' }
+    wb.Sheets['組分け']['C3'] = { t: 's', v: 'Class 3' }
+    wb.Sheets['組分け']['C4'] = { t: 's', v: '1年3組' }
+    const r = parseResultWorkbook(buf(wb)).result!
+    expect(r.k).toBe(k)
+    expect(r.classOf.slice(0, 3)).toEqual([2, 2, 2])
+    expect(r.classOf.slice(3)).toEqual(classOf.slice(3))
+
+    // 生徒数より大きい番号があれば並び順（組数が生徒数を超えない）
+    const big = make()
+    big.Sheets['組分け']['C2'] = { t: 's', v: '2026年1組' }
+    const rb = parseResultWorkbook(buf(big)).result!
+    expect(rb.k).toBeLessThanOrEqual(p.students.length)
+    expect(Math.max(...rb.classOf)).toBeLessThan(rb.k)
+  })
+
+  it('同じ NO の生徒は名簿と組分けで出てきた順に照らす', async () => {
+    const { parseResultWorkbook } = await import('../src/solver/parse')
+    const { resultWorkbook } = await import('../src/solver/export')
+    const X = (await import('xlsx-js-style')).default
+    const base = load('sample1.xlsx')
+    const p = { ...base, students: base.students.map((s, i) => (i === 1 ? { ...s, no: base.students[0].no } : s)) }
+    const k = 3
+    const classOf = p.students.map((_, i) => i % k)
+    const r = parseResultWorkbook(X.write(resultWorkbook(p, classOf, k, evaluate(p, classOf, k)), { bookType: 'xlsx', type: 'array' }) as ArrayBuffer).result!
+    expect(r.classOf).toEqual(classOf)
+  })
+})
