@@ -60,6 +60,8 @@ const config: ExpoConfig = {
     './plugins/withDebugPackageSuffix',
     // credentials.json があれば release を upload key で署名する（無ければ何もしない）
     './plugins/withLocalReleaseSigning',
+    // release の R8 で最適化まで行う（既定の proguard-android.txt は -dontoptimize）
+    './plugins/withR8Optimize',
     'expo-router',
     'expo-localization',
     'expo-sharing',
