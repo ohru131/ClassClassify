@@ -9,7 +9,7 @@ const config: ExpoConfig = {
   name: 'FairClass',
   // EAS のプロジェクトと一致している必要があるので旧名のまま（利用者には見えない）
   slug: 'mosaic-class-classify',
-  version: '1.5.0',
+  version: '1.5.1',
   // 学校のタブレット・Chromebook では横向き・分割画面で使うので、向きを固定しない。
   orientation: 'default',
   icon: './assets/icon.png',
@@ -26,7 +26,7 @@ const config: ExpoConfig = {
     // plugins/withLocalReleaseSigning.js が release を本番鍵で署名するので、ローカルでも
     // Play に出せる AAB が作れる。Play は同じ versionCode の AAB を二度受け付けないので、
     // リリースのたびに Play で未使用の値へ上げる（EAS の autoIncrement とは別系統）。
-    versionCode: 6,
+    versionCode: 7,
     adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#6366F1' },
     // 追加の権限は宣言しない（通知・カメラ・マイク等は使わない）。
     // ネイティブ依存（課金 = expo-iap の Play Billing）が持つ BILLING 権限はマニフェストのマージで自動的に入る。
@@ -60,13 +60,26 @@ const config: ExpoConfig = {
     './plugins/withDebugPackageSuffix',
     // credentials.json があれば release を upload key で署名する（無ければ何もしない）
     './plugins/withLocalReleaseSigning',
+    // release の R8 で最適化まで行う（既定の proguard-android.txt は -dontoptimize）
+    './plugins/withR8Optimize',
     'expo-router',
     'expo-localization',
     'expo-sharing',
     'expo-document-picker',
     // 課金（Google Play Billing を直接使う。買い切り1本）
     'expo-iap',
-    ['expo-build-properties', { android: { minSdkVersion: 24 } }],
+    [
+      'expo-build-properties',
+      {
+        android: {
+          minSdkVersion: 24,
+          // release を R8 で縮小・難読化する。無効だと Play Console の「DEX コードの最適化」が
+          // しきい値（25%）を下回り、露出に影響すると警告される（期限 2027年2月）。
+          enableMinifyInReleaseBuilds: true,
+          enableShrinkResourcesInReleaseBuilds: true,
+        },
+      },
+    ],
   ],
   experiments: {
     typedRoutes: false,

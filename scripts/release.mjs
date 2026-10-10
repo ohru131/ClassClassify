@@ -278,6 +278,21 @@ function readAab(path) {
     versionCode: Number(attrs.versionCode),
     versionName: attrs.versionName ?? null,
     permissions: permissions.sort(),
+    r8: readR8Stats(buf),
+  };
+}
+
+// R8 を通った AAB は BUNDLE-METADATA/com.android.tools/r8.json に「難読化・最適化・縮小されなかった
+// コードの割合」を残す。Play Console の「DEX コードの最適化」もカテゴリごとの割合で、25% を下回ると警告する。
+// R8 を通っていなければ null。
+function readR8Stats(buf) {
+  const raw = readZipEntry(buf, "BUNDLE-METADATA/com.android.tools/r8.json");
+  if (!raw) return null;
+  const { stats } = JSON.parse(raw.toString("utf8"));
+  return {
+    obfuscation: 100 - stats.noObfuscationPercentage,
+    optimization: 100 - stats.noOptimizationPercentage,
+    shrinking: 100 - stats.noShrinkingPercentage,
   };
 }
 
@@ -497,6 +512,16 @@ async function commandCheck(args, { quiet = false } = {}) {
     const newest = newestSourceMtime();
     if (newest.mtime > aab.mtime.getTime()) fail(`AAB よりソースの方が新しい（${newest.path?.replace(ROOT, ".")}）。ビルドし直す`);
     else ok("AAB はいまのソースより新しい");
+    // 25% を下回るカテゴリがあると Play Console が「DEX コードの最適化がしきい値を下回っています」と警告する
+    if (!aab.r8) {
+      fail("AAB が R8 を通っていない（android/gradle.properties の android.enableMinifyInReleaseBuilds。app.config.ts にあるなら prebuild し直す）");
+    } else {
+      const labels = { obfuscation: "難読化", optimization: "最適化", shrinking: "縮小" };
+      const summary = Object.entries(labels).map(([k, l]) => `${l} ${aab.r8[k].toFixed(0)}%`).join(" / ");
+      const low = Object.keys(labels).filter((k) => aab.r8[k] < 25);
+      if (low.length) fail(`R8 ${summary}。${low.map((k) => labels[k]).join("・")}が Play のしきい値 25% を下回る（最適化 0% なら plugins/withR8Optimize.js が効いていない）`);
+      else ok(`R8 ${summary}`);
+    }
     ok(`sha1 ${aab.sha1}`);
     ok(`権限 ${aab.permissions.length} 個: ${aab.permissions.map((p) => p.replace("android.permission.", "")).join(", ")}`);
   }

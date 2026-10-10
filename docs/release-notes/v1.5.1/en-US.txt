@@ -1,0 +1,1 @@
+- Optimized the app internally to reduce the download size (no changes to features).
