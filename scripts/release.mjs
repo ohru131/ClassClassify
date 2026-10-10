@@ -278,6 +278,8 @@ function readAab(path) {
     versionCode: Number(attrs.versionCode),
     versionName: attrs.versionName ?? null,
     permissions: permissions.sort(),
+    // R8 を通った AAB だけが難読化の対応表を同梱する（Play はこれでクラッシュのスタックを読み戻す）
+    minified: readZipEntry(buf, "BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map") !== null,
   };
 }
 
@@ -497,6 +499,9 @@ async function commandCheck(args, { quiet = false } = {}) {
     const newest = newestSourceMtime();
     if (newest.mtime > aab.mtime.getTime()) fail(`AAB よりソースの方が新しい（${newest.path?.replace(ROOT, ".")}）。ビルドし直す`);
     else ok("AAB はいまのソースより新しい");
+    // R8 無しだと Play Console の「DEX コードの最適化がしきい値を下回っています」に戻る
+    if (!aab.minified) fail("AAB が R8 を通っていない（app.config.ts の expo-build-properties の enableMinifyInReleaseBuilds）");
+    else ok("AAB は R8 で縮小・難読化済み（対応表を同梱）");
     ok(`sha1 ${aab.sha1}`);
     ok(`権限 ${aab.permissions.length} 個: ${aab.permissions.map((p) => p.replace("android.permission.", "")).join(", ")}`);
   }

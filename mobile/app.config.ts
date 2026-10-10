@@ -66,7 +66,18 @@ const config: ExpoConfig = {
     'expo-document-picker',
     // 課金（Google Play Billing を直接使う。買い切り1本）
     'expo-iap',
-    ['expo-build-properties', { android: { minSdkVersion: 24 } }],
+    [
+      'expo-build-properties',
+      {
+        android: {
+          minSdkVersion: 24,
+          // release を R8 で縮小・難読化する。無効だと Play Console の「DEX コードの最適化」が
+          // しきい値（25%）を下回り、露出に影響すると警告される（期限 2027年2月）。
+          enableMinifyInReleaseBuilds: true,
+          enableShrinkResourcesInReleaseBuilds: true,
+        },
+      },
+    ],
   ],
   experiments: {
     typedRoutes: false,
