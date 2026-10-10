@@ -5,11 +5,9 @@ import type { AppLanguage } from './languages'
 export type PrivacySection = { title: string; body: string[] }
 
 const GOOGLE_PRIVACY = 'https://policies.google.com/privacy'
-const ISSUES_URL = 'https://github.com/ohru131/ClassClassify/issues'
-const DEVELOPER = 'Katahimo'
 
 /** 最終更新日（本文を変えたら更新する）。Web で公開しているページ（privacy/index.html）にも出す */
-export const PRIVACY_UPDATED = '2026-10-05'
+export const PRIVACY_UPDATED = '2026-10-11'
 
 /**
  * 公開ページ（https://ohru131.github.io/ClassClassify/privacy/）の冒頭に出す「このポリシーの対象」。
@@ -55,10 +53,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `Google のプライバシーポリシー: ${GOOGLE_PRIVACY}`,
       ],
     },
-    {
-      title: '開発者・お問い合わせ',
-      body: [`開発者: ${DEVELOPER}`, `このポリシーやデータの扱いについてのお問い合わせは、GitHub の Issues へお寄せください: ${ISSUES_URL}`],
-    },
   ],
   en: [
     {
@@ -79,10 +73,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         'Whether you own Pro is checked by asking the Play Store on your device. The app itself sends nothing to the developer’s servers or anywhere else, including purchase information or identifiers. It never sends your name, email address or any roster data, and sends nothing for advertising, analytics or any other purpose.',
         `Google privacy policy: ${GOOGLE_PRIVACY}`,
       ],
-    },
-    {
-      title: 'Developer and contact',
-      body: [`Developer: ${DEVELOPER}`, `For questions about this policy or how data is handled, please open an issue on GitHub: ${ISSUES_URL}`],
     },
   ],
   ko: [
@@ -105,10 +95,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `Google 개인정보처리방침: ${GOOGLE_PRIVACY}`,
       ],
     },
-    {
-      title: '개발자 및 문의',
-      body: [`개발자: ${DEVELOPER}`, `이 방침이나 데이터 처리에 대한 문의는 GitHub Issues로 보내 주십시오: ${ISSUES_URL}`],
-    },
   ],
   es: [
     {
@@ -129,10 +115,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         'Para saber si ya tienes Pro, la app lo consulta a Play Store en tu dispositivo. La app en sí no envía nada a los servidores del desarrollador ni a ningún otro lugar, tampoco datos de compra ni identificadores. Nunca envía tu nombre, tu correo ni los datos de la lista, ni envía información con fines de publicidad, análisis u otros.',
         `Política de privacidad de Google: ${GOOGLE_PRIVACY}`,
       ],
-    },
-    {
-      title: 'Desarrollador y contacto',
-      body: [`Desarrollador: ${DEVELOPER}`, `Para consultas sobre esta política o el tratamiento de los datos, abre una incidencia en GitHub: ${ISSUES_URL}`],
     },
   ],
   de: [
@@ -155,10 +137,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         `Datenschutzerklärung von Google: ${GOOGLE_PRIVACY}`,
       ],
     },
-    {
-      title: 'Entwickler und Kontakt',
-      body: [`Entwickler: ${DEVELOPER}`, `Fragen zu dieser Erklärung oder zum Umgang mit Daten richten Sie bitte als Issue auf GitHub an uns: ${ISSUES_URL}`],
-    },
   ],
   'pt-BR': [
     {
@@ -179,10 +157,6 @@ export const PRIVACY: Record<AppLanguage, PrivacySection[]> = {
         'Para saber se você já tem o Pro, o app consulta a Play Store do seu aparelho. O próprio app não envia nada aos servidores do desenvolvedor nem a qualquer outro lugar, nem mesmo dados de compra ou identificadores. Ele nunca envia seu nome, e-mail ou dados da lista, nem envia informações para publicidade, análise ou qualquer outro fim.',
         `Política de privacidade do Google: ${GOOGLE_PRIVACY}`,
       ],
-    },
-    {
-      title: 'Desenvolvedor e contato',
-      body: [`Desenvolvedor: ${DEVELOPER}`, `Para dúvidas sobre esta política ou o tratamento de dados, abra uma issue no GitHub: ${ISSUES_URL}`],
     },
   ],
 }
